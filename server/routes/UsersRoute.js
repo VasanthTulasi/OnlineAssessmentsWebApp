@@ -3,9 +3,9 @@ const UsersModel = require("../Models/UsersModel");
 const bcrypt = require("bcrypt");
 const Users = require("../Models/UsersModel");
 const jwt = require("jsonwebtoken");
-const sendEmail = require("../services/EmailService");
-// const cookieParser = require('cookie-parser');
+const sendMail = require("../services/EmailService");
 
+// const cookieParser = require('cookie-parser');
 // router.use(cookieParser());
 
 const checkToken = (req, res, next) => {
@@ -34,23 +34,6 @@ const checkToken = (req, res, next) => {
 //   console.log("get user hit");
 //   res.json(req.user);
 // });
-
-router.post("/approveUser", (req, res) => {
-  const user = req.body;
-  const password = user.password;
-  bcrypt
-    .hash(password, 10)
-    .then((hash) => {
-      user.password = hash;
-      const approveUser = new UsersModel(user);
-      approveUser.save().then(() => {
-        res.status(200).json({ message: "User Successfully Approved" });
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-});
 
 router.post("/login", (req, res) => {
   const user = req.body;
@@ -110,7 +93,7 @@ router.post("/forgotPassword", async (req, res) => {
       "thisisthepasswordresetsecretcode",
       { expiresIn: "10m" },
       (err, token) => {
-        sendEmail(userEmail, token)
+        sendMail.passwordResetMail(userEmail, token)
           .then(
             UsersModel.updateOne(
               { email: userEmail },

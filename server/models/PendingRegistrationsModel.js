@@ -2,15 +2,15 @@ const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema(
   {
-    user_type: {
+    first_name: {
       type: String,
       required: true,
     },
-    uni_id: {
-      type: Number,
-      required: false,
+    last_name: {
+      type: String,
+      required: true,
     },
-    uni_email: {
+    email: {
       type: String,
       required: true,
     },
@@ -18,6 +18,14 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    role: {
+      type: String,
+      required: true,
+    },
+    uni_id: {
+      type: String,
+      required: false,
+    }
   },
   { collection: "PendingRegistrations", versionKey: false }
 );

@@ -1,38 +1,34 @@
 const router = require("express").Router();
 const PendingRegistrationsModel = require("../Models/PendingRegistrationsModel");
-const bcrypt = require("bcrypt");
+const UsersModel = require("../Models/UsersModel");
 
-// router.route("/getSuperHeroes").get((req, res) => {
-//     RegistrationPendingModel.find()
-//     .then(supheroes => res.json(supheroes))
-//     .catch(err => res.status(400).json(err));
-// })
-
-router.route("/newUser").post((req, res) => {
-  const body = req.body;
-  //Hasing password
-  const userPassword = body.password;
-  bcrypt
-    .hash(userPassword, 10)
-    .then((hash) => {
-      body.password = hash;
-      const newUser = new PendingRegistrationsModel(body);
-      newUser.save().then((result) => {
-        res
-          .status(200)
-          .json({ "Data Added Successfully": "Added successfully" });
-      });
-    })
-    .catch((err) => {
-      console.log(err);
+router.route("/").post(async (req, res) => {
+  // console.log("Request received");
+  const user = req.body;
+  // console.log("User enetered email: " + user.email);
+  const alreadyRegistered = await UsersModel.findOne({ email: user.email });
+  if (alreadyRegistered) {
+    res.json({ "message": "already registered" });
+  } else {
+    const alreadyPendingApproval = await PendingRegistrationsModel.findOne({
+      email: user.email
     });
+    if (alreadyPendingApproval) {
+      res.json({ "message": "already pending approval" });
+    } else {
+      const userData = new PendingRegistrationsModel(user);
+      userData.save().then(() => {
+        res.status(200).json({ "message": "success" });
+      });
+    }
+  }
 });
 
-// router.route("/deleteSuperHero").get((req, res) => {
-//     RegistrationPendingModel.deleteMany({"name": "fass"})
-//     .then(result => res.status(200).json({'Deleted Successfully': ''}))
-//     // .catch(err => res.status(400).json(err));
-// })
 
+router.get("/pendingusers",async (req,res) =>{
+  const users = await PendingRegistrationsModel.find();
+  if(users)
+  res.send(users);
+})
 
 module.exports = router;

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="visual" viewBox="0 0 900 900" width="900" height="900" version="1.1">
+  <rect x="0" y="0" width="900" height="900" fill="#ffffff"></rect>
+  <defs>
+    <linearGradient id="grad1_0" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="30%" stop-color="#ffffff" stop-opacity="1"></stop>
+      <stop offset="70%" stop-color="#ffffff" stop-opacity="1"></stop>
+    </linearGradient>
+  </defs>
+  <defs>
+    <linearGradient id="grad2_0" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="30%" stop-color="#ffffff" stop-opacity="1"></stop>
+      <stop offset="70%" stop-color="#ffffff" stop-opacity="1"></stop>
+    </linearGradient>
+  </defs>
+  <g transform="translate(900, 0)">
+    <path d="M0 190.9C-39.9 189.7 -79.8 188.5 -95.5 165.3C-111.1 142.2 -102.5 97.2 -114.3 66C-126.2 34.8 -158.5 17.4 -190.9 0L0 0Z" fill="#61dafb"></path>
+  </g>
+  <g transform="translate(0, 900)">
+    <path d="M0 -190.9C32.6 -184.9 65.2 -178.8 94.5 -163.7C123.8 -148.5 149.8 -124.3 165.3 -95.5C180.9 -66.7 185.9 -33.3 190.9 0L0 0Z" fill="#61dafb"></path>
+  </g>
+</svg>

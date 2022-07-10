@@ -24,7 +24,11 @@ const schema = new mongoose.Schema(
     },
     uni_id: {
       type: String,
-      required: false,
+      required: true,
+    },
+    activationToken: {
+      type: String,
+      required: false
     }
   },
   { collection: "PendingRegistrations", versionKey: false }

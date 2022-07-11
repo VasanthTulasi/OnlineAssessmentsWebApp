@@ -40,7 +40,8 @@ function Login() {
           password: loginPassword,
         })
         .then((res) => {
-          if (res.data.message !== "Success") console.log("Login Failed");
+          if (res.data.message !== "Success")
+            alert("Invalid User Name or Password!");
           else {
             setIsUserLoggedIn(true);
             setLoggedInUserDetails({
@@ -48,7 +49,7 @@ function Login() {
               first_name: res.data.user_data.first_name,
               last_name: res.data.user_data.last_name,
               role: res.data.user_data.role,
-              uni_id: res.data.user_data.uni_id
+              uni_id: res.data.user_data.uni_id,
             });
             // axios.get("/getUser").then(res=> console.log(res.data));
           }

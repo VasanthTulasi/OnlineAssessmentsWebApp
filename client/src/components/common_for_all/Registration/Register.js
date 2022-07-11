@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
 import styled from "styled-components";
-import LoginRightBGImage from "../../svgs/right_background.svg";
-import { useState, useEffect } from "react";
+import LoginRightBGImage from "../../../svgs/right_background.svg";
+import { useState} from "react";
 import Axios from "axios";
-import { LandingContext } from "../../contexts/LandingContext";
+import { LandingContext } from "../../../contexts/LandingContext";
 
 function Register() {
   const { setCurrentSection } = useContext(LandingContext);

@@ -1,7 +1,7 @@
 import React,{useContext} from "react";
 import styled from "styled-components";
-import LoginRightBGImage from "../../svgs/right_background.svg";
-import { LandingContext } from "../../contexts/LandingContext";
+import LoginRightBGImage from "../../../svgs/right_background.svg";
+import { LandingContext } from "../../../contexts/LandingContext";
 
 function RegistrationRequested() {
     const { setCurrentSection } = useContext(LandingContext);

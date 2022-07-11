@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 import Instructions from "./Instructions";
-import Login from "./Login";
 import styled from "styled-components";
-import Register from "./Register";
-import RegistrationRequested from "./RegistrationRequested";
-import { LandingContext } from "../../contexts/LandingContext";
 import { useParams } from "react-router-dom";
 import LoginRightBGImage from "../../svgs/right_background.svg";
 import Axios from "axios";

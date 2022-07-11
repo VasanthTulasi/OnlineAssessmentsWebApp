@@ -1,11 +1,9 @@
 import React from "react";
-import styled from "styled-components";
-// import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import {Route, Routes } from "react-router-dom";
 import Modules from "./Modules";
 import Exams from "./Exams";
 import Results from "./Results";
-import Profile from "../common_for_prof_and_stu/Profile";
+import Profile from "../common_for_all/MyProfile/MyProfile";
 import NavBar from '../common_for_all/Navbar'
 
 function Body() {

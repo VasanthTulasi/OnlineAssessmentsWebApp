@@ -13,7 +13,7 @@ router.route("/").post(async (req, res) => {
     res.json({ message: "already registered" });
   } else {
     const alreadyPendingApproval = await PendingRegistrationsModel.findOne({
-      email: user.email,
+      email: user.email
     });
     if (alreadyPendingApproval) {
       res.json({ message: "already pending approval" });

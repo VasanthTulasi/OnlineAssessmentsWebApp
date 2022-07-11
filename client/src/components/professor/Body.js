@@ -5,7 +5,7 @@ import {Route, Routes } from "react-router-dom";
 import Modules from "./Modules";
 import Exams from "./Exams";
 import Results from "./Results";
-import MyProfile from "../common_for_prof_and_stu/Profile";
+import MyProfile from "../common_for_all/MyProfile/MyProfile";
 import NavBar from '../common_for_all/Navbar'
 
 function Body() {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ProfileData from "../common_for_all/ProfileData";
+import ProfileData from "../common_for_all/MyProfile/ProfileData";
 import BodyImage from "../../svgs/body_background.svg";
 import styled from "styled-components";
 import { useLinkClickHandler, useNavigate } from "react-router-dom";

@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Instructions from "./Instructions";
 import Login from "./Login";
 import styled from "styled-components";
-import Register from "./Register";
-import RegistrationRequested from "./RegistrationRequested";
+import Register from "./Registration/Register";
+import RegistrationRequested from "./Registration/RegistrationRequested";
 import ForgotPassword from "./ForgotPassword";
 import { LandingContext } from "../../contexts/LandingContext";
 

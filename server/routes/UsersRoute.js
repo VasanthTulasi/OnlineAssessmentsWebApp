@@ -39,7 +39,7 @@ router.post("/login", (req, res) => {
   const user = req.body;
   Users.findOne({ email: user.email }).then((userInDB) => {
     if (!userInDB) {
-      res.json({ message: "Invalid User Name or Password from find one" });
+      res.json({ message: "Invalid User Name or Password!" });
     } else {
       bcrypt.compare(user.password, userInDB.password).then((valid) => {
         if (valid) {
@@ -68,7 +68,7 @@ router.post("/login", (req, res) => {
             }
           );
         } else {
-          res.json({ message: "Invalid User Name or Password" });
+          res.json({ message: "Invalid User Name or Password!" });
         }
       });
     }
@@ -93,7 +93,8 @@ router.post("/forgotPassword", async (req, res) => {
       "thisisthepasswordresetsecretcode",
       { expiresIn: "10m" },
       (err, token) => {
-        sendMail.passwordResetMail(userEmail, token)
+        sendMail
+          .passwordResetMail(userEmail, token)
           .then(
             UsersModel.updateOne(
               { email: userEmail },
@@ -110,7 +111,7 @@ router.post("/forgotPassword", async (req, res) => {
   }
 });
 
-router.post("/resetPassword",  (req, res) => {
+router.post("/resetPassword", (req, res) => {
   let newPassword = req.body.password;
   const resetToken = req.body.resetToken;
 
@@ -127,21 +128,48 @@ router.post("/resetPassword",  (req, res) => {
         }
       });
     })
-    .then( () => {
-        UsersModel.updateOne(
+    .then(() => {
+      UsersModel.updateOne(
         { resetPasswordToken: resetToken },
-        { $set: { password: newPassword, resetPasswordToken: "" }},
+        { $set: { password: newPassword, resetPasswordToken: "" } },
         function (err) {
           if (err) return res.json({ message: err });
         }
-      ).clone().then(res.json({ message: "password reset successful" }));
+      )
+        .clone()
+        .then(res.json({ message: "password reset successful" }));
     })
     .catch((err) => console.log(err));
 });
 
-function stopExec(err) {
-  return Promise.reject(err);
-}
+router.post("/changePassword", async (req, res) => {
+  console.log("reached change password");
+  const { userEmail, currentPassword, newPassword } = req.body;
+  const user = await UsersModel.findOne({ email: userEmail });
+  if (user) {
+    bcrypt.compare(currentPassword, user.password).then((valid) => {
+      if (valid) {
+        bcrypt.hash(newPassword, 10).then((hash) => {
+          const finalNewPassword = hash;
+          console.log("New Password: " + finalNewPassword);
+          UsersModel.updateOne({ email: userEmail },
+            { $set: { password: finalNewPassword } },
+            function (err) {
+              if (err)
+              res.json({ message: err });
+            }
+          )
+            .clone()
+            .then(res.json({ message: "success" }));
+        });
+      } else {
+        res.json({ message: "incorrect password" });
+      }
+    });
+  } else {
+    res.json({ message: "Operation failed! Please try again later!" });
+  }
+});
 
 router.get("/signOut", (req, res) => {
   res.cookie("token", "");

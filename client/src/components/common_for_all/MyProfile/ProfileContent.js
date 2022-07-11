@@ -1,38 +1,24 @@
-import React,{useEffect,useContext} from "react";
+import React, { useEffect, useContext } from "react";
 import styled from "styled-components";
-import BodyImage from "../../svgs/body_background.svg";
-import { LoginContext } from "../../contexts/LoginContext";
+import BodyImage from "../../../svgs/body_background.svg";
+import { LoginContext } from "../../../contexts/LoginContext";
+import ProfileData from "./ProfileData";
+import { useNavigate } from "react-router-dom";
 
+function ProfileContent() {
 
-function MyProfile() {
-const {loggedInUserDetails} = useContext(LoginContext);  
-const userEmail = loggedInUserDetails.email;
-const userFirstName = loggedInUserDetails.first_name;
-const userLastName = loggedInUserDetails.last_name;
-const userUniId = loggedInUserDetails.uni_id;
+  const navigate = useNavigate();  
+  const { loggedInUserDetails } = useContext(LoginContext);
+  const userObj = loggedInUserDetails;
+  const changePassword = () => {
+    navigate("../changepassword");
+  };
 
   return (
     <Profile>
       <div className="profile-heading">My Profile</div>
-      <table className="profile-content">
-        <tr>
-          <td className="user-data-heading">First Name</td>
-          <td className="user-data-value">{userFirstName}</td>
-        </tr>
-        <tr>
-          <td className="user-data-heading">Last Name</td>
-          <td className="user-data-value">{userLastName}</td>
-        </tr>
-        <tr>
-          <td className="user-data-heading">Email</td>
-          <td className="user-data-value">{userEmail}</td>
-        </tr>
-        <tr>
-          <td className="user-data-heading">University ID Number</td>
-          <td className="user-data-value">{userUniId}</td>
-        </tr>
-      </table>
-      <button className="change-password-button">
+      <ProfileData userData={userObj} />
+      <button className="change-password-button" onClick={changePassword}>
         Change Password
       </button>
     </Profile>
@@ -67,7 +53,7 @@ const Profile = styled.div`
     /* text-decoration: underline; */
   }
 
-  .profile-content{
+  .profile-content {
     color: white;
     /* border: 1px solid red; */
     margin-top: 25px;
@@ -77,8 +63,7 @@ const Profile = styled.div`
     border-spacing: 0 25px;
   }
 
-
-  .user-data-heading{
+  .user-data-heading {
     border: 1px solid white;
     font-family: "Source Sans Pro", sans-serif;
     font-weight: 400;
@@ -89,7 +74,7 @@ const Profile = styled.div`
     background-color: #282c34;
   }
 
-  .user-data-value{
+  .user-data-value {
     border: 1px solid white;
     font-family: "Source Sans Pro", sans-serif;
     font-weight: 400;
@@ -102,7 +87,6 @@ const Profile = styled.div`
     border-top-right-radius: 15px;
     border-bottom-right-radius: 15px;
     background-color: #282c34;
-
   }
 
   .change-password-button {
@@ -124,14 +108,11 @@ const Profile = styled.div`
     /* letter-spacing: 1px; */
     border-radius: 25px;
     padding: 0 20px 0 20px;
-
   }
 
   .change-password-button:hover {
     cursor: pointer;
   }
-
-
 `;
 
-export default MyProfile;
+export default ProfileContent;

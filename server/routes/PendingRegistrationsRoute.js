@@ -118,7 +118,7 @@ router.post("/rejectregistration", async (req, res) => {
       { email: rejectUser[0].email },
       function (err) {
         if (err) throw err;
-        sendMail.regRejectionMail(req.body.email);
+        sendMail.regRejectionMail(req.body.email, req.body.rejectionReason);
         res.json({ message: "success" });
       }
     ).clone();

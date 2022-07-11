@@ -1,15 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import ProfileData from "../common_for_all/ProfileData";
 import BodyImage from "../../svgs/body_background.svg";
 import styled from "styled-components";
 import { useLinkClickHandler, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import Axios from "axios";
+import UserRejectModal from "./UserRejectModal";
 
 function UserProfile(props) {
   const navigate = useNavigate();
   const { state } = useLocation();
   const userObj = state;
+  const [isModalVisible, setisModalVisible] = useState(false);
 
   const axios = Axios.create({
     withCredentials: true,
@@ -23,9 +25,7 @@ function UserProfile(props) {
 
   const approveUser = () => {
     console.log(userObj);
-    axios
-    .post("/approveregistration", userObj)
-    .then((res) => {
+    axios.post("/approveregistration", userObj).then((res) => {
       if (res.data.message === "success") {
         alert("User Registration Approved Successfully!");
         navigate("../userslist");
@@ -34,14 +34,18 @@ function UserProfile(props) {
         navigate("../userslist");
       }
     });
-
   };
 
   const rejectUser = () => {
-    
+    setisModalVisible(true);
+  };
+
+  const confirmRejection = (reason) => {
+    setisModalVisible(false);
     axios
       .post("/rejectregistration", {
         email: userObj.email,
+        rejectionReason: reason
       })
       .then((res) => {
         if (res.data.message === "success") {
@@ -54,8 +58,16 @@ function UserProfile(props) {
       });
   };
 
+  const setModalVisibility = () => {
+    console.log("clicked");
+    setisModalVisible(false);
+  };
+
   return (
     <Profile>
+      {isModalVisible && (
+        <UserRejectModal setModalVisibility={setModalVisibility} confirmRejection={confirmRejection} />
+      )}
       <div className="profile-heading">User Profile</div>
       <ProfileData userData={userObj} />
       <div>

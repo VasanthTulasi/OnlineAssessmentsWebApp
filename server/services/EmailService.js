@@ -47,11 +47,11 @@ const sendPasswordResetMail = async (recipientID,token) => await transporter.sen
     console.log("Success "+inf.response);
   });
 
-  const sendRegRejectionMail = async (recipientID) => await transporter.sendMail({
+  const sendRegRejectionMail = async (recipientID,rejectionReason) => await transporter.sendMail({
     from: 'Admin OnlineAssess <noreply@OnlineAssess.com>',
     to: recipientID,
     subject: "Registration Denied - Admin OnlineAssess",
-    text: "Dear User,\n\nYour request for OnlineAssess account has been denied by the admin. Please reach out to the admin for further details.\n\nRegards,\nOnlineAssess."
+    text: "Dear User,\n\nYour request for OnlineAssess account has been denied by the admin with the reason mentioned below. Please reach out to the admin for further details.\n\nReason: "+rejectionReason+"\n\nRegards,\nOnlineAssess."
   }, function(err, inf){
     if(err)
     console.log("Error is "+err.message);

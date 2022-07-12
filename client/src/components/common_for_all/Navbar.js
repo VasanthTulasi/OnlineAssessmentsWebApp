@@ -57,7 +57,7 @@ function HomePage() {
               </Link>
             </li>
             <li>
-              <Link to="/myprofile" className="menu">
+              <Link to="/myprofile/profilecontent" className="menu">
                 My Profile
               </Link>
             </li>
@@ -82,7 +82,7 @@ function HomePage() {
               </Link>
             </li>
             <li>
-              <Link to="/myprofile" className="menu">
+              <Link to="/myprofile/profilecontent" className="menu">
                 My Profile
               </Link>
             </li>
@@ -97,7 +97,7 @@ function HomePage() {
               </Link>
             </li>
             <li>
-              <Link to="/managemodules" className="menu">
+              <Link to="/managemodules/vieweditmodules/viewmodules" className="menu">
                 Manage Modules
               </Link>
             </li>

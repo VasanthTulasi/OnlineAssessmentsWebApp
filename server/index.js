@@ -19,9 +19,11 @@ mongoose.connect(
 
 const PendingRegistrationsRoute = require("./routes/PendingRegistrationsRoute");
 const UsersRoute = require("./routes/UsersRoute");
+const ModulesRoute = require("./routes/ModulesRoute");
 
 app.use("/pendingregistrations", PendingRegistrationsRoute);
 app.use("/users", UsersRoute);
+app.use("/modules", ModulesRoute);
 
 app.listen(3001, () => {
   console.log("Server is good");

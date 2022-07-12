@@ -15,7 +15,7 @@ function Body() {
           <Route exact path="/modules" element={<Modules />} />
           <Route exact path="/exams" element={<Exams />} />
           <Route exact path="/results" element={<Results />} />
-          <Route exact path="/myprofile" element={<Profile />} />
+          <Route exact path="/myprofile/*" element={<Profile />} />
       </Routes>
     </>
   );

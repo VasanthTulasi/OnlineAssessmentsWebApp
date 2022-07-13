@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Routes, Route } from "react-router-dom";
 import ViewEditModules from "./ViewEditModules/ViewEditModules";
 import AddNewModules from "./AddNewModules";
-import ViewEditUsers from "./ViewEditUsers";
+import ViewUsersForModules from "./ViewUsersForModules";
 import AddNewUsers from "./AddNewUsers";
 import { Link } from "react-router-dom";
 
@@ -21,18 +21,18 @@ function ManageModules() {
         <Link to="addnewmodules" className="menu" >
           Add New Modules
         </Link>
-        <Link to="vieweditusers" className="menu" >
-          View / Edit Module Users
+        <Link to="viewusersformodules" className="menu" >
+          View Users for Modules
         </Link>
         <Link to="addnewusers" className="menu" >
-          Add New Users to Modules
+          Assign Users to Modules
         </Link>
       </div>
       <div className="module-sub-page">
         <Routes>
           <Route path="/vieweditmodules/*" element={<ViewEditModules />} />
           <Route path="/addnewmodules" element={<AddNewModules />} />
-          <Route path="/vieweditusers" element={<ViewEditUsers />} />
+          <Route path="/viewusersformodules" element={<ViewUsersForModules />} />
           <Route path="/addnewusers" element={<AddNewUsers />} />
         </Routes>
       </div>
@@ -56,7 +56,7 @@ const Modules = styled.div`
     display: flex;
     list-style-type: none;
     flex-direction: column;
-    flex: 1.75;
+    flex: 2;
     border-right: 1px solid #61dafb;
   }
 
@@ -66,7 +66,7 @@ const Modules = styled.div`
 
   .menu {
     padding: 5px;
-    margin: 10px;
+    margin: 10px 20px 10px 20px; 
     font-family: "Source Sans Pro", sans-serif;
     font-weight: 600;
     font-size: 15px;
@@ -82,7 +82,7 @@ const Modules = styled.div`
 
   .module-sub-page {
     /* border: 1px solid cyan; */
-    flex: 8.25;
+    flex: 8;
   }
 
   .no-highlight{

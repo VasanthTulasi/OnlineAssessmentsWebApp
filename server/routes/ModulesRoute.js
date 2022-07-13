@@ -27,6 +27,14 @@ router.post("/editModule", async (req, res) => {
   );
 });
 
+
+router.post("/deleteModule", (req,res)=>{
+    ModulesModel.deleteOne({module_code: req.body.module_code}, function (err) {
+      if (err) res.json({"message": err});;
+      res.json({"message": "success"});
+    })
+});
+
 router.post("/addNewModule", async (req, res) => {
   const moduleData = {
     module_code: req.body.moduleCode,

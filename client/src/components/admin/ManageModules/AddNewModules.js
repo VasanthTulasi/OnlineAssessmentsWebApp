@@ -59,12 +59,12 @@ function AddModules() {
   };
 
   const goBackOperation = () => {
-    navigate("../vieweditmodules");
+    navigate("../vieweditmodules/viewmodules");
   };
 
   return (
     <Main>
-      <div className="add-new-module-heading">New Module</div>
+      <div className="add-new-module-heading">Add New Modules</div>
       <div className="add-new-module-card">
         <label className="add-new-module-label">Enter Module Code</label>
         <input

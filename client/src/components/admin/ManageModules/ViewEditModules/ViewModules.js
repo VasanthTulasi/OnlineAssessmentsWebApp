@@ -2,10 +2,15 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Axios from "axios";
+import ConfirmDeleteModal from "../ConfirmDeletionModal";
+
 
 function ViewModules() {
   let [modulesArray, setModulesArray] = useState([]);
   const navigate = useNavigate();
+  const [isModalVisible, setisModalVisible] = useState(false);
+  const [deletionIndex, setDeletionIndex] = useState();
+
   const axios = Axios.create({
     withCredentials: true,
     baseURL: "http://localhost:3001/modules",
@@ -19,18 +24,39 @@ function ViewModules() {
     });
   };
 
-  const deleteModule = (event) => {
-    
+
+  const deleteModule = (event) =>{
+    setDeletionIndex(event.currentTarget.id.split("_")[1]);
+    setisModalVisible(true);
+  }
+
+  const confirmedModuleDeletion = () => {
+    setisModalVisible(false);
+    const itemIndex = deletionIndex;
+    axios.post("/deleteModule",{module_code: modulesArray[itemIndex].module_code}).then((res) => {
+      if(res.data.message === "success"){
+        alert("Module deleted succesfully!");
+        const modModulesArray = modulesArray;
+        modModulesArray.splice(itemIndex,1);
+        console.log("New Array is "+JSON.stringify(modModulesArray));
+        setModulesArray([...modModulesArray]);
+      }
+      else
+        alert("Error: " + res.data.message);
+    });
   }
 
   useEffect(() => {
     axios.get("/listofmodules").then((res) => {
       setModulesArray(res.data);
-      // console.log(res.data);
     });
   }, []);
 
   return (
+    <>
+    {isModalVisible && (
+      <ConfirmDeleteModal setModalVisibility={()=>setisModalVisible(false)} moduleInfo={modulesArray[deletionIndex].module_code} confirmedDeletion={confirmedModuleDeletion}/>
+    )}
     <ViewEditMod>
       <div>View / Edit Modules</div>
       <table className="module-data-content">
@@ -72,6 +98,7 @@ function ViewModules() {
         </tbody>
       </table>
     </ViewEditMod>
+    </>
   );
 }
 
@@ -99,7 +126,7 @@ const ViewEditMod = styled.div`
     color: white;
     /* border: 1px solid red; */
     margin-top: 25px;
-    width: 75%;
+    width: 80%;
     /* border: 1; */
     border-collapse: separate;
     /* border-spacing: 0 25px; */

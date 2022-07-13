@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { useLinkClickHandler, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import Axios from "axios";
-import UserRejectModal from "./UserRejectModal";
+import UserRejectModal from "./ConfirmUserRejectModal";
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -58,15 +58,10 @@ function UserProfile() {
       });
   };
 
-  const setModalVisibility = () => {
-    console.log("clicked");
-    setisModalVisible(false);
-  };
-
   return (
     <Profile>
       {isModalVisible && (
-        <UserRejectModal setModalVisibility={setModalVisibility} confirmRejection={confirmRejection} />
+        <UserRejectModal setModalVisibility={()=>setisModalVisible(false)} confirmRejection={confirmRejection} />
       )}
       <div className="profile-heading">User Profile</div>
       <ProfileData userData={userObj} />

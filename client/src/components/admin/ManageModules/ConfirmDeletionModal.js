@@ -6,7 +6,7 @@ function ConfirmDeleteModal(props) {
     <Main>
       <ModalBox>
         <label className="modal-heading">
-           Are you sure you want to delete this module?<br/><br/>{props.moduleInfo ? "Module: "+props.moduleInfo : "User ID: "+props.userInfo}
+           Are you sure you want to delete this {props.moduleInfo ? "module" : "user from this module"}?<br/><br/>{props.moduleInfo ? "Module: "+props.moduleInfo : "User University ID: "+props.userInfo}
         </label>
         <br />
         <br />

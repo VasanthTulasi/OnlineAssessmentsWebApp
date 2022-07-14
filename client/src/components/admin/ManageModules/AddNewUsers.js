@@ -123,11 +123,11 @@ function ViewUsersForModules() {
             onChange={selectedModule}
           />
         </div>
-        <label className="add-new-user-label">Enter User ID(s)</label>
+        <label className="add-new-user-label">Enter the University ID(s) of the User(s)</label>
         <div className="select-module-dropdown">
           <CreatableSelect
             styles={customStyles}
-            placeholder="Please type the User ID(s) and add them"
+            placeholder="Please type here and add them"
             onChange={selectedUsers}
             isMulti
             formatCreateLabel={formatCreateLabel}
@@ -184,7 +184,8 @@ const Main = styled.div`
   font-size: 20px;
   flex-direction: column;
   overflow-y: auto;
-
+  /* border: 10px solid red; */
+  
   .add-new-user-heading {
     margin-top: 60px;
     color: white;
@@ -196,7 +197,7 @@ const Main = styled.div`
   .add-new-user-card {
     display: flex;
     flex-direction: column;
-    /* justify-content: flex-start; */
+    /* justify-content: center; */
     align-items: flex-start;
   }
 

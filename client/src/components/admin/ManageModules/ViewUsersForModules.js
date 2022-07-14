@@ -2,16 +2,25 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Axios from "axios";
 import ConfirmDeleteModal from "./ConfirmDeletionModal";
+import SingleSelect from "react-select";
 
 function ViewUsersForModules() {
   let [moduleUsersArray, setModuleUsersArray] = useState([]);
   let [moduleCode, setModuleCode] = useState("");
+  let [usersLoaded, setUsersLoaded] = useState(false);
   const [isModalVisible, setisModalVisible] = useState(false);
   const [deletionIndex, setDeletionIndex] = useState();
+  let [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
 
   const axios = Axios.create({
     withCredentials: true,
     baseURL: "http://localhost:3001/modules",
+    crossDomain: true,
+  });
+
+  const axios2 = Axios.create({
+    withCredentials: true,
+    baseURL: "http://localhost:3001/users",
     crossDomain: true,
   });
 
@@ -20,20 +29,75 @@ function ViewUsersForModules() {
     setisModalVisible(true);
   };
 
+  const selectedModule = (selOption) => {
+    setModuleCode(selOption.value);
+    setUsersLoaded(false);
+    setModuleUsersArray([]);
+  };
+
+  useEffect(() => {
+    axios2.post("/usersForModule", { moduleCode }).then((res) => {
+      const users = res.data;
+      if (users.length === 0) {
+        setUsersLoaded(true);
+      } else {
+        setUsersLoaded(true);
+        setModuleUsersArray(users);
+      }
+    });
+  }, [moduleCode]);
+
+  useEffect(() => {
+    axios.get("/moduleCodes").then((res) => {
+      let moduleCodes = res.data;
+      moduleCodes = moduleCodes.map((ele) => {
+        return { value: ele, label: ele };
+      });
+      setModuleCodesFromDB(moduleCodes);
+    });
+  }, []);
+
+  const customStyles = {
+    valueContainer: (provided) => ({
+      ...provided,
+      width: "400px",
+      paddingLeft: "10px",
+      color: "black",
+      font: "17px",
+      fontFamily: '"Source Sans Pro", sans-serif',
+      fontSize: "17px",
+      fontWeight: 400,
+      color: "#282c34",
+    }),
+    option: (provided) => ({
+      ...provided,
+      color: "black",
+      font: "17px",
+      fontFamily: '"Source Sans Pro", sans-serif',
+      fontSize: "17px",
+      fontWeight: 400,
+      color: "#282c34",
+    }),
+    placeholder: (provided) => ({
+      ...provided,
+      fontSize: "17px",
+    }),
+  };
+
   const confirmedUserDeletion = () => {
     setisModalVisible(false);
     const itemIndex = deletionIndex;
     axios
-      .post("/deleteModule", {
-        module_code: moduleUsersArray[itemIndex].module_code,
+      .post("/deleteUserFromModule", {
+        uni_id: moduleUsersArray[itemIndex].uni_id,
+        module_code: moduleCode 
       })
       .then((res) => {
         if (res.data.message === "success") {
-          alert("Module deleted succesfully!");
-          const modModulesArray = moduleUsersArray;
-          modModulesArray.splice(itemIndex, 1);
-          console.log("New Array is " + JSON.stringify(modModulesArray));
-          setModuleUsersArray([...modModulesArray]);
+          alert("User deleted succesfully!");
+          const modUsersArray = moduleUsersArray;
+          modUsersArray.splice(itemIndex, 1);
+          setModuleUsersArray([...modUsersArray]);
         } else alert("Error: " + res.data.message);
       });
   };
@@ -48,33 +112,39 @@ function ViewUsersForModules() {
         />
       )}
       <ViewEditMod>
-        <div>View Users For Modules</div>
+        <div className="heading">View Users For Modules</div>
         <div class="whole-content">
           <label className="select-module-label">Select Module Code</label>
-          <input
-            className="select-module-text-field"
-            placeholder="Module Code"
-            onChange={(event) => setModuleCode(event.target.value)}
-            value={moduleCode}
-          />
-          <div style={{ fontSize: "17px" }}>Users for the selected module:</div>
+          <div className="select-module-dropdown">
+            <SingleSelect
+              options={moduleCodesFromDB}
+              styles={customStyles}
+              placeholder="Select or Enter Module Code"
+              onChange={selectedModule}
+            />
+          </div>
+          <div className="heading" style={{ fontSize: "17px" }}>
+            Users for the selected module:
+          </div>
           <table className="module-data-content">
             <tbody>
               <tr>
                 <td className="module-data start headers-color">S. No</td>
-                <td className="module-data headers-color">Module Code</td>
-                <td className="module-data headers-color">Module Title</td>
-                <td className="module-data headers-color">Year</td>
-                <td className="module-data end headers-color">Sem</td>
+                <td className="module-data headers-color">First Name</td>
+                <td className="module-data headers-color">Last Name</td>
+                <td className="module-data headers-color">Role</td>
+                <td className="module-data headers-color">University ID</td>
+                <td className="module-data end headers-color">Email</td>
               </tr>
               {moduleUsersArray.map((ele, index) => {
                 return (
                   <tr>
                     <td className="module-data start">{index + 1}</td>
-                    <td className="module-data mid">{ele.module_code}</td>
-                    <td className="module-data mid">{ele.module_title}</td>
-                    <td className="module-data mid">{ele.module_year}</td>
-                    <td className="module-data end">{ele.module_semester}</td>
+                    <td className="module-data mid">{ele.first_name}</td>
+                    <td className="module-data mid">{ele.last_name}</td>
+                    <td className="module-data mid">{ele.role}</td>
+                    <td className="module-data mid">{ele.uni_id}</td>
+                    <td className="module-data end">{ele.email}</td>
                     <td>
                       <button
                         id={"deleteButton_" + index}
@@ -87,18 +157,30 @@ function ViewUsersForModules() {
                   </tr>
                 );
               })}
-              {moduleCode !== "" && moduleUsersArray.length === 0 && (
+
+              {moduleCode !== "" && !usersLoaded && (
                 <tr>
-                  <td colSpan="5" className="no-user-data">
-                    No users for this module
+                  <td colSpan="6" className="no-user-data">
+                    Loading Users for the Selected Module...
                   </td>
                 </tr>
               )}
 
+              {moduleCode !== "" &&
+                usersLoaded &&
+                moduleUsersArray.length === 0 && (
+                  <tr>
+                    <td colSpan="6" className="no-user-data">
+                      No users found for this module.
+                    </td>
+                  </tr>
+                )}
+
               {moduleCode === "" && (
                 <tr>
-                  <td colSpan="5" className="no-user-data">
-                    No module selected. Please select a module first to see its users.
+                  <td colSpan="6" className="no-user-data">
+                    No module selected. Please select a module first to see its
+                    users.
                   </td>
                 </tr>
               )}
@@ -122,7 +204,11 @@ const ViewEditMod = styled.div`
   flex-direction: column;
   overflow-y: auto;
 
-  div {
+  .select-module-dropdown {
+    margin-top: 5px;
+  }
+
+  .heading {
     margin-top: 30px;
     color: white;
     font-family: "Source Sans Pro", sans-serif;
@@ -135,7 +221,7 @@ const ViewEditMod = styled.div`
     align-items: flex-start;
     flex-direction: column;
     /* border:1px solid red; */
-    width: 75%;
+    width: 80%;
   }
 
   .select-module-label {
@@ -206,7 +292,7 @@ const ViewEditMod = styled.div`
     padding: 7px 20px 7px 20px;
   }
 
-  .no-user-data{
+  .no-user-data {
     border: 1px solid white;
     font-family: "Source Sans Pro", sans-serif;
     font-weight: 400;

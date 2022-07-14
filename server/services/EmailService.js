@@ -10,7 +10,6 @@ const transporter = nodemailer.createTransport({
     }
   });
 
-
 const sendPasswordResetMail = async (recipientID,token) => await transporter.sendMail({
     from: 'Admin OnlineAssess <noreply@OnlineAssess.com>',
     to: recipientID,

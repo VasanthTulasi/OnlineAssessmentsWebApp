@@ -152,11 +152,11 @@ router.post("/changePassword", async (req, res) => {
         bcrypt.hash(newPassword, 10).then((hash) => {
           const finalNewPassword = hash;
           console.log("New Password: " + finalNewPassword);
-          UsersModel.updateOne({ email: userEmail },
+          UsersModel.updateOne(
+            { email: userEmail },
             { $set: { password: finalNewPassword } },
             function (err) {
-              if (err)
-              res.json({ message: err });
+              if (err) res.json({ message: err });
             }
           )
             .clone()
@@ -175,6 +175,21 @@ router.get("/signOut", (req, res) => {
   res.cookie("token", "");
   res.json({ message: "success" });
   // console.log("no error");
+});
+
+router.post("/usersForModule", async (req, res) => {
+  const { moduleCode } = req.body;
+  const users = await UsersModel.find({
+    assigned_modules: { $in: moduleCode }
+  });
+  if (users){ 
+  let moduleUsers = users;
+  moduleUsers = moduleUsers.map((ele) =>{
+    return {first_name: ele.first_name, last_name: ele.last_name, email: ele.email, uni_id :ele.uni_id, role: ele.role};
+  });
+  res.send(moduleUsers);
+  // console.log(moduleUsers);
+  }
 });
 
 module.exports = router;

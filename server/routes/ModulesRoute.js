@@ -84,21 +84,34 @@ router.post("/assignUsers", async (req, res) => {
 
   await ModulesModel.updateOne(
     { module_code: moduleCode },
-    { $push: { assigned_users: { $each: validUsers } } },
+    { $push: { assigned_users: { $each: validUsers } } }
   )
     .then(async () => {
       for (let i = 0; i < validUsers.length; i++) {
         await UsersModel.updateOne(
-          { uni_id: validUsers[i]},
+          { uni_id: validUsers[i] },
           { $push: { assigned_modules: { $each: [moduleCode] } } }
         );
       }
       res.json({ message: "success", invalidUsers: invalidUsers });
     })
     .catch((err) => {
-      console.log('reached');
+      console.log("reached");
       res.json({ message: err.message });
     });
+});
+
+router.post("/deleteUserFromModule", async (req, res) => {
+  const { uni_id, module_code } = req.body;
+  await ModulesModel.updateOne(
+    { module_code: module_code },
+    { $pull: { assigned_users: uni_id }}
+  ).then(async () => {
+    await UsersModel.updateOne(
+      { uni_id: uni_id },
+      { $pull: { assigned_modules: module_code } }
+    );
+  }).then(()=>res.json({"message":"success"})).catch(err => res.json({"message":err}));
 });
 
 module.exports = router;

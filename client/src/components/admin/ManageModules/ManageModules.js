@@ -4,14 +4,12 @@ import { Routes, Route } from "react-router-dom";
 import ViewEditModules from "./ViewEditModules/ViewEditModules";
 import AddNewModules from "./AddNewModules";
 import ViewUsersForModules from "./ViewUsersForModules";
-import AddNewUsers from "./AddNewUsers_backup";
+import AddNewUsers from "./AddNewUsers";
 import { Link } from "react-router-dom";
 
 function ManageModules() {
   
   
-  
-
   return (
     <Modules>
       <div className="menus">

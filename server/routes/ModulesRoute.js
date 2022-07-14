@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const ModulesModel = require("../Models/ModulesModel");
+const UsersModel = require("../Models/UsersModel");
 
 router.get("/listofmodules", async (req, res) => {
   // console.log("reached");
@@ -8,10 +9,9 @@ router.get("/listofmodules", async (req, res) => {
 });
 
 router.post("/editModule", async (req, res) => {
-  
   console.log(req.body.moduleCode);
   ModulesModel.updateOne(
-    { module_code: req.body.moduleCode},
+    { module_code: req.body.moduleCode },
     {
       $set: {
         module_code: req.body.moduleCode,
@@ -27,12 +27,11 @@ router.post("/editModule", async (req, res) => {
   );
 });
 
-
-router.post("/deleteModule", (req,res)=>{
-    ModulesModel.deleteOne({module_code: req.body.module_code}, function (err) {
-      if (err) res.json({"message": err});;
-      res.json({"message": "success"});
-    })
+router.post("/deleteModule", (req, res) => {
+  ModulesModel.deleteOne({ module_code: req.body.module_code }, function (err) {
+    if (err) res.json({ message: err });
+    res.json({ message: "success" });
+  });
 });
 
 router.post("/addNewModule", async (req, res) => {
@@ -58,6 +57,48 @@ router.post("/addNewModule", async (req, res) => {
       })
       .catch((err) => res.json({ message: err }));
   }
+});
+
+router.get("/moduleCodes", async (req, res) => {
+  let moduleCodes = [];
+  const modules = await ModulesModel.find();
+  if (modules) {
+    modules.forEach((ele) => {
+      moduleCodes.push(ele.module_code);
+    });
+    res.send(moduleCodes);
+  }
+});
+
+router.post("/assignUsers", async (req, res) => {
+  const { moduleCode, newUsers } = req.body;
+  let validUsers = [],
+    invalidUsers = [];
+  let user = null;
+
+  for (let i = 0; i < newUsers.length; i++) {
+    user = await UsersModel.findOne({ uni_id: newUsers[i] });
+    if (user) validUsers.push(newUsers[i]);
+    else invalidUsers.push(newUsers[i]);
+  }
+
+  await ModulesModel.updateOne(
+    { module_code: moduleCode },
+    { $push: { assigned_users: { $each: validUsers } } },
+  )
+    .then(async () => {
+      for (let i = 0; i < validUsers.length; i++) {
+        await UsersModel.updateOne(
+          { uni_id: validUsers[i]},
+          { $push: { assigned_modules: { $each: [moduleCode] } } }
+        );
+      }
+      res.json({ message: "success", invalidUsers: invalidUsers });
+    })
+    .catch((err) => {
+      console.log('reached');
+      res.json({ message: err.message });
+    });
 });
 
 module.exports = router;

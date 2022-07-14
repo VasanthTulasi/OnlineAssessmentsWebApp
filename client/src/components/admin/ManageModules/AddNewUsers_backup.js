@@ -4,16 +4,21 @@ import Axios from "axios";
 import ConfirmDeleteModal from "./ConfirmDeletionModal";
 import { useNavigate } from "react-router-dom";
 import SingleSelect from "react-select";
-import CreatableSelect from "react-select/creatable";
+import CreatableSelect from 'react-select/creatable';
+
 
 function ViewUsersForModules() {
   let [moduleCode, setModuleCode] = useState("");
-  let [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
+  let [addedUsers, setAddedUsers] = useState([]);
   let [newUsers, setNewUsers] = useState([]);
-  let [invalidUsers, setInvalidUsers] = useState([]);
-  let [usersSavedStatus, setUsersSavedStatus] = useState("");
   const [isModalVisible, setisModalVisible] = useState(false);
   const navigate = useNavigate();
+  const options = [
+    { value: "chocolate", label: "Chocolate" },
+    { value: "gdfsj", label: "Vanilla" },
+    { value: "strawbegasdrry", label: "Strawberry" }
+  
+  ];
 
   const axios = Axios.create({
     withCredentials: true,
@@ -21,63 +26,23 @@ function ViewUsersForModules() {
     crossDomain: true,
   });
 
-  useEffect(() => {
-    axios.get("/moduleCodes").then((res) => {
-      let moduleCodes = res.data;
-      moduleCodes = moduleCodes.map((ele) => {
-        return { value: ele, label: ele };
-      });
-      setModuleCodesFromDB(moduleCodes);
-    });
-  }, []);
-
   const removeUser = () => {};
-  const saveUsers = () => {
-    setInvalidUsers([]);
-    axios.post("/assignUsers", { moduleCode, newUsers }).then((res) => {
-      // console.log("message is: "+res.data.message);
-      // console.log("length is: "+res.data.invalidUsers.length);
-      if (
-        res.data.message === "success" &&
-        res.data.invalidUsers.length === 0
-      ) {
-        console.log("reached");
-        setUsersSavedStatus(
-          "All the users are assigned to the module successfully."
-        );
-      }
-      else if(res.data.invalidUsers.length === newUsers.length){
-        setUsersSavedStatus(
-          "Alert! None of the users are added to the module as they do not exist in the database. Please find the invalid user(s) below."
-        );
-        setInvalidUsers(res.data.invalidUsers);
-      }
-      else if (
-        res.data.message === "success" &&
-        res.data.invalidUsers.length !== 0
-      ) {
-        setUsersSavedStatus(
-          "Alert! Only valid users are assigned to the module. Some users were not assigned as they do not exist in the database. Please find the invalid user(s) below."
-        );
-        setInvalidUsers(res.data.invalidUsers);
-      }
-       else setUsersSavedStatus("Error: " + res.data.message);
-    });
-  };
+  const saveUsers = () => {};
   const goBackOperation = () => {
     navigate("../vieweditmodules/viewmodules");
   };
 
   const selectedModule = (selOption) => {
     setModuleCode(selOption.value);
-  };
+  }
 
   const selectedUsers = (selOptions) => {
-    const newUsersArray = selOptions;
-    const newUserIds = [];
+    const newUsersArray  = selOptions;
+    const newUserIds = []
     newUsersArray.map((ele) => newUserIds.push(ele.value));
     setNewUsers(newUserIds);
-  };
+  }
+  
 
   const customStyles = {
     valueContainer: (provided) => ({
@@ -104,76 +69,90 @@ function ViewUsersForModules() {
       ...provided,
       fontSize: "17px",
     }),
+    // singleValue: (provided, state) => {
+    //   const opacity = state.isDisabled ? 0.5 : 1;
+    //   const transition = 'opacity 300ms';
+    //   return { ...provided, opacity, transition };
+    // }
   };
 
-  function formatCreateLabel(value) {
-    return 'Add User "' + value + '"';
-  }
-
   return (
-    <Main>
-      <div className="add-new-user-heading">Assign Users to Modules</div>
-      <div className="add-new-user-card">
-        <label className="add-new-user-label">Select Module</label>
+    <ViewEditMod>
+      <div className="heading">Assign Users To Modules</div>
+      <div className="whole-content">
+        <label className="select-module-label">Select Module</label>
         <div className="select-module-dropdown">
           <SingleSelect
-            options={moduleCodesFromDB}
+            options={options}
             styles={customStyles}
             placeholder="Select or Enter Module Code"
             onChange={selectedModule}
           />
         </div>
-        <label className="add-new-user-label">Enter User ID(s)</label>
+        <label className="select-module-label">Select User(s)</label>
         <div className="select-module-dropdown">
           <CreatableSelect
+            options={options}
             styles={customStyles}
-            placeholder="Please type the User ID(s) and add them"
+            placeholder="Select or Enter User IDs"
             onChange={selectedUsers}
             isMulti
-            formatCreateLabel={formatCreateLabel}
           />
         </div>
-        <div className="add-new-user-buttons">
+        {/* <div className="heading" style={{ fontSize: "17px" }}>User(s) to be added:</div> */}
+        {/* <table className="module-data-content">
+          <tbody>
+            <tr>
+              <td className="module-data start headers-color">S. No</td>
+              <td className="module-data headers-color">Module Code</td>
+              <td className="module-data headers-color">Module Title</td>
+              <td className="module-data headers-color">Year</td>
+              <td className="module-data end headers-color">Sem</td>
+            </tr>
+            {newUsers.map((ele, index) => {
+              return (
+                <tr>
+                  <td className="module-data start">{index + 1}</td>
+                  <td className="module-data mid">{ele.module_code}</td>
+                  <td className="module-data mid">{ele.module_title}</td>
+                  <td className="module-data mid">{ele.module_year}</td>
+                  <td className="module-data end">{ele.module_semester}</td>
+                  <td>
+                    <button
+                      id={"removeButton_" + index}
+                      className="module-data-button"
+                      onClick={removeUser}
+                    >
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+            {newUsers.length === 0 && (
+              <tr>
+                <td colSpan="5" className="no-user-data">
+                  No user(s) selected. Please select user(s) to be added for
+                  this module.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table> */}
+        <div className="add-new-users-buttons">
           <button className="button" onClick={saveUsers}>
             SAVE
           </button>
           <button className="button" onClick={goBackOperation}>
-            GO BACK
+            CANCEL
           </button>
         </div>
       </div>
-      <div className="user-save-status">
-        {usersSavedStatus !== "" && (
-          <div className="heading" style={{ fontSize: "17px" }}>
-            {usersSavedStatus}
-          </div>
-        )}
-        {invalidUsers.length !== 0 && (
-          <table className="module-data-content">
-            <tbody>
-              <tr>
-              <td className="module-data start headers-color">S. No</td>
-                <td className="module-data end headers-color">
-                  Invalid User IDs
-                </td>
-              </tr>
-              {invalidUsers.map((ele,index) => {
-                return (
-                  <tr>
-                    <td className="module-data start">{index+1}</td>
-                    <td className="module-data end">{ele}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
-    </Main>
+    </ViewEditMod>
   );
 }
 
-const Main = styled.div`
+const ViewEditMod = styled.div`
   height: 100%;
   width: 100%;
   background-color: #282c34;
@@ -185,22 +164,24 @@ const Main = styled.div`
   flex-direction: column;
   overflow-y: auto;
 
-  .add-new-user-heading {
-    margin-top: 60px;
+  .heading {
+    margin-top: 30px;
     color: white;
     font-family: "Source Sans Pro", sans-serif;
     font-weight: 400;
     font-size: 20px;
   }
 
-  .add-new-user-card {
+  .whole-content {
     display: flex;
-    flex-direction: column;
-    /* justify-content: flex-start; */
+    justify-content: center;
     align-items: flex-start;
+    flex-direction: column;
+    /* border:1px solid red; */
+    width: 75%;
   }
 
-  .add-new-user-label {
+  .select-module-label {
     color: white;
     font-family: "Source Sans Pro", sans-serif;
     font-size: 17px;
@@ -208,7 +189,7 @@ const Main = styled.div`
     margin-top: 20px;
   }
 
-  .add-new-user-text-field {
+  .select-module-text-field {
     color: #282c34;
     font-family: "Source Sans Pro", sans-serif;
     font-size: 17px;
@@ -216,72 +197,20 @@ const Main = styled.div`
     border: 1px solid #282c34;
     margin-top: 5px;
     border-radius: 5px;
-    width: 500px;
+    width: 400px;
     height: 35px;
     padding-left: 10px;
-  }
-
-  .add-new-user-buttons {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    align-items: center;
-    /* border: 1px solid red; */
-    width: 100%;
-    /* margin-bottom: 10px; */
-  }
-
-  .button {
-    margin-top: 40px;
-    border: 1px solid black;
-    color: #282c34;
-    background-color: white;
-    font-family: "Sourse Sans Pro ", sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    width: max-content;
-    height: 35px;
-    border-radius: 25px;
-    padding: 0 20px 0 20px;
-  }
-
-  .button:hover {
-    cursor: pointer;
-  }
-
-  .back-to-login-page {
-    margin-top: 5px;
-    /* border: 1px solid red; */
-    color: #282c34;
-    font-family: "Source Sans Pro", sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: underline;
-  }
-
-  .back-to-login-page:hover {
-    cursor: pointer;
   }
 
   .select-module-dropdown {
     margin-top: 5px;
   }
 
-  .heading {
-    color: white;
-    font-family: "Source Sans Pro", sans-serif;
-    font-weight: 400;
-    font-size: 20px;
-    margin: 15px 50px 15px 50px;
-    /* border:1px solid red; */
-  }
-
   .module-data-content {
     color: white;
     /* border: 1px solid red; */
     margin-top: 5px;
-    margin-left:50px;
-    width: 20%;
+    width: 100%;
     /* border: 1; */
     border-collapse: separate;
     /* border-spacing: 0 25px; */
@@ -342,6 +271,16 @@ const Main = styled.div`
     color: #61dafb;
   }
 
+  .add-new-users-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    /* border: 1px solid red; */
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
   .button {
     margin-top: 40px;
     border: 1px solid black;
@@ -354,11 +293,15 @@ const Main = styled.div`
     height: 35px;
     border-radius: 25px;
     padding: 0 20px 0 20px;
-    /* border:1px solid red; */
   }
 
   .button:hover {
     cursor: pointer;
+  }
+
+  .datalist {
+    width: 100px;
+    border: 1px solid red;
   }
 `;
 

@@ -51,7 +51,6 @@ function Login() {
               role: res.data.user_data.role,
               uni_id: res.data.user_data.uni_id,
             });
-            // axios.get("/getUser").then(res=> console.log(res.data));
           }
         });
     }

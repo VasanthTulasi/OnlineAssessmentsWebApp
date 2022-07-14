@@ -17,6 +17,10 @@ const schema = new mongoose.Schema(
     module_semester: {
       type: String,
       required: true
+    },
+    assigned_users:{
+      type: Array,
+      required:false
     }
   },
   { collection: "Modules", versionKey: false }

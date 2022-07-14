@@ -6,6 +6,8 @@ import ResetPassword from "./components/common_for_all/ResetPassword";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import ActivateUserAccount from "./components/common_for_all/ActivateUserAccount";
 
+
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <>

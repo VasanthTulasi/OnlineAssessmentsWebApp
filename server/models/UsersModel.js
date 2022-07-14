@@ -29,6 +29,10 @@ const schema = new mongoose.Schema(
     resetPasswordToken: {
       type: String,
       required: false
+    },
+    assigned_modules:{
+      type:Array,
+      required: false
     }
   },
   { collection: "Users", versionKey: false }

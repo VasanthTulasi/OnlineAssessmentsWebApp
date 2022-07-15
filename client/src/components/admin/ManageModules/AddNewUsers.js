@@ -31,8 +31,11 @@ function ViewUsersForModules() {
     });
   }, []);
 
-  const removeUser = () => {};
   const saveUsers = () => {
+    if (moduleCode === "" || newUsers.length === 0) {
+      alert("Fields cannot be empty. All the fields must be filled.");
+      return;
+    }
     setInvalidUsers([]);
     axios.post("/assignUsers", { moduleCode, newUsers }).then((res) => {
       // console.log("message is: "+res.data.message);
@@ -43,25 +46,22 @@ function ViewUsersForModules() {
       ) {
         console.log("reached");
         setUsersSavedStatus(
-          "All the users are assigned to the module successfully."
+          "All the specified users are assigned to the module successfully."
         );
-      }
-      else if(res.data.invalidUsers.length === newUsers.length){
+      } else if (res.data.invalidUsers.length === newUsers.length) {
         setUsersSavedStatus(
-          "Alert! None of the users are added to the module as they do not exist in the database. Please find the invalid user(s) below."
+          "Error: None of the specified users are added to the module as they are invalid. Please find the invalid user(s) below."
         );
         setInvalidUsers(res.data.invalidUsers);
-      }
-      else if (
+      } else if (
         res.data.message === "success" &&
         res.data.invalidUsers.length !== 0
       ) {
         setUsersSavedStatus(
-          "Alert! Only valid users are assigned to the module. Some users were not assigned as they do not exist in the database. Please find the invalid user(s) below."
+          "Error: Failed to assign the below users to the module as they are invalid. The remaining users are successfully assigned."
         );
         setInvalidUsers(res.data.invalidUsers);
-      }
-       else setUsersSavedStatus("Error: " + res.data.message);
+      } else setUsersSavedStatus("Error: " + res.data.message);
     });
   };
   const goBackOperation = () => {
@@ -80,29 +80,42 @@ function ViewUsersForModules() {
   };
 
   const customStyles = {
-    valueContainer: (provided) => ({
+    container: (provided) => ({
       ...provided,
       width: "400px",
-      paddingLeft: "10px",
+      // paddingLeft: "10px",
       color: "black",
       font: "17px",
       fontFamily: '"Source Sans Pro", sans-serif',
       fontSize: "17px",
       fontWeight: 400,
       color: "#282c34",
+      // border: "1px solid red"
     }),
-    option: (provided) => ({
+    option: (provided, state) => ({
       ...provided,
+      // ...state,
       color: "black",
       font: "17px",
       fontFamily: '"Source Sans Pro", sans-serif',
       fontSize: "17px",
       fontWeight: 400,
       color: "#282c34",
+      backgroundColor: state.isSelected ? "#61dafb" : "white",
+      "&:hover": {
+        backgroundColor: "rgba(189,197,209,.3)",
+      },
     }),
     placeholder: (provided) => ({
       ...provided,
       fontSize: "17px",
+    }),
+    multiValueRemove: (provided) => ({
+      ...provided,
+      "&:hover": {
+        backgroundColor: "#282c34",
+        color: "white",
+      },
     }),
   };
 
@@ -121,9 +134,12 @@ function ViewUsersForModules() {
             styles={customStyles}
             placeholder="Select or Enter Module Code"
             onChange={selectedModule}
+            noOptionsMessage={() => "Module Not Found"}
           />
         </div>
-        <label className="add-new-user-label">Enter the University ID(s) of the User(s)</label>
+        <label className="add-new-user-label">
+          Enter the University ID(s) of the User(s)
+        </label>
         <div className="select-module-dropdown">
           <CreatableSelect
             styles={customStyles}
@@ -131,6 +147,11 @@ function ViewUsersForModules() {
             onChange={selectedUsers}
             isMulti
             formatCreateLabel={formatCreateLabel}
+            noOptionsMessage={() => null}
+            components={{
+              DropdownIndicator: () => null,
+              IndicatorSeparator: () => null,
+            }}
           />
         </div>
         <div className="add-new-user-buttons">
@@ -152,15 +173,15 @@ function ViewUsersForModules() {
           <table className="module-data-content">
             <tbody>
               <tr>
-              <td className="module-data start headers-color">S. No</td>
+                <td className="module-data start headers-color">S. No</td>
                 <td className="module-data end headers-color">
                   Invalid User IDs
                 </td>
               </tr>
-              {invalidUsers.map((ele,index) => {
+              {invalidUsers.map((ele, index) => {
                 return (
                   <tr>
-                    <td className="module-data start">{index+1}</td>
+                    <td className="module-data start">{index + 1}</td>
                     <td className="module-data end">{ele}</td>
                   </tr>
                 );
@@ -185,7 +206,7 @@ const Main = styled.div`
   flex-direction: column;
   overflow-y: auto;
   /* border: 10px solid red; */
-  
+
   .add-new-user-heading {
     margin-top: 60px;
     color: white;
@@ -281,13 +302,14 @@ const Main = styled.div`
     color: white;
     /* border: 1px solid red; */
     margin-top: 5px;
-    margin-left:50px;
-    width: 20%;
+    margin-left: 50px;
+    width: max-content;
     /* border: 1; */
     border-collapse: separate;
     /* border-spacing: 0 25px; */
     border-spacing: 0;
     /* border:1px solid red; */
+    margin-bottom: 20px;
   }
 
   .module-data {

@@ -84,13 +84,13 @@ router.post("/assignUsers", async (req, res) => {
 
   await ModulesModel.updateOne(
     { module_code: moduleCode },
-    { $push: { assigned_users: { $each: validUsers } } }
+    { $addToSet: { assigned_users: { $each: validUsers } } }
   )
     .then(async () => {
       for (let i = 0; i < validUsers.length; i++) {
         await UsersModel.updateOne(
           { uni_id: validUsers[i] },
-          { $push: { assigned_modules: { $each: [moduleCode] } } }
+          { $addToSet: { assigned_modules: { $each: [moduleCode] } } }
         );
       }
       res.json({ message: "success", invalidUsers: invalidUsers });

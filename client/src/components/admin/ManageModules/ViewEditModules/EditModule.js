@@ -50,7 +50,7 @@ function EditModule() {
         .then((res) => {
           if (res.data.message === "success") {
             alert("Module Edited successfully!");
-            // navigate("../viewmodules");
+            navigate("../viewmodules");
           } else alert("Error: " + res.data.message);
         });
     }
@@ -70,6 +70,7 @@ function EditModule() {
           placeholder="Module Code"
           onChange={(event) => setModuleCode(event.target.value)}
           value={moduleCode}
+          disabled
         />
         <label className="add-new-module-label">Enter Module Title</label>
         <input

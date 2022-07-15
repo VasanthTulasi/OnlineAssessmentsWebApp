@@ -69,7 +69,7 @@ function ViewUsersForModules() {
       fontWeight: 400,
       color: "#282c34",
     }),
-    option: (provided) => ({
+    option: (provided,state) => ({
       ...provided,
       color: "black",
       font: "17px",
@@ -77,6 +77,10 @@ function ViewUsersForModules() {
       fontSize: "17px",
       fontWeight: 400,
       color: "#282c34",
+      backgroundColor: state.isSelected ? "#61dafb" : "white",
+      "&:hover": {  
+        backgroundColor: "rgba(189,197,209,.3)"
+      }
     }),
     placeholder: (provided) => ({
       ...provided,

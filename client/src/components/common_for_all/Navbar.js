@@ -180,7 +180,7 @@ const MenuBar = styled.div`
     /* border: 1px solid cornflowerblue; */
     color: #0b1118;
     /* background: #84f7d1; */
-    background-color: #f4ac45;
+    /* background-color: #f4ac45; */
     /* background-color: #0CF574; */
     background-color: #f2cc8f;
     /* background-color: #C5D86D; */

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import SingleSelect from "react-select";
 import Axios from "axios";
@@ -11,14 +11,11 @@ import CodingTemplate from "./QuestionTemplates/CodingTemplate";
 function CreateExams() {
   const [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
   const [moduleCode, setModuleCode] = useState("");
-  const [questionType, setQuestionType] = useState("mcq");
-  // const [questionNumber, setQuestionNumber] = useState(0);
+  // const [questionType, setQuestionType] = useState("mcq");
   const [questions, setQuestions] = useState([]);
-  
-  console.log("Question id "+questions.length);
-  // const [questionTemplate, setQuestionTemplate] = useState();
-  const expandDivClassName = "new-question expand"
-  const questionTypes = [
+  const questionTypeComponent = useRef(null);
+
+  const questionTypesDropdown = [
     { label: "Multiple Choice Question", value: "mcq" },
     { label: "Fill in the Blank", value: "fib" },
     { label: "Essay", value: "essay" },
@@ -41,8 +38,7 @@ function CreateExams() {
   const enteredMCQOptions = (event) => {
     const val = event.currentTarget.id.split("_")[2];
     console.log(val);
-  }
-  
+  };
 
   useEffect(() => {
     axios.get("/moduleCodes").then((res) => {
@@ -55,33 +51,42 @@ function CreateExams() {
   }, []);
 
   const moduleCodeSelected = (selOption) => {
+    setQuestions([]);
     setModuleCode(selOption.value);
-
   };
 
-  const questionTypeSelected = (selOption) => {
-    setQuestionType(selOption.value);
-    // switch (selOption.value) {
-    //   case "mcq":
-    //     setQuestionTemplate(questionTemplates[0]);
-    //     break;
-    //   case "fib":
-    //     setQuestionTemplate(questionTemplates[1]);
-    //     break;
-    //   case "essay":
-    //     setQuestionTemplate(questionTemplates[2]);
-    //     break;
-    //   case "coding":
-    //     setQuestionTemplate(questionTemplates[3]);
-    //     break;
-    // }
-  };
+  useEffect(() => {
+    setQuestions([
+      {
+        questionId: questions.length,
+        questionType: "mcq",
+        questionText: "",
+        options: [],
+        correctAnswer: "",
+      },
+    ]);
+  }, [moduleCode]);
 
   const addNewQuestion = () => {
-    // console.log("Called")
-    setQuestions([...questions, ""]);
-    // setQuestionNumber(preVal => preVal + 1 )
+    setQuestions([
+      ...questions,
+      {
+        questionId: questions.length,
+        questionType: "mcq",
+        questionText: "",
+        options: [],
+        correctAnswer: "",
+      },
+    ]);
   };
+
+  const setQuestionType = () => {
+    console.log(questionTypeComponent.current.props.id);
+  };
+
+const save = () =>{
+  console.log(JSON.stringify(questions));
+}
 
   const customStyles1 = {
     valueContainer: (provided) => ({
@@ -119,14 +124,7 @@ function CreateExams() {
     container: (provided) => ({
       ...provided,
       width: "400px",
-      // paddingLeft: "10px",
-      marginTop: "10px",
-      color: "black",
-      font: "17px",
-      fontFamily: '"Source Sans Pro", sans-serif',
-      fontSize: "12px",
-      fontWeight: 400,
-      color: "#282c34",
+      marginTop: "5px",
     }),
   };
 
@@ -134,19 +132,27 @@ function CreateExams() {
     <CreateExam>
       <div className="pending-registrations-heading">Create an Exam</div>
       <div className="module-select">
-        <label className="select-module-label">Select Module Code</label>
-        <div className="select-module-dropdown">
-          <SingleSelect
-            options={moduleCodesFromDB}
-            styles={customStyles1}
-            placeholder="Select or Search Module Code"
-            onChange={moduleCodeSelected}
-            noOptionsMessage={() => "This module is not assigned to you"}
-          />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-start",
+          }}
+        >
+          <label className="select-module-label">Select Module Code</label>
+          <div className="select-module-dropdown">
+            <SingleSelect
+              options={moduleCodesFromDB}
+              styles={customStyles1}
+              placeholder="Select or Search Module Code"
+              onChange={moduleCodeSelected}
+              noOptionsMessage={() => "This module is not assigned to you"}
+            />
+          </div>
         </div>
       </div>
       <div className="questions">
-        {questions.map((ele, index) => {
+        {moduleCode !== "" && questions.map((ele, index) => {
           return (
             <div className="new-question">
               <div className="question-number">{index + 1}</div>
@@ -155,14 +161,23 @@ function CreateExams() {
                   Select Question Type
                 </label>
                 <SingleSelect
-                  options={questionTypes}
+                  ref={questionTypeComponent}
+                  id={"question_type_" + index}
+                  options={questionTypesDropdown}
                   styles={customStyles2}
-                  placeholder="Select Question Type"
-                  onChange={questionTypeSelected}
-                  defaultValue={questionTypes}
-                  noOptionsMessage={() => "Option Not Available"}
+                  onChange={setQuestionType}
+                  defaultValue={questionTypesDropdown[0]}
+                  noOptionsMessage={() => "This module is not assigned to you"}
                 />
-                {questionType === "mcq" && <MCQTemplate templateId={index} enteredMCQOptions={enteredMCQOptions}/>}
+                {ele.questionType === "mcq" && (
+                  <MCQTemplate
+                    templateId={index}
+                    enteredMCQOptions={enteredMCQOptions}
+                  />
+                )}
+                {ele.questionType === "fib" && <FIBTemplate />}
+                {ele.questionType === "essay" && <EssayTemplate />}
+                {ele.questionType === "coding" && <CodingTemplate />}
                 <button className="remove-question-button">
                   Remove This Question
                 </button>
@@ -171,11 +186,16 @@ function CreateExams() {
           );
         })}
       </div>
-      <div style={{ textAlign: "center" }}>
-        <button className="new-question-button" onClick={addNewQuestion}>
-          Add New Question
-        </button>
-      </div>
+      {moduleCode !== "" && (
+        <div style={{ textAlign: "center" }}>
+          <button className="new-question-button" onClick={addNewQuestion}>
+            Add New Question
+          </button>
+          <button className="new-question-button" onClick={save}>
+            Save
+          </button>
+        </div>
+      )}
     </CreateExam>
   );
 }
@@ -283,7 +303,7 @@ const CreateExam = styled.div`
   }
 
   .remove-question-button {
-    margin-top: 15px;
+    margin-top: 25px;
     border: 1px solid black;
     color: #282c34;
     background-color: white;

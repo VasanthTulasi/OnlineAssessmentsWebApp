@@ -10,7 +10,7 @@ function Body() {
     <>
       <NavBar />
       <Routes>
-          <Route exact path="/" element={<ManageUsers />} />
+          {/* <Route exact path="/" element={<ManageUsers />} /> */}
           <Route exact path="/manageusers/*" element={<ManageUsers />} />
           <Route exact path="/managemodules/*" element={<ManageModules />} />
           <Route exact path="/myprofile/*" element={<MyProfile />} />

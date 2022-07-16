@@ -1,13 +1,13 @@
 import React from 'react';
-import styled from "styled-components";
+import styled from 'styled-components';
 
-function Exams() {
+function Results() {
   return (
-    <Exam>Professor Exams Info</Exam>
+    <Result>Student Results</Result>
   )
 }
 
-const Exam = styled.div`
+const Result = styled.div`
   height: 100vh;
   width: 100%;
   background-color: #282c34;
@@ -20,4 +20,4 @@ const Exam = styled.div`
   font-size: 20px;
 `;
 
-export default Exams
+export default Results

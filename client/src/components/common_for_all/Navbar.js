@@ -31,7 +31,10 @@ function HomePage() {
   useEffect(() =>{
     if(role === "admin")
     navigate("/manageusers/userslist");
-    console.log("affect");
+    if(role === "professor")
+    navigate("/createExams");
+    if(role === "student")
+    navigate("/modules");
   },[role]);
 
   return (
@@ -67,18 +70,18 @@ function HomePage() {
         {role === "professor" && (
           <ul className="menus">
             <li>
-              <Link to="/modules" className="menu">
-                PModules
+              <Link to="/createExams" className="menu">
+                Create Exams
               </Link>
             </li>
             <li>
-              <Link to="/exams" className="menu">
-                Exams
+              <Link to="/editExams" className="menu">
+                Edit Exams
               </Link>
             </li>
             <li>
-              <Link to="/results" className="menu">
-                Results
+              <Link to="/studentResults" className="menu">
+                Student Results
               </Link>
             </li>
             <li>
@@ -131,6 +134,7 @@ const MenuBar = styled.div`
   top: 0;
   height: 72px;
   border-bottom: 1px solid #61dafb;
+  z-index: 9999;
 
   .app-name {
     font-family: "Sora", sans-serif;

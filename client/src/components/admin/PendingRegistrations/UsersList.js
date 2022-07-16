@@ -95,15 +95,15 @@ const Users = styled.div`
   flex-direction: column;
   margin-top: 30px;
 
-  .pending-registrations-heading {
-    color: white;
-    font-family: "Source Sans Pro", sans-serif;
-    font-weight: 400;
-    font-size: 25px;
-    /* border: 1px solid red; */
-    vertical-align: middle;
-    /* text-decoration: underline; */
-  }
+    .pending-registrations-heading {
+      color: white;
+      font-family: "Source Sans Pro", sans-serif;
+      font-weight: 400;
+      font-size: 25px;
+      /* border: 1px solid red; */
+      vertical-align: middle;
+      /* text-decoration: underline; */
+    }
 
   .user-data-content {
     color: white;
@@ -173,7 +173,7 @@ const Users = styled.div`
     padding: 7px 20px 7px 20px;
   }
 
-  .user-data-button {
+  .user-data-button:hover {
     cursor: pointer;
   }
 

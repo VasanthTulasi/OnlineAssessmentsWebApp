@@ -11,7 +11,7 @@ function Body() {
     <>
       <NavBar />
       <Routes>
-          <Route exact path="/" element={<Modules />} />
+          {/* <Route exact path="/" element={<Modules />} /> */}
           <Route exact path="/modules" element={<Modules />} />
           <Route exact path="/exams" element={<Exams />} />
           <Route exact path="/results" element={<Results />} />

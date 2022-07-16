@@ -7,27 +7,12 @@ import MCQTemplate from "./QuestionTemplates/MCQTemplate";
 import FIBTemplate from "./QuestionTemplates/FIBTemplate";
 import EssayTemplate from "./QuestionTemplates/EssayTemaplate";
 import CodingTemplate from "./QuestionTemplates/CodingTemplate";
+import QuestionTypeDropdown from "./QuestionTypeDropdown";
 
 function CreateExams() {
   const [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
   const [moduleCode, setModuleCode] = useState("");
-  // const [questionType, setQuestionType] = useState("mcq");
   const [questions, setQuestions] = useState([]);
-  const questionTypeComponent = useRef(null);
-
-  const questionTypesDropdown = [
-    { label: "Multiple Choice Question", value: "mcq" },
-    { label: "Fill in the Blank", value: "fib" },
-    { label: "Essay", value: "essay" },
-    { label: "Coding", value: "coding" },
-  ];
-
-  // const questionTemplates = [
-  //   <MCQTemplate/>,
-  //   <FIBTemplate/>,
-  //   <EssayTemplate/>,
-  //   <CodingTemplate/>,
-  // ];
 
   const axios = Axios.create({
     withCredentials: true,
@@ -35,9 +20,31 @@ function CreateExams() {
     crossDomain: true,
   });
 
-  const enteredMCQOptions = (event) => {
-    const val = event.currentTarget.id.split("_")[2];
-    console.log(val);
+  //Question Type Methods
+  const changeQuestionType = (index, val) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].questionType = val;
+    setQuestions(modQuestionArr);
+    console.log(index);
+  };
+
+  //MCQ Methods
+  const saveMCQQuestion = (index, question) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].questionText = question;
+    setQuestions(modQuestionArr);
+  };
+
+  const saveMCQQuestionOptions = (index, options) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].options = options;
+    setQuestions(modQuestionArr);
+  };
+
+  const saveMCQCorrectAnswer = (index, correctAnswer) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].correctAnswer = correctAnswer;
+    setQuestions(modQuestionArr);
   };
 
   useEffect(() => {
@@ -50,6 +57,10 @@ function CreateExams() {
     });
   }, []);
 
+  useEffect(() => {
+    console.log("Updated questions:\n"+JSON.stringify(questions));
+  }, [questions]);
+
   const moduleCodeSelected = (selOption) => {
     setQuestions([]);
     setModuleCode(selOption.value);
@@ -58,7 +69,7 @@ function CreateExams() {
   useEffect(() => {
     setQuestions([
       {
-        questionId: questions.length,
+        id: 0,
         questionType: "mcq",
         questionText: "",
         options: [],
@@ -68,10 +79,10 @@ function CreateExams() {
   }, [moduleCode]);
 
   const addNewQuestion = () => {
-    setQuestions([
-      ...questions,
+    setQuestions((prevState) => [
+      ...prevState,
       {
-        questionId: questions.length,
+        id: questions.length,
         questionType: "mcq",
         questionText: "",
         options: [],
@@ -80,13 +91,21 @@ function CreateExams() {
     ]);
   };
 
-  const setQuestionType = () => {
-    console.log(questionTypeComponent.current.props.id);
+  const removeQuestion = (event) => {
+    const index = event.currentTarget.id.split("_")[2];
+    let modQuestionArray = [...questions];
+    modQuestionArray.splice(index, 1);
+    setQuestions(modQuestionArray);
   };
 
-const save = () =>{
-  console.log(JSON.stringify(questions));
-}
+  const save = () => {
+    // let finalQuestionArray = [...questions];
+    // finalQuestionArray = finalQuestionArray.map((ele, ind) => {
+    //   return {...ele , id: ind };
+    // });
+    // setQuestions(finalQuestionArray);
+    console.log(JSON.stringify(questions));
+  };
 
   const customStyles1 = {
     valueContainer: (provided) => ({
@@ -119,15 +138,6 @@ const save = () =>{
     }),
   };
 
-  const customStyles2 = {
-    ...customStyles1,
-    container: (provided) => ({
-      ...provided,
-      width: "400px",
-      marginTop: "5px",
-    }),
-  };
-
   return (
     <CreateExam>
       <div className="pending-registrations-heading">Create an Exam</div>
@@ -152,39 +162,38 @@ const save = () =>{
         </div>
       </div>
       <div className="questions">
-        {moduleCode !== "" && questions.map((ele, index) => {
-          return (
-            <div className="new-question">
-              <div className="question-number">{index + 1}</div>
-              <div className="question-content">
-                <label className="select-module-label">
-                  Select Question Type
-                </label>
-                <SingleSelect
-                  ref={questionTypeComponent}
-                  id={"question_type_" + index}
-                  options={questionTypesDropdown}
-                  styles={customStyles2}
-                  onChange={setQuestionType}
-                  defaultValue={questionTypesDropdown[0]}
-                  noOptionsMessage={() => "This module is not assigned to you"}
-                />
-                {ele.questionType === "mcq" && (
-                  <MCQTemplate
-                    templateId={index}
-                    enteredMCQOptions={enteredMCQOptions}
-                  />
-                )}
-                {ele.questionType === "fib" && <FIBTemplate />}
-                {ele.questionType === "essay" && <EssayTemplate />}
-                {ele.questionType === "coding" && <CodingTemplate />}
-                <button className="remove-question-button">
-                  Remove This Question
-                </button>
+        {moduleCode !== "" &&
+          questions.map((ele, index) => {
+            return (
+              <div key={ele.id} className="new-question">
+                <div className="question-number">{index + 1}</div>
+                <div className="question-content">
+                  <label className="select-module-label">
+                    Select Question Type
+                  </label>
+                  <QuestionTypeDropdown indexVal={index} changeQuestionType={changeQuestionType} />
+                  {ele.questionType === "mcq" && (
+                    <MCQTemplate
+                      indexVal={index}
+                      saveMCQQuestion={saveMCQQuestion}
+                      saveMCQQuestionOptions={saveMCQQuestionOptions}
+                      saveMCQCorrectAnswer={saveMCQCorrectAnswer}
+                    />
+                  )}
+                  {ele.questionType === "fib" && <FIBTemplate />}
+                  {ele.questionType === "essay" && <EssayTemplate />}
+                  {ele.questionType === "coding" && <CodingTemplate />}
+                  <button
+                    className="remove-question-button"
+                    id={"remove_question_" + index}
+                    onClick={removeQuestion}
+                  >
+                    Remove This Question
+                  </button>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
       {moduleCode !== "" && (
         <div style={{ textAlign: "center" }}>
@@ -204,10 +213,10 @@ const CreateExam = styled.div`
   height: 100%;
   width: 100%;
   min-height: 100vh;
-  /* background-color: #282c34; */
-  background-image: url("${BodyImage}");
+  background-color: #282c34;
+  /* background-image: url("${BodyImage}");
   background-repeat: repeat;
-  background-size: auto;
+  background-size: auto; */
   color: white;
   padding-top: 72px;
   /* border: 1px solid red; */
@@ -260,11 +269,11 @@ const CreateExam = styled.div`
   }
 
   .new-question {
-    border: 1px solid white;
+    border: 2px solid white;
     border-radius: 10px;
-    margin-top: 20px;
+    margin-top: 40px;
     display: flex;
-    width: 75%;
+    width: 80%;
     justify-content: space-evenly;
     /* align-self: center; */
     align-items: center;
@@ -279,6 +288,11 @@ const CreateExam = styled.div`
     padding: 0px 20px 0px 20px;
     flex: 1;
     text-align: center;
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    margin-top: 20px;
   }
   .question-content {
     border-left: 1px solid white;

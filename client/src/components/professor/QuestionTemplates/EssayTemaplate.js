@@ -6,7 +6,7 @@ function EssayTemplate() {
         <Essay>
           <label className="label">Enter The Essay Question</label>
           <br />
-          <textarea className="" onChange="textAreaChanged" rows="5" cols="50" />
+          <textarea className="" rows="5" cols="50" />
         </Essay>
       );
 }

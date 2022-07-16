@@ -6,7 +6,7 @@ function FIBTemplate() {
         <FIB>
           <label className="label">Enter The FIB Question</label>
           <br />
-          <textarea className="" onChange="textAreaChanged" rows="5" cols="50" />
+          <textarea className="" rows="5" cols="50" />
         </FIB>
       );
 }

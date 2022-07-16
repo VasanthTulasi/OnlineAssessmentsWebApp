@@ -6,7 +6,7 @@ function CodingTemplate() {
         <Coding>
           <label className="label">Enter The Coding Question</label>
           <br />
-          <textarea className="" onChange="textAreaChanged" rows="5" cols="50" />
+          <textarea className="" rows="5" cols="50" />
         </Coding>
       );
 }

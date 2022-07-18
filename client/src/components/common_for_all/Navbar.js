@@ -32,7 +32,7 @@ function HomePage() {
     if(role === "admin")
     navigate("/manageusers/userslist");
     if(role === "professor")
-    navigate("/createExams");
+    navigate("/createAssessments");
     if(role === "student")
     navigate("/modules");
   },[role]);
@@ -50,8 +50,8 @@ function HomePage() {
               </Link>
             </li>
             <li>
-              <Link to="/exams" className="menu">
-                Exams
+              <Link to="/Assessments" className="menu">
+                Assessments
               </Link>
             </li>
             <li>
@@ -70,13 +70,13 @@ function HomePage() {
         {role === "professor" && (
           <ul className="menus">
             <li>
-              <Link to="/createExams" className="menu">
-                Create Exams
+              <Link to="/createAssessments" className="menu">
+                Create Assessments
               </Link>
             </li>
             <li>
-              <Link to="/editExams" className="menu">
-                Edit Exams
+              <Link to="/editAssessments" className="menu">
+                Edit Assessments
               </Link>
             </li>
             <li>

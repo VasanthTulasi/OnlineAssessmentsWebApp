@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from "styled-components";
 
-function Exams() {
+function Assessments() {
   return (
-    <Exam>Exams Info</Exam>
+    <Assessment>Assessments Info</Assessment>
   )
 }
 
-const Exam = styled.div`
+const Assessment = styled.div`
   height: 100vh;
   width: 100%;
   background-color: #282c34;
@@ -20,4 +20,4 @@ const Exam = styled.div`
   font-size: 20px;
 `;
 
-export default Exams
+export default Assessments

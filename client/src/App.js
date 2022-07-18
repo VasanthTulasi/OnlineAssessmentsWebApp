@@ -37,9 +37,9 @@ function App() {
   //   if (loggedInUser) {
   //     getCurrentUserRole();
   //     if (loggedInUserRole === "admin") {
-  //       return <AdminExam />;
+  //       return <AdminAssessment />;
   //     } else if (loggedInUserRole === "professor") {
-  //       return <ProfessorExam />;
+  //       return <ProfessorAssessment />;
   //     } else if (loggedInUserRole === "student") {
   //       return <StudentBody />;
   //     }

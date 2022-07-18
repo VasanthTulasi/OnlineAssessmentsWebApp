@@ -4,6 +4,11 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
 
+const PendingRegistrationsRoute = require("./routes/PendingRegistrationsRoute");
+const UsersRoute = require("./routes/UsersRoute");
+const ModulesRoute = require("./routes/ModulesRoute");
+const AssessmentsRoute = require("./routes/AssessmentsRoute");
+
 const corsConfig = {
   credentials: true,
   origin: true,
@@ -17,13 +22,10 @@ mongoose.connect(
   "mongodb+srv://lalithavasanth10:Pmbcem08@onlineexamcluster.x1ohh.mongodb.net/OnlineExamWebAppDB?retryWrites=true&w=majority"
 );
 
-const PendingRegistrationsRoute = require("./routes/PendingRegistrationsRoute");
-const UsersRoute = require("./routes/UsersRoute");
-const ModulesRoute = require("./routes/ModulesRoute");
-
 app.use("/pendingregistrations", PendingRegistrationsRoute);
 app.use("/users", UsersRoute);
 app.use("/modules", ModulesRoute);
+app.use("/assessments", AssessmentsRoute);
 
 app.listen(3001, () => {
   console.log("Server is good");

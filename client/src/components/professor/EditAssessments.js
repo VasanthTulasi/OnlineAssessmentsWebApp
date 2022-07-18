@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 function Modules() {
   return (
-    <Module>This is edit exams</Module>
+    <Module>This is edit Assessments</Module>
   )
 }
 

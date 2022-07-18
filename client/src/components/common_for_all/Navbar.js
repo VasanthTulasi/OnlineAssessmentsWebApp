@@ -74,8 +74,8 @@ function HomePage() {
                 Create Assessments
               </Link>
             </li>
-            <li>
-              <Link to="/editAssessments" className="menu">
+            <li>  
+              <Link to="/viewEditAssessments/viewAssessments" className="menu">
                 Edit Assessments
               </Link>
             </li>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useContext } from "react";
 import styled from "styled-components";
 import SingleSelect from "react-select";
 import Axios from "axios";
@@ -8,8 +8,10 @@ import FIBTemplate from "./QuestionTemplates/FIBTemplate";
 import EssayTemplate from "./QuestionTemplates/EssayTemaplate";
 import CodingTemplate from "./QuestionTemplates/CodingTemplate";
 import QuestionTypeDropdown from "./QuestionTypeDropdown";
+import { LoginContext } from "../../contexts/LoginContext";
 
 function CreateAssessments() {
+  const { loggedInUserDetails } = useContext(LoginContext);
   const [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
   const [moduleCode, setModuleCode] = useState("");
   const [questions, setQuestions] = useState([]);
@@ -23,6 +25,8 @@ function CreateAssessments() {
   const [windowStartTime, setWindowStartTime] = useState("");
   const [windowEndTime, setWindowEndTime] = useState("");
   const timeNow = new Date().toISOString().slice(0, 16);
+  
+
   // const [assessmentWindowNumberOptions, setAssessmentWindowNumberOptions] =
   //   useState([]);
   // const [selectedAssessmentWindowMeasure, setSelectedAssessmentWindowMeasure] =
@@ -68,7 +72,7 @@ function CreateAssessments() {
   };
 
   useEffect(() => {
-    axios.get("/moduleCodes").then((res) => {
+    axios.post("/assignedModuleCodes",{uni_id: loggedInUserDetails.uni_id}).then((res) => {
       let moduleCodes = res.data;
       moduleCodes = moduleCodes.map((ele) => {
         return { value: ele, label: ele };

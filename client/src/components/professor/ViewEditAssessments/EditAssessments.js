@@ -1,13 +1,13 @@
-import React from 'react';
+import React from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
-function Modules() {
-  return (
-    <Module>This is edit Assessments</Module>
-  )
+function EditAssessments() {
+    const navigate = useNavigate();
+  return <EditAssess>This is Edit Assess</EditAssess>;
 }
 
-const Module = styled.div`
+const EditAssess = styled.div`
   height: 100vh;
   width: 100%;
   background-color: #282c34;
@@ -20,4 +20,4 @@ const Module = styled.div`
   font-size: 20px;
 `;
 
-export default Modules
+export default EditAssessments;

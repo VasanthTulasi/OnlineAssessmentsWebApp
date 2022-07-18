@@ -70,6 +70,18 @@ router.get("/moduleCodes", async (req, res) => {
   }
 });
 
+router.post("/assignedModuleCodes", async (req, res) => {
+  let moduleCodes = [];
+  // console.log("User is:"+);
+  const modules = await ModulesModel.find({ assigned_users: req.body.uni_id });
+  if (modules) {
+    modules.forEach((ele) => {
+      moduleCodes.push(ele.module_code);
+    });
+    res.send(moduleCodes);
+  }
+});
+
 router.post("/assignUsers", async (req, res) => {
   const { moduleCode, newUsers } = req.body;
   let validUsers = [],

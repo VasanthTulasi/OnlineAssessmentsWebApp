@@ -82,16 +82,12 @@ const Users = styled.div`
   width: 100%;
   min-height: 100vh;
   background-color: #282c34;
-  /* background-image: url("${BodyImage}"); */
-  /* background-repeat: repeat-y; */
-  /* background-size: cover; */
   color: #61dafb;
   padding-top: 72px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   font-size: 20px;
-  /* border: 1px solid red; */
   flex-direction: column;
   margin-top: 30px;
 

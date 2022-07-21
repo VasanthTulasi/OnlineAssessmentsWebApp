@@ -4,6 +4,7 @@ import Axios from "axios";
 import ConfirmDeleteModal from "../ConfirmDeletionModal";
 import SingleSelect from "react-select";
 import { LoginContext } from "../../../contexts/LoginContext";
+import { useNavigate } from "react-router-dom";
 
 function ViewAssessments() {
   const { loggedInUserDetails } = useContext(LoginContext);
@@ -13,7 +14,7 @@ function ViewAssessments() {
   const [isModalVisible, setisModalVisible] = useState(false);
   const [deletionIndex, setDeletionIndex] = useState();
   let [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
-
+  const navigate = useNavigate();
   const axios = Axios.create({
     withCredentials: true,
     baseURL: "http://localhost:3001/modules",
@@ -28,10 +29,16 @@ function ViewAssessments() {
 
   const deleteAssessment = (event) => {
     setDeletionIndex(event.currentTarget.id.split("_")[1]);
-    setisModalVisible(true);
+    setisModalVisible(true);  
   };
 
-  const editModule = (event) => {};
+  const editModule = (event) => {
+    const itemIndex = event.currentTarget.id.split("_")[1];
+    // console.log(assessmentsArray[itemIndex]);
+    navigate("../editAssessments", {
+      state: { ...assessmentsArray[itemIndex] },
+    });
+  };
 
   const selectedModule = (selOption) => {
     setModuleCode(selOption.value);
@@ -39,17 +46,6 @@ function ViewAssessments() {
     setAssessmentsArray([]);
   };
 
-  useEffect(() => {
-    axios2.post("/assessmentsForModule", { moduleCode }).then((res) => {
-      const assessments = res.data;
-      if (assessments.length === 0) {
-        setAssessmentsLoaded(true);
-      } else {
-        setAssessmentsLoaded(true);
-        setAssessmentsArray(assessments);
-      }
-    });
-  }, [moduleCode]);
 
   useEffect(() => {
     axios
@@ -62,6 +58,18 @@ function ViewAssessments() {
         setModuleCodesFromDB(moduleCodes);
       });
   }, []);
+
+  useEffect(() => {
+    axios2.post("/assessmentsForModule", { moduleCode }).then((res) => {
+      const assessments = res.data;
+      if (assessments.length === 0) {
+        setAssessmentsLoaded(true);
+      } else {
+        setAssessmentsLoaded(true);
+        setAssessmentsArray(assessments);
+      }
+    });
+  }, [moduleCode]);
 
   const customStyles = {
     valueContainer: (provided) => ({
@@ -100,7 +108,7 @@ function ViewAssessments() {
     axios2
       .post("/deleteAssessmentFromModule", {
         _id: assessmentsArray[itemIndex]._id,
-        // obj: assessmentsArray[itemIndex] 
+        // obj: assessmentsArray[itemIndex]
       })
       .then((res) => {
         if (res.data.message === "success") {
@@ -141,8 +149,11 @@ function ViewAssessments() {
               <tr>
                 <td className="module-data start headers-color">S. No</td>
                 <td className="module-data headers-color">Assesment Title</td>
-                <td className="module-data end headers-color">
+                <td className="module-data headers-color">
                   Assessment Start Time
+                </td>
+                <td className="module-data end headers-color">
+                  Assessment Status
                 </td>
               </tr>
               {assessmentsArray.map((ele, index) => {
@@ -150,8 +161,15 @@ function ViewAssessments() {
                   <tr>
                     <td className="module-data start">{index + 1}</td>
                     <td className="module-data mid">{ele.title}</td>
-                    <td className="module-data end">
+                    <td className="module-data mid">
                       {new Date(ele.window_start_time).toString().slice(0, 24)}
+                    </td>
+                    <td className="module-data end">
+                      {new Date() > new Date(ele.window_end_time)
+                        ? "Completed"
+                        : new Date() > new Date(ele.window_start_time)
+                        ? "Ongoing"
+                        : "Upcoming"}
                     </td>
                     <td>
                       <button

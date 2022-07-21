@@ -181,7 +181,8 @@ function CreateAssessments() {
       let assessment = {
       module_code: moduleCode,
       title: assessmentTitle,
-      duration: getDurationInSeconds(),
+      duration_number: selectedDurationNumber,
+      duration_measure: selectedDurationMeasure, 
       window_start_time: windowStartTime,
       window_end_time: windowEndTime
       }
@@ -191,14 +192,14 @@ function CreateAssessments() {
     }
   };
 
-  const getDurationInSeconds = () => {
-    return (
-      selectedDurationNumber *
-      (selectedDurationMeasure === "minutes"
-        ? 60
-        : (60 * 60))
-    );
-  };
+  // const getDurationInSeconds = () => {
+  //   return (
+  //     selectedDurationNumber *
+  //     (selectedDurationMeasure === "minutes"
+  //       ? 60
+  //       : (60 * 60))
+  //   );
+  // };
 
   const validateQuestions = () => {
     for (let i = 0; i < questions.length; i++) {

@@ -76,7 +76,7 @@ function HomePage() {
             </li>
             <li>  
               <Link to="/viewEditAssessments/viewAssessments" className="menu">
-                Edit Assessments
+                View Assessments
               </Link>
             </li>
             <li>

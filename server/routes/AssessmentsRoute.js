@@ -15,22 +15,22 @@ router.post("/assessmentsForModule", async (req, res) => {
     module_code: req.body.moduleCode,
   });
   if (assessments) {
-    let assessmentList = assessments;
-    assessmentList = assessmentList.map((ele) => {
-      return {
-        _id: ele._id,
-        title: ele.title,
-        window_start_time: ele.window_start_time
-      };
-    });
-    res.send(assessmentList);
+    // let assessmentList = assessments;
+    // assessmentList = assessmentList.map((ele) => {
+    //   return {
+    //     _id: ele._id,
+    //     title: ele.title,
+    //     window_start_time: ele.window_start_time,
+    //     window_end_time: ele.window_end_time
+    //   };
+    // });
+    res.send(assessments);
   }
 });
 
 
 router.post("/deleteAssessmentFromModule", (req,res) =>{
     const {_id} = req.body;
-    // console.log("id is: "+_id);
     AssessmentsModel.deleteOne({_id: _id}, function (err) {
         if (err) return res.json({ message: err });
         res.json({ message: "success" });

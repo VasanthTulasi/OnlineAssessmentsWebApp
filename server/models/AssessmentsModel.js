@@ -10,8 +10,12 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    duration: {
+    duration_number: {
       type: Number,
+      required: true,
+    },
+    duration_measure: {
+      type: String,
       required: true,
     },
     window_start_time: {

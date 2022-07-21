@@ -12,27 +12,24 @@ import { LoginContext } from "../../../contexts/LoginContext";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function EditAssessments() {
+  console.log("Rendered \n");
   const navigate = useNavigate();
   const { state } = useLocation();
   const { loggedInUserDetails } = useContext(LoginContext);
   const [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
-  const [moduleCode, setModuleCode] = useState(state.module_code);
-  const [questions, setQuestions] = useState(state.questions);
-  const [nextKeyId, setNextKeyId] = useState(null);
+  const [moduleCode, setModuleCode] = useState("");
+  // console.log("State Questions \n"+JSON.stringify(state.questions));
+  const [questions, setQuestions] = useState([]);
+  const [nextKeyId, setNextKeyId] = useState(1);
   const [assessmentDurationNumberOptions, setAssessmentDurationNumberOptions] =
     useState([]);
-  const [selectedDurationMeasure, setSelectedDurationMeasure] = useState(
-    state.duration_measure
-  );
-  const [assessmentTitle, setAssessmentTitle] = useState(state.title);
-  const [selectedDurationNumber, setSelectedDurationNumber] = useState(null);
-  const [windowStartTime, setWindowStartTime] = useState(
-    state.window_start_time
-  );
-  const [windowEndTime, setWindowEndTime] = useState(state.window_end_time);
+  const [selectedDurationMeasure, setSelectedDurationMeasure] =
+    useState("minutes");
+  const [assessmentTitle, setAssessmentTitle] = useState("");
+  const [selectedDurationNumber, setSelectedDurationNumber] = useState(10);
+  const [windowStartTime, setWindowStartTime] = useState("");
+  const [windowEndTime, setWindowEndTime] = useState("");
   const timeNow = new Date().toISOString().slice(0, 16);
-  console.log("Set first time")
-  const [isFirstTime,setIsFirstTime] = useState(true);
 
   const axios = Axios.create({
     withCredentials: true,
@@ -56,24 +53,31 @@ function EditAssessments() {
 
   //MCQ Methods
   const saveMCQQuestion = (index, question) => {
+    console.log("saveMCQQuestion")
     let modQuestionArr = [...questions];
     modQuestionArr[index].questionText = question;
     setQuestions(modQuestionArr);
+    console.log("Modified: "+JSON.stringify(questions))
   };
 
   const saveMCQQuestionOptions = (index, options) => {
+    console.log("saveMCQQuestionOptions")
     let modQuestionArr = [...questions];
     modQuestionArr[index].options = options;
     setQuestions(modQuestionArr);
+    console.log("Modified: "+JSON.stringify(questions))
   };
 
   const saveMCQCorrectAnswer = (index, correctAnswer) => {
+    console.log("saveMCQCorrectAnswer")
     let modQuestionArr = [...questions];
     modQuestionArr[index].correctAnswer = correctAnswer;
     setQuestions(modQuestionArr);
+    console.log("Modified: "+JSON.stringify(questions))
   };
 
   useEffect(() => {
+    console.log("Initial use effect");
     // setAssessmentTitle(state.title);
     // setSelectedDurationMeasure(state.duration_measure);
     // setSelectedDurationNumber(state.duration_number);
@@ -98,48 +102,42 @@ function EditAssessments() {
     // console.log("Questions with id: "+JSON.stringify(questionsWithIds));
     // console.log("in");
     // setQuestions(questionsWithIds);
-    setNextKeyId(state.questions.length);
+    // setNextKeyId();
+      axios2.post("/assessmentsbyId",{_id: state._id}).then(res =>{
+          console.log("Returned assessment is:"+ JSON.stringify(res.data));
+          const assessment = res.data;
+          setAssessmentTitle(assessment.title);
+          setSelectedDurationMeasure(assessment.duration_measure);
+          setSelectedDurationNumber(assessment.duration_number);
+          setWindowStartTime(assessment.window_start_time);
+          setWindowEndTime(assessment.window_end_time);
+          setModuleCode(assessment.module_code);
+          setQuestions(assessment.questions);
+
+          if(assessment.duration_measure === "minutes"){
+            let newNumbers = [];
+            for (let i = 10; i <= 59; i = i + 10) newNumbers.push(i);
+            setAssessmentDurationNumberOptions(newNumbers);
+          }else{
+            let newNumbers = [];
+            for (let i = 1; i <= 3; i = i + 0.5) newNumbers.push(i);
+            setAssessmentDurationNumberOptions(newNumbers);
+          }
+      });
   }, []);
 
-  useEffect(() => {
-    console.log("use effect");
-    if (selectedDurationMeasure === "minutes") {
+  const changeDurationMeasure = (event) =>{
+    setSelectedDurationMeasure(event.target.value);
+    if(event.target.value === "minutes"){
       let newNumbers = [];
       for (let i = 10; i <= 59; i = i + 10) newNumbers.push(i);
       setAssessmentDurationNumberOptions(newNumbers);
-      if (isFirstTime) {
-        console.log("in first");
-        setSelectedDurationNumber(state.duration_number);
-        setIsFirstTime(false);
-      } else setSelectedDurationNumber(10);
-    } else {
+    }else{
       let newNumbers = [];
       for (let i = 1; i <= 3; i = i + 0.5) newNumbers.push(i);
       setAssessmentDurationNumberOptions(newNumbers);
-      if (isFirstTime) {
-        console.log("in first two");
-        setSelectedDurationNumber(state.duration_number);
-        setIsFirstTime(false);
-      } else setSelectedDurationNumber(10);
     }
-  }, [selectedDurationMeasure]);
-
-  // useEffect(() => {
-  //   if (selectedAssessmentWindowMeasure === "minutes") {
-  //     let newNumbers = [];
-  //     for (let i = 10; i <= 59; i = i + 10) newNumbers.push(i);
-  //     setAssessmentWindowNumberOptions(newNumbers);
-  //   } else if (selectedAssessmentWindowMeasure === "hours") {
-  //     let newNumbers = [];
-  //     for (let i = 1; i <= 23; i = i + 0.5) newNumbers.push(i);
-  //     setAssessmentWindowNumberOptions(newNumbers);
-  //   } else {
-  //     // console.log("reached");
-  //     let newNumbers = [];
-  //     for (let i = 1; i <= 5; i++) newNumbers.push(i);
-  //     setAssessmentWindowNumberOptions(newNumbers);
-  //   }
-  // }, [selectedAssessmentWindowMeasure]);
+  }
 
   // useEffect(() => {
   //   const finalQuestions = questions.map((ele, index) => {
@@ -149,20 +147,7 @@ function EditAssessments() {
   // }, [questions]);
 
   const moduleCodeSelected = (selOption) => {
-    if (selOption.value !== moduleCode) {
-      setQuestions([]);
-      setModuleCode(selOption.value);
-      setQuestions([
-        {
-          id: 0,
-          questionType: "mcq",
-          questionText: "",
-          options: [],
-          correctAnswer: "",
-        },
-      ]);
-      setNextKeyId(1);
-    }
+    setModuleCode(selOption.value);
   };
 
   const addNewQuestion = () => {
@@ -194,16 +179,15 @@ function EditAssessments() {
     // console.log(state.window_end_time);
     // console.log("\n" + JSON.stringify(state.questions));
     // console.log(state.module_code);
-    console.log(state.questions);
+    console.log("save: ");
 
-    // console.log("\n" + JSON.stringify(questions));
-    // console.log(assessmentTitle);
-    // console.log(selectedDurationNumber);
-    // console.log(selectedDurationMeasure);
-    // console.log(windowStartTime);
-    // console.log(windowEndTime);
-    // console.log(moduleCode);
-    // console.log(questions);
+    console.log(JSON.stringify(questions));
+    console.log(assessmentTitle);
+    console.log(selectedDurationNumber);
+    console.log(selectedDurationMeasure);
+    console.log(windowStartTime);
+    console.log(windowEndTime);
+    console.log(moduleCode);
 
     // if (
     //   assessmentTitle === "" ||
@@ -314,7 +298,7 @@ function EditAssessments() {
 
   return (
     <EditAssessment>
-      <div className="pending-registrations-heading">Edit the Assessment</div>
+      <div className="pending-registrations-heading">Edit this Assessment</div>
       <div className="assessment-info">
         <label className="assessment-info-label">Enter Assessment Title</label>
         <input
@@ -323,8 +307,8 @@ function EditAssessments() {
           onChange={(e) => {
             setAssessmentTitle(e.target.value);
           }}
-          defaultValue={state.title}
-          // value={assessmentTitle}
+          // defaultValue={assessmentTitle}
+          value={assessmentTitle}
         />
         <label className="assessment-info-label">
           Select Assessment Duration
@@ -335,8 +319,8 @@ function EditAssessments() {
             onChange={(e) => {
               setSelectedDurationNumber(e.target.value);
             }}
-            // value={selectedDurationNumber}
-            defaultValue={selectedDurationNumber}
+            value={selectedDurationNumber}
+            // defaultValue={selectedDurationNumber}
           >
             {assessmentDurationNumberOptions.map((e, index) => {
               return <option value={e}>{e}</option>;
@@ -344,9 +328,9 @@ function EditAssessments() {
           </select>
           <select
             className="assessment-duration-measure"
-            onChange={(event) => setSelectedDurationMeasure(event.target.value)}
-            // value={selectedDurationMeasure}
-            defaultValue={selectedDurationMeasure}
+            onChange={(event) => changeDurationMeasure(event)}
+            value={selectedDurationMeasure}
+            // defaultValue={selectedDurationMeasure}
           >
             <option value="minutes">Minutes</option>
             <option value="hours">Hour(s)</option>
@@ -363,7 +347,8 @@ function EditAssessments() {
           onChange={(e) => {
             setWindowStartTime(e.target.value);
           }}
-          defaultValue={state.window_start_time}
+          // defaultValue={state.window_start_time}
+          value={windowStartTime}
         />
         <label className="assessment-info-label">
           Select Assessment Window End Time
@@ -377,26 +362,9 @@ function EditAssessments() {
             setWindowEndTime(e.target.value);
           }}
           //   value={windowEndTime}
-          defaultValue={state.window_end_time}
+          // defaultValue={state.window_end_time}
+          value={windowEndTime}
         />
-        {/* <div className="assessment-duration">
-          <select className="assessment-duration-number" onChange={() => {}}>
-            {assessmentWindowNumberOptions.map((e) => {
-              return <option value={e}>{e}</option>;
-            })}
-          </select>
-          <select
-            className="assessment-duration-measure"
-            onChange={(event) =>
-              setSelectedAssessmentWindowMeasure(event.target.value)
-            }
-          >
-            <option value="minutes">Minutes</option>
-            <option value="hours">Hour(s)</option>
-            <option value="days">Day(s)</option>
-          </select>
-          
-        </div> */}
         <label className="assessment-info-label">Select Module Code</label>
         <div className="select-module-dropdown">
           <SingleSelect
@@ -405,9 +373,13 @@ function EditAssessments() {
             placeholder="Select or Search Module Code"
             onChange={moduleCodeSelected}
             noOptionsMessage={() => "This module is not assigned to you"}
-            defaultValue={{
-              label: state.module_code,
-              value: state.module_code,
+            // defaultValue={{
+            //   label: state.module_code,
+            //   value: state.module_code,
+            // }}
+            value={{
+              label: moduleCode,
+              value: moduleCode,
             }}
           />
           {/* </div> */}
@@ -438,6 +410,9 @@ function EditAssessments() {
                     saveMCQQuestion={saveMCQQuestion}
                     saveMCQQuestionOptions={saveMCQQuestionOptions}
                     saveMCQCorrectAnswer={saveMCQCorrectAnswer}
+                    questionText={ele.questionText}
+                    options={ele.options}
+                    correctAnswer={ele.correctAnswer}
                   />
                 )}
                 {ele.questionType === "fib" && <FIBTemplate />}

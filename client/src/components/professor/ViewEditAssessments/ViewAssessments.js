@@ -36,7 +36,7 @@ function ViewAssessments() {
     const itemIndex = event.currentTarget.id.split("_")[1];
     // console.log(assessmentsArray[itemIndex]);
     navigate("../editAssessments", {
-      state: { ...assessmentsArray[itemIndex] },
+      state: { _id: assessmentsArray[itemIndex]._id },
     });
   };
 
@@ -131,7 +131,7 @@ function ViewAssessments() {
       )}
       <ViewEditMod>
         <div className="heading">View Assessments For Modules</div>
-        <div class="whole-content">
+        <div className="whole-content">
           <label className="select-module-label">Select Module Code</label>
           <div className="select-module-dropdown">
             <SingleSelect

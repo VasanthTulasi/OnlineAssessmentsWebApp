@@ -6,7 +6,6 @@ import ProfileData from "./ProfileData";
 import { useNavigate } from "react-router-dom";
 
 function ProfileContent() {
-
   const navigate = useNavigate();  
   const { loggedInUserDetails } = useContext(LoginContext);
   const userObj = loggedInUserDetails;

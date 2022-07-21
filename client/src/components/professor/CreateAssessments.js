@@ -93,29 +93,6 @@ function CreateAssessments() {
     }
   }, [selectedDurationMeasure]);
 
-  // useEffect(() => {
-  //   if (selectedAssessmentWindowMeasure === "minutes") {
-  //     let newNumbers = [];
-  //     for (let i = 10; i <= 59; i = i + 10) newNumbers.push(i);
-  //     setAssessmentWindowNumberOptions(newNumbers);
-  //   } else if (selectedAssessmentWindowMeasure === "hours") {
-  //     let newNumbers = [];
-  //     for (let i = 1; i <= 23; i = i + 0.5) newNumbers.push(i);
-  //     setAssessmentWindowNumberOptions(newNumbers);
-  //   } else {
-  //     // console.log("reached");
-  //     let newNumbers = [];
-  //     for (let i = 1; i <= 5; i++) newNumbers.push(i);
-  //     setAssessmentWindowNumberOptions(newNumbers);
-  //   }
-  // }, [selectedAssessmentWindowMeasure]);
-
-  // useEffect(() => {
-  //   const finalQuestions = questions.map((ele, index) => {
-  //     return { id: index, ...ele };
-  //   });
-  //   setQuestionsWithIDs(finalQuestions);
-  // }, [questions]);
 
   const moduleCodeSelected = (selOption) => {
     setQuestions([]);

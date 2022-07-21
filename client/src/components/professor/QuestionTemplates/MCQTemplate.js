@@ -16,6 +16,10 @@ function MCQTemplate(props) {
   function formatCreateLabel(value) {
     return 'Add Option "' + value + '"';
   }
+  // console.log("Vals: \n");
+  // console.log("quesion "+props.questionText);
+  // console.log("options "+props.options);
+  // console.log("correct Answer "+props.correctAnswer);
 
   const customStyles = {
     container: (provided) => ({
@@ -60,6 +64,14 @@ function MCQTemplate(props) {
     }),
   };
 
+  useEffect(() => {
+    let options = props.options;
+    options = options.map((ele) => {
+      return { label: ele, value: ele };
+    });
+    setAvailableOptions(options);
+  }, []);
+
   //Methods
   const saveMCQQuestion = (event) => {
     setQuestion(event.target.value);
@@ -103,6 +115,7 @@ function MCQTemplate(props) {
         className="text-area"
         onChange={saveMCQQuestion}
         rows="3"
+        defaultValue={props.questionText}
       />
       <label className="label-class">Enter Options for this Question</label>
       <div style={{ marginTop: "5px" }}>
@@ -119,6 +132,13 @@ function MCQTemplate(props) {
             DropdownIndicator: () => null,
             IndicatorSeparator: () => null,
           }}
+          defaultValue={() => {
+            let options = props.options;
+            options = options.map((ele) => {
+              return { label: ele, value: ele };
+            });
+            return options;
+          }}
         />
       </div>
       <label className="label-class">Select the Correct Answer</label>
@@ -131,6 +151,10 @@ function MCQTemplate(props) {
           placeholder="Correct Answer"
           onChange={saveMCQCorrectAnswer}
           noOptionsMessage={() => "This module is not assigned to you"}
+          defaultValue={{
+            label: props.correctAnswer,
+            value: props.correctAnswer,
+          }}
         />
       </div>
     </MCQ>

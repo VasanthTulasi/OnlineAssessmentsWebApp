@@ -4,9 +4,9 @@ import CreatableSelect from "react-select/creatable";
 import SingleSelect from "react-select";
 
 function MCQTemplate(props) {
-  const [question, setQuestion] = useState("");
-  const [questionOptions, setQuestionOptions] = useState([]);
-  const [correctAnswer, setCorrectAnswer] = useState("");
+  // const [question, setQuestion] = useState("");
+  // const [questionOptions, setQuestionOptions] = useState([]);
+  // const [correctAnswer, setCorrectAnswer] = useState("");
   const [availableOptions, setAvailableOptions] = useState([]);
 
   const optionsComponent = useRef(null);
@@ -74,34 +74,37 @@ function MCQTemplate(props) {
 
   //Methods
   const saveMCQQuestion = (event) => {
-    setQuestion(event.target.value);
+    // setQuestion(event.target.value);
+    const questionId = textAreaComponent.current.id.split("_")[3];
+    props.saveMCQQuestion(questionId, event.target.value);
   };
 
   const saveMCQQuestionOptions = (selOptions) => {
     let optionsArray = selOptions;
     optionsArray = optionsArray.map((ele) => ele.value);
-    setQuestionOptions(optionsArray);
+    // setQuestionOptions(optionsArray);
     setAvailableOptions(selOptions);
+    const questionId = optionsComponent.current.props.id.split("_")[2];
+    props.saveMCQQuestionOptions(questionId, optionsArray);
   };
 
   const saveMCQCorrectAnswer = (selOption) => {
-    setCorrectAnswer(selOption.value);
+    // setCorrectAnswer(selOption.value);
+    const questionId = correctOptionComponent.current.props.id.split("_")[2];
+    props.saveMCQCorrectAnswer(questionId, selOption.value);
   };
 
-  useEffect(() => {
-    const questionId = textAreaComponent.current.id.split("_")[3];
-    props.saveMCQQuestion(questionId, question);
-  }, [question]);
+  // useEffect(() => {
+    
+  // }, [question]);
 
-  useEffect(() => {
-    const questionId = optionsComponent.current.props.id.split("_")[2];
-    props.saveMCQQuestionOptions(questionId, questionOptions);
-  }, [questionOptions]);
+  // useEffect(() => {
+    
+  // }, [questionOptions]);
 
-  useEffect(() => {
-    const questionId = correctOptionComponent.current.props.id.split("_")[2];
-    props.saveMCQCorrectAnswer(questionId, correctAnswer);
-  }, [correctAnswer]);
+  // useEffect(() => {
+    
+  // }, [correctAnswer]);
 
   return (
     <MCQ>

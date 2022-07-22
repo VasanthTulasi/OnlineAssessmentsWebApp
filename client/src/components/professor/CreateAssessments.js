@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef,useContext } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import styled from "styled-components";
 import SingleSelect from "react-select";
 import Axios from "axios";
@@ -24,13 +24,8 @@ function CreateAssessments() {
   const [selectedDurationNumber, setSelectedDurationNumber] = useState(10);
   const [windowStartTime, setWindowStartTime] = useState("");
   const [windowEndTime, setWindowEndTime] = useState("");
-  const timeNow = new Date().toISOString().slice(0, 16);
-  
 
-  // const [assessmentWindowNumberOptions, setAssessmentWindowNumberOptions] =
-  //   useState([]);
-  // const [selectedAssessmentWindowMeasure, setSelectedAssessmentWindowMeasure] =
-  //   useState("minutes");
+  const [showfirstQuestion, setShowFirstQuestion] = useState(true);
 
   const axios = Axios.create({
     withCredentials: true,
@@ -72,16 +67,16 @@ function CreateAssessments() {
   };
 
   useEffect(() => {
-    axios.post("/assignedModuleCodes",{uni_id: loggedInUserDetails.uni_id}).then((res) => {
-      let moduleCodes = res.data;
-      moduleCodes = moduleCodes.map((ele) => {
-        return { value: ele, label: ele };
+    axios
+      .post("/assignedModuleCodes", { uni_id: loggedInUserDetails.uni_id })
+      .then((res) => {
+        let moduleCodes = res.data;
+        moduleCodes = moduleCodes.map((ele) => {
+          return { value: ele, label: ele };
+        });
+        setModuleCodesFromDB(moduleCodes);
       });
-      setModuleCodesFromDB(moduleCodes);
-    });
-  }, []);
 
-  useEffect(() => {
     if (selectedDurationMeasure === "minutes") {
       let newNumbers = [];
       for (let i = 10; i <= 59; i = i + 10) newNumbers.push(i);
@@ -91,15 +86,30 @@ function CreateAssessments() {
       for (let i = 1; i <= 3; i = i + 0.5) newNumbers.push(i);
       setAssessmentDurationNumberOptions(newNumbers);
     }
-  }, [selectedDurationMeasure]);
-
+  }, []);
 
   const moduleCodeSelected = (selOption) => {
-    setQuestions([]);
     setModuleCode(selOption.value);
+    if (showfirstQuestion) {
+      displayFirstQuestion();
+      setShowFirstQuestion(false);
+    }
   };
 
-  useEffect(() => {
+  const changeDurationMeasure = (event) => {
+    setSelectedDurationMeasure(event.target.value);
+    if (event.target.value === "minutes") {
+      let newNumbers = [];
+      for (let i = 10; i <= 59; i = i + 10) newNumbers.push(i);
+      setAssessmentDurationNumberOptions(newNumbers);
+    } else {
+      let newNumbers = [];
+      for (let i = 1; i <= 3; i = i + 0.5) newNumbers.push(i);
+      setAssessmentDurationNumberOptions(newNumbers);
+    }
+  };
+
+  const displayFirstQuestion = () => {
     setQuestions([
       {
         id: 0,
@@ -109,7 +119,7 @@ function CreateAssessments() {
         correctAnswer: "",
       },
     ]);
-  }, [moduleCode]);
+  };
 
   const addNewQuestion = () => {
     setQuestions((prevState) => [
@@ -145,38 +155,39 @@ function CreateAssessments() {
       windowEndTime === ""
     ) {
       alert("Fields cannot be empty. All the fields must be filled.");
-    } else if (windowStartTime <= timeNow) {
+    } else if (windowStartTime <= getCurrentTime()) {
       alert(
-        "Assessment Window Start Time cannot be in the past. It must be a time in the future."
+        "Assessment Window Start Time cannot be in the past. Please select a future time."
       );
     } else if (windowEndTime <= windowStartTime) {
       alert(
         "Assessment Window End Time cannot be same or earlier than the Start Time."
       );
     } else if (validateQuestions() === true) {
-
       let assessment = {
-      module_code: moduleCode,
-      title: assessmentTitle,
-      duration_number: selectedDurationNumber,
-      duration_measure: selectedDurationMeasure, 
-      window_start_time: windowStartTime,
-      window_end_time: windowEndTime
-      }
-      const questionsWithoutIDs = questions.map(({questionType, questionText, options, correctAnswer}) => ({questionType, questionText,options,correctAnswer}));
+        module_code: moduleCode,
+        title: assessmentTitle,
+        duration_number: selectedDurationNumber,
+        duration_measure: selectedDurationMeasure,
+        window_start_time: windowStartTime,
+        window_end_time: windowEndTime,
+      };
+      const questionsWithoutIDs = questions.map(
+        ({ questionType, questionText, options, correctAnswer }) => ({
+          questionType,
+          questionText,
+          options,
+          correctAnswer,
+        })
+      );
       assessment.questions = questionsWithoutIDs;
-      axios2.post("/saveNewExam",assessment).then(res => alert(JSON.stringify(res.data.message)));
+      axios2
+        .post("saveNewAssessment", assessment)
+        .then((res) => alert(JSON.stringify(res.data.message)));
     }
   };
 
-  // const getDurationInSeconds = () => {
-  //   return (
-  //     selectedDurationNumber *
-  //     (selectedDurationMeasure === "minutes"
-  //       ? 60
-  //       : (60 * 60))
-  //   );
-  // };
+  const getCurrentTime = () => new Date().toISOString().slice(0, 16);
 
   const validateQuestions = () => {
     for (let i = 0; i < questions.length; i++) {
@@ -269,7 +280,7 @@ function CreateAssessments() {
           </select>
           <select
             className="assessment-duration-measure"
-            onChange={(event) => setSelectedDurationMeasure(event.target.value)}
+            onChange={(event) => changeDurationMeasure(event)}
           >
             <option value="minutes">Minutes</option>
             <option value="hours">Hour(s)</option>
@@ -280,7 +291,7 @@ function CreateAssessments() {
         </label>
         <input
           type="datetime-local"
-          min={timeNow}
+          min={getCurrentTime}
           className="assessment-text-field"
           placeholder="Assessment Title"
           onChange={(e) => {
@@ -355,6 +366,9 @@ function CreateAssessments() {
                       saveMCQQuestion={saveMCQQuestion}
                       saveMCQQuestionOptions={saveMCQQuestionOptions}
                       saveMCQCorrectAnswer={saveMCQCorrectAnswer}
+                      questionText={ele.questionText}
+                      options={ele.options}
+                      correctAnswer={ele.correctAnswer}
                     />
                   )}
                   {ele.questionType === "fib" && <FIBTemplate />}

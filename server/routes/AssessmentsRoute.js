@@ -1,13 +1,29 @@
 const router = require("express").Router();
 const AssessmentsModel = require("../models/AssessmentsModel");
 
-router.post("/saveNewExam", async (req, res) => {
+router.post("/saveNewAssessment", async (req, res) => {
   console.log(JSON.stringify(req.body));
   const assessment = new AssessmentsModel(req.body);
   assessment
     .save()
     .then(() => res.json({ message: "success" }))
     .catch((err) => res.json({ message: err }));
+});
+
+
+router.post("/updateAssessmentById", async (req, res) => {
+  // console.log(req.body._id);
+  console.log(JSON.stringify(req.body.assessment));
+  const assessments = await AssessmentsModel.replaceOne({
+    _id: req.body._id
+  },{...req.body.assessment}).then(() => res.json({ "message": "success" })).catch(err => res.json({"message":err}));
+
+
+  // assessment
+  //   .save()
+  //   .then(() => res.json({ message: "success" }))
+  //   .catch((err) => res.json({ message: err }));
+  res.json({ "message": "success" })
 });
 
 router.post("/assessmentsForModule", async (req, res) => {
@@ -39,8 +55,8 @@ router.post("/deleteAssessmentFromModule", (req,res) =>{
 
 
 router.post("/assessmentsbyId", async (req, res) => {
-  console.log("Reached");
-  console.log(req.body._id);
+  // console.log("Reached");
+  // console.log(req.body._id);
   const assessments = await AssessmentsModel.find({
     _id: req.body._id
   });

@@ -29,7 +29,7 @@ function EditAssessments() {
   const [selectedDurationNumber, setSelectedDurationNumber] = useState(10);
   const [windowStartTime, setWindowStartTime] = useState("");
   const [windowEndTime, setWindowEndTime] = useState("");
-  const timeNow = new Date().toISOString().slice(0, 16);
+  
 
   const axios = Axios.create({
     withCredentials: true,
@@ -53,37 +53,25 @@ function EditAssessments() {
 
   //MCQ Methods
   const saveMCQQuestion = (index, question) => {
-    console.log("saveMCQQuestion")
     let modQuestionArr = [...questions];
     modQuestionArr[index].questionText = question;
     setQuestions(modQuestionArr);
-    console.log("Modified: "+JSON.stringify(questions))
   };
 
   const saveMCQQuestionOptions = (index, options) => {
-    console.log("saveMCQQuestionOptions")
     let modQuestionArr = [...questions];
     modQuestionArr[index].options = options;
     setQuestions(modQuestionArr);
-    console.log("Modified: "+JSON.stringify(questions))
   };
 
   const saveMCQCorrectAnswer = (index, correctAnswer) => {
-    console.log("saveMCQCorrectAnswer")
     let modQuestionArr = [...questions];
     modQuestionArr[index].correctAnswer = correctAnswer;
     setQuestions(modQuestionArr);
-    console.log("Modified: "+JSON.stringify(questions))
   };
 
   useEffect(() => {
-    console.log("Initial use effect");
-    // setAssessmentTitle(state.title);
-    // setSelectedDurationMeasure(state.duration_measure);
-    // setSelectedDurationNumber(state.duration_number);
-    // setWindowStartTime(state.window_start_time);
-    // setWindowEndTime(state.window_end_time);
-
+    console.log("Default use effect");
     axios
       .post("/assignedModuleCodes", { uni_id: loggedInUserDetails.uni_id })
       .then((res) => {
@@ -93,51 +81,48 @@ function EditAssessments() {
         });
         setModuleCodesFromDB(moduleCodes);
       });
-    // setModuleCode(state.module_code);
 
-    // let questionsWithIds = state.questions;
-    // questionsWithIds = questionsWithIds.map((ele,index) => {
-    //     return {id:index,...ele}
-    // });
-    // console.log("Questions with id: "+JSON.stringify(questionsWithIds));
-    // console.log("in");
-    // setQuestions(questionsWithIds);
-    // setNextKeyId();
-      axios2.post("/assessmentsbyId",{_id: state._id}).then(res =>{
-          console.log("Returned assessment is:"+ JSON.stringify(res.data));
-          const assessment = res.data;
-          setAssessmentTitle(assessment.title);
-          setSelectedDurationMeasure(assessment.duration_measure);
-          setSelectedDurationNumber(assessment.duration_number);
-          setWindowStartTime(assessment.window_start_time);
-          setWindowEndTime(assessment.window_end_time);
-          setModuleCode(assessment.module_code);
-          setQuestions(assessment.questions);
+    
+    axios2.post("/assessmentsbyId", { _id: state._id }).then((res) => {
+      console.log("Returned assessment is:" + JSON.stringify(res.data));
+      const assessment = res.data;
+      setAssessmentTitle(assessment.title);
+      setSelectedDurationMeasure(assessment.duration_measure);
+      setSelectedDurationNumber(assessment.duration_number);
+      setWindowStartTime(assessment.window_start_time);
+      setWindowEndTime(assessment.window_end_time);
+      setModuleCode(assessment.module_code);
 
-          if(assessment.duration_measure === "minutes"){
-            let newNumbers = [];
-            for (let i = 10; i <= 59; i = i + 10) newNumbers.push(i);
-            setAssessmentDurationNumberOptions(newNumbers);
-          }else{
-            let newNumbers = [];
-            for (let i = 1; i <= 3; i = i + 0.5) newNumbers.push(i);
-            setAssessmentDurationNumberOptions(newNumbers);
-          }
+      const finalQuestions = assessment.questions.map((ele, index) => {
+        return { id: index, ...ele };
       });
+      setQuestions(finalQuestions);
+      setNextKeyId(finalQuestions.length);
+
+      if (assessment.duration_measure === "minutes") {
+        let newNumbers = [];
+        for (let i = 10; i <= 59; i = i + 10) newNumbers.push(i);
+        setAssessmentDurationNumberOptions(newNumbers);
+      } else {
+        let newNumbers = [];
+        for (let i = 1; i <= 3; i = i + 0.5) newNumbers.push(i);
+        setAssessmentDurationNumberOptions(newNumbers);
+      }
+    });
   }, []);
 
-  const changeDurationMeasure = (event) =>{
+  const changeDurationMeasure = (event) => {
     setSelectedDurationMeasure(event.target.value);
-    if(event.target.value === "minutes"){
+    if (event.target.value === "minutes") {
       let newNumbers = [];
       for (let i = 10; i <= 59; i = i + 10) newNumbers.push(i);
       setAssessmentDurationNumberOptions(newNumbers);
-    }else{
+    } else {
       let newNumbers = [];
       for (let i = 1; i <= 3; i = i + 0.5) newNumbers.push(i);
       setAssessmentDurationNumberOptions(newNumbers);
     }
-  }
+  };
 
   // useEffect(() => {
   //   const finalQuestions = questions.map((ele, index) => {
@@ -179,52 +164,59 @@ function EditAssessments() {
     // console.log(state.window_end_time);
     // console.log("\n" + JSON.stringify(state.questions));
     // console.log(state.module_code);
-    console.log("save: ");
 
-    console.log(JSON.stringify(questions));
-    console.log(assessmentTitle);
-    console.log(selectedDurationNumber);
-    console.log(selectedDurationMeasure);
-    console.log(windowStartTime);
-    console.log(windowEndTime);
-    console.log(moduleCode);
+    // console.log("save: ");
+    // console.log(JSON.stringify(questions));
+    // console.log(assessmentTitle);
+    // console.log(selectedDurationNumber);
+    // console.log(selectedDurationMeasure);
+    // console.log(windowStartTime);
+    // console.log(windowEndTime);
+    // console.log(moduleCode);
+    // console.log(state._id);
 
-    // if (
-    //   assessmentTitle === "" ||
-    //   windowStartTime === "" ||
-    //   windowEndTime === ""
-    // ) {
-    //   alert("Fields cannot be empty. All the fields must be filled.");
-    // } else if (windowStartTime <= timeNow) {
-    //   alert(
-    //     "Assessment Window Start Time cannot be in the past. It must be a time in the future."
-    //   );
-    // } else if (windowEndTime <= windowStartTime) {
-    //   alert(
-    //     "Assessment Window End Time cannot be same or earlier than the Start Time."
-    //   );
-    // } else if (validateQuestions() === true) {
-    //   let assessment = {
-    //     module_code: moduleCode,
-    //     title: assessmentTitle,
-    //     duration: getDurationInSeconds(),
-    //     window_start_time: windowStartTime,
-    //     window_end_time: windowEndTime,
-    //   };
-    //   const questionsWithoutIDs = questions.map(
-    //     ({ questionType, questionText, options, correctAnswer }) => ({
-    //       questionType,
-    //       questionText,
-    //       options,
-    //       correctAnswer,
-    //     })
-    //   );
-    //   assessment.questions = questionsWithoutIDs;
-    //   axios2
-    //     .post("/saveNewExam", assessment)
-    //     .then((res) => alert(JSON.stringify(res.data.message)));
-    // }
+
+    if (
+      assessmentTitle === "" ||
+      windowStartTime === "" ||
+      windowEndTime === ""
+    ) {
+      alert("Fields cannot be empty. All the fields must be filled.");
+    } else if (windowStartTime <= getCurrentTime()) {
+      alert(
+        "Assessment Window Start Time cannot be in the past. Please select a future time."
+      );
+    } else if (windowEndTime <= windowStartTime) {
+      alert(
+        "Assessment Window End Time cannot be same or earlier than the Start Time."
+      );
+    } else if (validateQuestions() === true) {
+      let assessment = {
+        module_code: moduleCode,
+        title: assessmentTitle,
+        duration_number: selectedDurationNumber,
+        duration_measure: selectedDurationMeasure,
+        window_start_time: windowStartTime,
+        window_end_time: windowEndTime,
+      };
+      const questionsWithoutIDs = questions.map(
+        ({ questionType, questionText, options, correctAnswer }) => ({
+          questionType,
+          questionText,
+          options,
+          correctAnswer,
+        })
+      );
+      assessment.questions = questionsWithoutIDs;
+      axios2
+        .post("/updateAssessmentById", {_id: state._id, assessment})
+        .then((res) => alert(JSON.stringify(res.data.message)));
+    }
   };
+
+  const goBack = () => navigate("../viewAssessments");
+
+  const getCurrentTime = () => new Date().toISOString().slice(0, 16);
 
   const getDurationInSeconds = () => {
     return (
@@ -298,7 +290,7 @@ function EditAssessments() {
 
   return (
     <EditAssessment>
-      <div className="pending-registrations-heading">Edit this Assessment</div>
+      <div className="pending-registrations-heading">Edit Assessment</div>
       <div className="assessment-info">
         <label className="assessment-info-label">Enter Assessment Title</label>
         <input
@@ -341,7 +333,7 @@ function EditAssessments() {
         </label>
         <input
           type="datetime-local"
-          min={timeNow}
+          min={getCurrentTime}
           className="assessment-text-field"
           //   placeholder="Assessment Title"
           onChange={(e) => {
@@ -388,13 +380,13 @@ function EditAssessments() {
       <div className="questions">
         {/* {moduleCode !== "" && ( */}
         <label className="assessment-info-label" style={{ width: "80%" }}>
-          Create Questions
+          Add Questions
         </label>
         {/* )} */}
         {/* {moduleCode !== "" && */}
         {questions.map((ele, index) => {
           return (
-            <div className="new-question">
+            <div key={ele.id} className="new-question">
               <div className="question-number">{index + 1}</div>
               <div className="question-content">
                 <label className="assessment-info-label">
@@ -445,6 +437,9 @@ function EditAssessments() {
         </button>
         <button className="new-question-button" onClick={save}>
           Save
+        </button>
+        <button className="new-question-button" onClick={goBack}>
+          Go Back
         </button>
       </div>
       {/* )} */}

@@ -13,17 +13,11 @@ router.post("/saveNewAssessment", async (req, res) => {
 
 router.post("/updateAssessmentById", async (req, res) => {
   // console.log(req.body._id);
-  console.log(JSON.stringify(req.body.assessment));
+  // console.log(JSON.stringify(req.body.assessment));
   const assessments = await AssessmentsModel.replaceOne({
     _id: req.body._id
   },{...req.body.assessment}).then(() => res.json({ "message": "success" })).catch(err => res.json({"message":err}));
 
-
-  // assessment
-  //   .save()
-  //   .then(() => res.json({ message: "success" }))
-  //   .catch((err) => res.json({ message: err }));
-  res.json({ "message": "success" })
 });
 
 router.post("/assessmentsForModule", async (req, res) => {

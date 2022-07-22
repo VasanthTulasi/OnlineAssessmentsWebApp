@@ -29,7 +29,6 @@ function EditAssessments() {
   const [selectedDurationNumber, setSelectedDurationNumber] = useState(10);
   const [windowStartTime, setWindowStartTime] = useState("");
   const [windowEndTime, setWindowEndTime] = useState("");
-  
 
   const axios = Axios.create({
     withCredentials: true,
@@ -82,7 +81,6 @@ function EditAssessments() {
         setModuleCodesFromDB(moduleCodes);
       });
 
-    
     axios2.post("/assessmentsbyId", { _id: state._id }).then((res) => {
       console.log("Returned assessment is:" + JSON.stringify(res.data));
       const assessment = res.data;
@@ -175,7 +173,6 @@ function EditAssessments() {
     // console.log(moduleCode);
     // console.log(state._id);
 
-
     if (
       assessmentTitle === "" ||
       windowStartTime === "" ||
@@ -209,7 +206,7 @@ function EditAssessments() {
       );
       assessment.questions = questionsWithoutIDs;
       axios2
-        .post("/updateAssessmentById", {_id: state._id, assessment})
+        .post("/updateAssessmentById", { _id: state._id, assessment })
         .then((res) => alert(JSON.stringify(res.data.message)));
     }
   };
@@ -386,7 +383,7 @@ function EditAssessments() {
         {/* {moduleCode !== "" && */}
         {questions.map((ele, index) => {
           return (
-            <div key={ele.id} className="new-question">
+            <div key={ele.id} id={ele.id} className="new-question">
               <div className="question-number">{index + 1}</div>
               <div className="question-content">
                 <label className="assessment-info-label">
@@ -429,17 +426,22 @@ function EditAssessments() {
           textAlign: "center",
           width: "100%",
           backgroundColor: "#282c34",
-          paddingTop: "10px",
+          // bacgroundColor: "#f2cc8f",
+          paddingTop: "5px",
+          paddingBottom: "5px",
+          position: "fixed",
+          bottom: 0,
+          // borderTop: "1px solid #f2cc8f"
         }}
       >
+        <button className="new-question-button" onClick={goBack}>
+          Go Back
+        </button>
         <button className="new-question-button" onClick={addNewQuestion}>
           Add New Question
         </button>
         <button className="new-question-button" onClick={save}>
           Save
-        </button>
-        <button className="new-question-button" onClick={goBack}>
-          Go Back
         </button>
       </div>
       {/* )} */}
@@ -595,7 +597,7 @@ const EditAssessment = styled.div`
   }
 
   .new-question-button {
-    margin: 20px;
+    margin: 10px;
     border: 1px solid black;
     color: #282c34;
     background-color: white;

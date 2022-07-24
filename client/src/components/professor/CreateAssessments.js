@@ -5,7 +5,7 @@ import Axios from "axios";
 import BodyImage from "../../svgs/body_background.svg";
 import MCQTemplate from "./QuestionTemplates/MCQTemplate";
 import FIBTemplate from "./QuestionTemplates/FIBTemplate";
-import EssayTemplate from "./QuestionTemplates/EssayTemaplate";
+import EssayTemplate from "./QuestionTemplates/EssayTemplate";
 import CodingTemplate from "./QuestionTemplates/CodingTemplate";
 import QuestionTypeDropdown from "./QuestionTypeDropdown";
 import { LoginContext } from "../../contexts/LoginContext";
@@ -39,12 +39,52 @@ function CreateAssessments() {
     crossDomain: true,
   });
 
-  //Question Type Methods
+  //Question Type Method
   const changeQuestionType = (index, val) => {
     let modQuestionArr = [...questions];
     modQuestionArr[index].questionType = val;
+    modQuestionArr[index].questionText = "";
+
+    if (val === "mcq") {
+      deletePropertiesExcept(
+        ["id", "questionType", "questionText", "options", "correctAnswer"],
+        modQuestionArr,
+        index
+      );
+      modQuestionArr[index].options = [];
+      modQuestionArr[index].correctAnswer = "";
+    } else if (val === "fib") {
+      deletePropertiesExcept(
+        ["id", "questionType", "questionText"],
+        modQuestionArr,
+        index
+      );
+    } else if (val === "essay") {
+      deletePropertiesExcept(
+        ["id", "questionType", "questionText"],
+        modQuestionArr,
+        index
+      );
+    }else{
+      deletePropertiesExcept(
+        ["id", "questionType", "questionText","codingLanguage"],
+        modQuestionArr,
+        index
+      );
+      modQuestionArr[index].codingLanguage = "";
+    }
+
+    console.log("Final arr " + JSON.stringify(modQuestionArr[index]));
     setQuestions(modQuestionArr);
-    console.log(index);
+  };
+
+  const deletePropertiesExcept = (exceptionVals, modQuestionArr, index) => {
+    for (let val in modQuestionArr[index]) {
+      if (!exceptionVals.includes(String(val))) {
+        console.log("deleting " + val);
+        delete modQuestionArr[index][val];
+      }
+    }
   };
 
   //MCQ Methods
@@ -63,6 +103,33 @@ function CreateAssessments() {
   const saveMCQCorrectAnswer = (index, correctAnswer) => {
     let modQuestionArr = [...questions];
     modQuestionArr[index].correctAnswer = correctAnswer;
+    setQuestions(modQuestionArr);
+  };
+
+  //Essay Methods
+  const saveEssayQuestion = (index, question) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].questionText = question;
+    setQuestions(modQuestionArr);
+  };
+
+  //FIB Methods
+  const saveFIBQuestion = (index, question) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].questionText = question;
+    setQuestions(modQuestionArr);
+  };
+
+  //Coding Methods
+  const saveCodingQuestion = (index, question) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].questionText = question;
+    setQuestions(modQuestionArr);
+  };
+
+  const saveCodingLanguage = (index, codingLanguage) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].codingLanguage = codingLanguage;
     setQuestions(modQuestionArr);
   };
 
@@ -143,48 +210,49 @@ function CreateAssessments() {
   };
 
   const save = () => {
-    // console.log("\n" + JSON.stringify(questions));
+    console.log("\n" + JSON.stringify(questions));
     // console.log(assessmentTitle);
     // console.log(selectedDurationNumber);
     // console.log(selectedDurationMeasure);
     // console.log(windowStartTime);
     // console.log(windowEndTime);
-    if (
-      assessmentTitle === "" ||
-      windowStartTime === "" ||
-      windowEndTime === ""
-    ) {
-      alert("Fields cannot be empty. All the fields must be filled.");
-    } else if (windowStartTime <= getCurrentTime()) {
-      alert(
-        "Assessment Window Start Time cannot be in the past. Please select a future time."
-      );
-    } else if (windowEndTime <= windowStartTime) {
-      alert(
-        "Assessment Window End Time cannot be same or earlier than the Start Time."
-      );
-    } else if (validateQuestions() === true) {
-      let assessment = {
-        module_code: moduleCode,
-        title: assessmentTitle,
-        duration_number: selectedDurationNumber,
-        duration_measure: selectedDurationMeasure,
-        window_start_time: windowStartTime,
-        window_end_time: windowEndTime,
-      };
-      const questionsWithoutIDs = questions.map(
-        ({ questionType, questionText, options, correctAnswer }) => ({
-          questionType,
-          questionText,
-          options,
-          correctAnswer,
-        })
-      );
-      assessment.questions = questionsWithoutIDs;
-      axios2
-        .post("saveNewAssessment", assessment)
-        .then((res) => alert(JSON.stringify(res.data.message)));
-    }
+
+    // if (
+    //   assessmentTitle === "" ||
+    //   windowStartTime === "" ||
+    //   windowEndTime === ""
+    // ) {
+    //   alert("Fields cannot be empty. All the fields must be filled.");
+    // } else if (windowStartTime <= getCurrentTime()) {
+    //   alert(
+    //     "Assessment Window Start Time cannot be in the past. Please select a future time."
+    //   );
+    // } else if (windowEndTime <= windowStartTime) {
+    //   alert(
+    //     "Assessment Window End Time cannot be same or earlier than the Start Time."
+    //   );
+    // } else if (validateQuestions() === true) {
+    //   let assessment = {
+    //     module_code: moduleCode,
+    //     title: assessmentTitle,
+    //     duration_number: selectedDurationNumber,
+    //     duration_measure: selectedDurationMeasure,
+    //     window_start_time: windowStartTime,
+    //     window_end_time: windowEndTime,
+    //   };
+    //   const questionsWithoutIDs = questions.map(
+    //     ({ questionType, questionText, options, correctAnswer }) => ({
+    //       questionType,
+    //       questionText,
+    //       options,
+    //       correctAnswer,
+    //     })
+    //   );
+    //   assessment.questions = questionsWithoutIDs;
+    //   axios2
+    //     .post("saveNewAssessment", assessment)
+    //     .then((res) => alert(JSON.stringify(res.data.message)));
+    // }
   };
 
   const getCurrentTime = () => new Date().toISOString().slice(0, 16);
@@ -337,7 +405,6 @@ function CreateAssessments() {
             onChange={moduleCodeSelected}
             noOptionsMessage={() => "This module is not assigned to you"}
           />
-          {/* </div> */}
         </div>
       </div>
 
@@ -371,9 +438,28 @@ function CreateAssessments() {
                       correctAnswer={ele.correctAnswer}
                     />
                   )}
-                  {ele.questionType === "fib" && <FIBTemplate />}
-                  {ele.questionType === "essay" && <EssayTemplate />}
-                  {ele.questionType === "coding" && <CodingTemplate />}
+                  {ele.questionType === "fib" && (
+                    <FIBTemplate
+                      indexVal={index}
+                      saveFIBQuestion={saveFIBQuestion}
+                      questionText={ele.questionText}
+                    />
+                  )}
+                  {ele.questionType === "essay" && (
+                    <EssayTemplate
+                      indexVal={index}
+                      saveEssayQuestion={saveEssayQuestion}
+                      questionText={ele.questionText}
+                    />
+                  )}
+                  {ele.questionType === "coding" && (
+                    <CodingTemplate
+                      indexVal={index}
+                      saveCodingQuestion={saveCodingQuestion}
+                      saveCodingLanguage={saveCodingLanguage}
+                      questionText={ele.questionText}
+                    />
+                  )}
                   <button
                     className="remove-question-button"
                     id={"remove_question_" + index}

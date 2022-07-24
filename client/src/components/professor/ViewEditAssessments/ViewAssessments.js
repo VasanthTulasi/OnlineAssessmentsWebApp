@@ -162,7 +162,7 @@ function ViewAssessments() {
                     <td className="module-data start">{index + 1}</td>
                     <td className="module-data mid">{ele.title}</td>
                     <td className="module-data mid">
-                      {new Date(ele.window_start_time).toString().slice(0, 24)}
+                      {new Date(ele.window_start_time).toString().slice(0, 21)}
                     </td>
                     <td className="module-data end">
                       {new Date() > new Date(ele.window_end_time)

@@ -5,7 +5,7 @@ import Axios from "axios";
 import BodyImage from "../../../svgs/body_background.svg";
 import MCQTemplate from "../QuestionTemplates/MCQTemplate";
 import FIBTemplate from "../QuestionTemplates/FIBTemplate";
-import EssayTemplate from "../QuestionTemplates/EssayTemaplate";
+import EssayTemplate from "../QuestionTemplates/EssayTemplate";
 import CodingTemplate from "../QuestionTemplates/CodingTemplate";
 import QuestionTypeDropdown from "../QuestionTypeDropdown";
 import { LoginContext } from "../../../contexts/LoginContext";

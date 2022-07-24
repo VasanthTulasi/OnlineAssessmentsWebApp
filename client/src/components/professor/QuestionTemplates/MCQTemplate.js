@@ -4,9 +4,7 @@ import CreatableSelect from "react-select/creatable";
 import SingleSelect from "react-select";
 
 function MCQTemplate(props) {
-  // const [question, setQuestion] = useState("");
-  // const [questionOptions, setQuestionOptions] = useState([]);
-  // const [correctAnswer, setCorrectAnswer] = useState("");
+
   const [availableOptions, setAvailableOptions] = useState([]);
 
   const optionsComponent = useRef(null);
@@ -16,27 +14,21 @@ function MCQTemplate(props) {
   function formatCreateLabel(value) {
     return 'Add Option "' + value + '"';
   }
-  // console.log("Vals: \n");
-  // console.log("quesion "+props.questionText);
-  // console.log("options "+props.options);
-  // console.log("correct Answer "+props.correctAnswer);
+
 
   const customStyles = {
     container: (provided) => ({
       ...provided,
       width: "400px",
-      // paddingLeft: "10px",
       color: "black",
       font: "17px",
       fontFamily: '"Source Sans Pro", sans-serif',
       fontSize: "17px",
       fontWeight: 400,
       color: "#282c34",
-      // border: "1px solid red"
     }),
     option: (provided, state) => ({
       ...provided,
-      // ...state,
       color: "black",
       fontFamily: '"Source Sans Pro", sans-serif',
       fontSize: "17px",
@@ -72,9 +64,7 @@ function MCQTemplate(props) {
     setAvailableOptions(options);
   }, []);
 
-  //Methods
   const saveMCQQuestion = (event) => {
-    // setQuestion(event.target.value);
     const questionId = textAreaComponent.current.id.split("_")[3];
     props.saveMCQQuestion(questionId, event.target.value);
   };
@@ -82,34 +72,20 @@ function MCQTemplate(props) {
   const saveMCQQuestionOptions = (selOptions) => {
     let optionsArray = selOptions;
     optionsArray = optionsArray.map((ele) => ele.value);
-    // setQuestionOptions(optionsArray);
     setAvailableOptions(selOptions);
     const questionId = optionsComponent.current.props.id.split("_")[2];
     props.saveMCQQuestionOptions(questionId, optionsArray);
   };
 
   const saveMCQCorrectAnswer = (selOption) => {
-    // setCorrectAnswer(selOption.value);
     const questionId = correctOptionComponent.current.props.id.split("_")[2];
     props.saveMCQCorrectAnswer(questionId, selOption.value);
   };
 
-  // useEffect(() => {
-    
-  // }, [question]);
-
-  // useEffect(() => {
-    
-  // }, [questionOptions]);
-
-  // useEffect(() => {
-    
-  // }, [correctAnswer]);
-
   return (
     <MCQ>
       <label className="label-class" style={{ marginTop: 0 }}>
-        Enter the Question
+        Enter the MCQ Question
       </label>
       <br />
       <textarea
@@ -119,6 +95,8 @@ function MCQTemplate(props) {
         onChange={saveMCQQuestion}
         rows="3"
         defaultValue={props.questionText}
+        placeholder="MCQ Question"
+        spellCheck="false"
       />
       <label className="label-class">Enter Options for this Question</label>
       <div style={{ marginTop: "5px" }}>
@@ -153,7 +131,7 @@ function MCQTemplate(props) {
           styles={customStyles}
           placeholder="Correct Answer"
           onChange={saveMCQCorrectAnswer}
-          noOptionsMessage={() => "This module is not assigned to you"}
+          noOptionsMessage={() => "This is not one of the added options"}
           defaultValue={{
             label: props.correctAnswer,
             value: props.correctAnswer,

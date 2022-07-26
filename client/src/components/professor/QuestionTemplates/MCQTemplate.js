@@ -75,6 +75,7 @@ function MCQTemplate(props) {
     setAvailableOptions(selOptions);
     const questionId = optionsComponent.current.props.id.split("_")[2];
     props.saveMCQQuestionOptions(questionId, optionsArray);
+    props.saveMCQCorrectAnswer(questionId, "");
   };
 
   const saveMCQCorrectAnswer = (selOption) => {
@@ -125,6 +126,7 @@ function MCQTemplate(props) {
       <label className="label-class">Select the Correct Answer</label>
       <div style={{ marginTop: "5px" }}>
         <SingleSelect
+          isSearchable={false}
           ref={correctOptionComponent}
           options={availableOptions}
           id={"correct_option_" + props.indexVal}

@@ -1,6 +1,5 @@
-import React,{useRef} from "react";
+import React, { useRef } from "react";
 import SingleSelect from "react-select";
-
 
 function QuestionTypeDropdown(props) {
   const questionTypeComponent = useRef(null);
@@ -12,7 +11,7 @@ function QuestionTypeDropdown(props) {
   ];
   const setQuestionType = (selOption) => {
     const questionId = questionTypeComponent.current.props.id.split("_")[2];
-    props.changeQuestionType(questionId,selOption.value);
+    props.changeQuestionType(questionId, selOption.value);
   };
 
   const customStyles = {
@@ -58,7 +57,7 @@ function QuestionTypeDropdown(props) {
       options={questionTypesDropdown}
       styles={customStyles}
       onChange={setQuestionType}
-      defaultValue={questionTypesDropdown[0]}
+      defaultValue={() => {}}
       noOptionsMessage={() => "Question Type Not Found"}
     />
   );

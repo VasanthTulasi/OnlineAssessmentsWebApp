@@ -46,8 +46,49 @@ function EditAssessments() {
   const changeQuestionType = (index, val) => {
     let modQuestionArr = [...questions];
     modQuestionArr[index].questionType = val;
+    modQuestionArr[index].questionText = "";
+
+    if (val === "mcq") {
+      deletePropertiesExcept(
+        ["id", "questionType", "questionText", "options", "correctAnswer"],
+        modQuestionArr,
+        index
+      );
+      modQuestionArr[index].options = [];
+      modQuestionArr[index].correctAnswer = "";
+    } else if (val === "fib") {
+      deletePropertiesExcept(
+        ["id", "questionType", "questionText", "correctFIBAnswers"],
+        modQuestionArr,
+        index
+      );
+      modQuestionArr[index].correctFIBAnswers = [];
+    } else if (val === "essay") {
+      deletePropertiesExcept(
+        ["id", "questionType", "questionText"],
+        modQuestionArr,
+        index
+      );
+    } else {
+      deletePropertiesExcept(
+        ["id", "questionType", "questionText", "codingLanguage"],
+        modQuestionArr,
+        index
+      );
+      modQuestionArr[index].codingLanguage = "";
+    }
+
+    // console.log("Final arr " + JSON.stringify(modQuestionArr[index]));
     setQuestions(modQuestionArr);
-    console.log(index);
+  };
+
+  const deletePropertiesExcept = (exceptionVals, modQuestionArr, index) => {
+    for (let val in modQuestionArr[index]) {
+      if (!exceptionVals.includes(String(val))) {
+        // console.log("deleting " + val);
+        delete modQuestionArr[index][val];
+      }
+    }
   };
 
   //MCQ Methods
@@ -66,6 +107,48 @@ function EditAssessments() {
   const saveMCQCorrectAnswer = (index, correctAnswer) => {
     let modQuestionArr = [...questions];
     modQuestionArr[index].correctAnswer = correctAnswer;
+    setQuestions(modQuestionArr);
+  };
+
+  //Essay Methods
+  const saveEssayQuestion = (index, question) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].questionText = question;
+    setQuestions(modQuestionArr);
+  };
+
+  //FIB Methods
+  const saveFIBQuestion = (index, question) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].questionText = question;
+    setQuestions(modQuestionArr);
+  };
+
+  const saveFIBAnswers = (index, answerIndex, correctAnswer) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].correctFIBAnswers[answerIndex] = correctAnswer;
+    setQuestions(modQuestionArr);
+  };
+
+  const removeFIBAnswer = (index) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].correctFIBAnswers.splice(
+      modQuestionArr[index].correctFIBAnswers.length - 1,
+      1
+    );
+    setQuestions(modQuestionArr);
+  };
+
+  //Coding Methods
+  const saveCodingQuestion = (index, question) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].questionText = question;
+    setQuestions(modQuestionArr);
+  };
+
+  const saveCodingLanguage = (index, codingLanguage) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].codingLanguage = codingLanguage;
     setQuestions(modQuestionArr);
   };
 
@@ -196,14 +279,32 @@ function EditAssessments() {
         window_start_time: windowStartTime,
         window_end_time: windowEndTime,
       };
-      const questionsWithoutIDs = questions.map(
-        ({ questionType, questionText, options, correctAnswer }) => ({
-          questionType,
-          questionText,
-          options,
-          correctAnswer,
-        })
-      );
+      const questionsWithoutIDs = questions.map((ele) => {
+        if (ele.questionType === "mcq")
+          return {
+            questionType: ele.questionType,
+            questionText: ele.questionText,
+            options: ele.options,
+            correctAnswer: ele.correctAnswer,
+          };
+        else if (ele.questionType === "fib")
+          return {
+            questionType: ele.questionType,
+            questionText: ele.questionText,
+            correctFIBAnswers: ele.correctFIBAnswers,
+          };
+        else if (ele.questionType === "coding")
+          return {
+            questionType: ele.questionType,
+            questionText: ele.questionText,
+            codingLanguage: ele.codingLanguage,
+          };
+        else
+          return {
+            questionType: ele.questionType,
+            questionText: ele.questionText,
+          };
+      });
       assessment.questions = questionsWithoutIDs;
       axios2
         .post("/updateAssessmentById", { _id: state._id, assessment })
@@ -229,20 +330,55 @@ function EditAssessments() {
           "Error in question number " + (i + 1) + ". Question cannot be empty."
         );
         return false;
-      } else if (questions[i].options.length < 2) {
-        alert(
-          "Error in question number " +
-            (i + 1) +
-            ". There must atleast be two options for the question."
-        );
-        return false;
-      } else if (questions[i].correctAnswer === "") {
-        alert(
-          "Error in question number " +
-            (i + 1) +
-            ". The correct answer for the question must be selected."
-        );
-        return false;
+      }
+
+      if (questions[i].questionType === "mcq") {
+        if (questions[i].options.length < 2) {
+          alert(
+            "Error in question number " +
+              (i + 1) +
+              ". There must atleast be two options for the question."
+          );
+          return false;
+        } else if (questions[i].correctAnswer === "") {
+          alert(
+            "Error in question number " +
+              (i + 1) +
+              ". The correct answer selected for the question is invalid."
+          );
+          return false;
+        }
+      } else if (questions[i].questionType === "fib") {
+        
+        for(let j=0;j<questions[i].correctFIBAnswers.length;j++){
+          if(questions[i].correctFIBAnswers[j].length === 0){
+            alert(
+              "Error in question number " +
+                (i + 1) +
+                ". The correct answer for question "+(j+1) + " cannot be empty."
+            );
+            return false;
+          }
+        }
+
+        if (questions[i].correctFIBAnswers.length === 0) {
+          alert(
+            "Error in question number " +
+              (i + 1) +
+              ". There must at least be one blank and a valid correct answer."
+          );
+          return false;
+        }
+
+      } else if (questions[i].questionType === "coding") {
+        if (questions[i].codingLanguage === "") {
+          alert(
+            "Error in question number " +
+              (i + 1) +
+              ". Atleast one programming language must be selected."
+          );
+          return false;
+        }
       }
     }
 
@@ -392,6 +528,7 @@ function EditAssessments() {
                 <QuestionTypeDropdown
                   indexVal={index}
                   changeQuestionType={changeQuestionType}
+                  questionType={ele.questionType}
                 />
                 {ele.questionType === "mcq" && (
                   <MCQTemplate
@@ -404,9 +541,31 @@ function EditAssessments() {
                     correctAnswer={ele.correctAnswer}
                   />
                 )}
-                {ele.questionType === "fib" && <FIBTemplate />}
-                {ele.questionType === "essay" && <EssayTemplate />}
-                {ele.questionType === "coding" && <CodingTemplate />}
+                  {ele.questionType === "fib" && (
+                    <FIBTemplate
+                      indexVal={index}
+                      saveFIBQuestion={saveFIBQuestion}
+                      saveFIBAnswers={saveFIBAnswers}
+                      questionText={ele.questionText}
+                      correctFIBAnswers={ele.correctFIBAnswers}
+                      removeFIBAnswer={removeFIBAnswer}
+                    />
+                  )}
+                  {ele.questionType === "essay" && (
+                    <EssayTemplate
+                      indexVal={index}
+                      saveEssayQuestion={saveEssayQuestion}
+                      questionText={ele.questionText}
+                    />
+                  )}
+                  {ele.questionType === "coding" && (
+                    <CodingTemplate
+                      indexVal={index}
+                      saveCodingQuestion={saveCodingQuestion}
+                      saveCodingLanguage={saveCodingLanguage}
+                      questionText={ele.questionText}
+                    />
+                  )}
                 <button
                   className="remove-question-button"
                   id={"remove_question_" + index}

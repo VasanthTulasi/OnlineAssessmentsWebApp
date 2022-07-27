@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
 import AssessmentInstructions from "../AssessmentInstructions";
@@ -15,6 +15,8 @@ function TakeAssessments() {
   });
   const [questions, setQuestions] = useState(state.assessment.questions);
   const [questionIndex, setQuestionIndex] = useState(0);
+  const submitButton = useRef(null);
+  const [selectedOptionIndex,setSelectedOptionIndex] = useState("");
 
   // useEffect(() => {
   //   axios.post("/assessmentsbyId", { _id: state._id }).then((res) => {
@@ -50,9 +52,19 @@ function TakeAssessments() {
   };
 
   const nextQuestion = () => {
-    if (questionIndex <= questions.length - 2)
+    setSelectedOptionIndex("");
+    if (questionIndex <= questions.length - 2) {
       setQuestionIndex((prevVal) => prevVal + 1);
-    else console.log("reached last question");
+      if (questionIndex === questions.length - 2)
+        submitButton.current.textContent = "Submit & Finish";
+    } else {
+      //Submit and Finish functionality
+    }
+  };
+
+  const optionSelected = (highlightIndex,selVal,quesIndex) => {    
+    setSelectedOptionIndex(String(highlightIndex))
+    console.log("Answer for question "+quesIndex +" is "+ selVal);
   };
 
   return (
@@ -70,25 +82,51 @@ function TakeAssessments() {
         <div className="timer">Remaining Time: 34:00</div>
       </div>
       <div className="question">
-        <div className="question-number">Question {questionIndex+1}</div>
+        <div className="question-number">
+          Question {questionIndex + 1} / {questions.length}
+        </div>
         <div className="question-text">
-        {questions[questionIndex].questionText}
+          {questions[questionIndex].questionText}
         </div>
         <div className="question-options">
           <div className="question-options-sub">
-            <div className="question-option">{questions[questionIndex].options[0]}</div>
-            <div className="question-option">{questions[questionIndex].options[1]}</div>
+            <div
+              className={selectedOptionIndex == "0" ? "question-option highlight":"question-option"}
+              onClick={(event) => optionSelected(0,event.target.textContent,questionIndex)}
+            >
+              {questions[questionIndex].options[0]}
+            </div>
+            <div
+              className={selectedOptionIndex == "1" ? "question-option highlight":"question-option"}
+              onClick={(event) => optionSelected(1,event.target.textContent,questionIndex)}
+            >
+              {questions[questionIndex].options[1]}
+            </div>
           </div>
           <div className="question-options-sub">
-            <div className="question-option">{questions[questionIndex].options[2]}</div>
-            <div className="question-option">{questions[questionIndex].options[3]}</div>
+            <div
+              className={selectedOptionIndex == "2" ? "question-option highlight":"question-option"}
+              onClick={(event) => optionSelected(2,event.target.textContent,questionIndex)}
+            >
+              {questions[questionIndex].options[2]}
+            </div>
+            <div
+              className={selectedOptionIndex == "3" ? "question-option highlight":"question-option"}
+              onClick={(event) => optionSelected(3,event.target.textContent,questionIndex)}
+            >
+              {questions[questionIndex].options[3]}
+            </div>
             {/* <div className="question-option"></div> */}
             {/* <div className="question-option"></div> */}
           </div>
         </div>
       </div>
-      <div style={{ display: "flex", "justify-content": "flex-end" }}>
-        <button className="submit-button" onClick={nextQuestion}>
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <button
+          className="submit-button"
+          onClick={nextQuestion}
+          ref={submitButton}
+        >
           {"Save & Next"}
         </button>
       </div>
@@ -104,9 +142,9 @@ const TakeAssess = styled.div`
   color: #61dafb;
   /* display: flex; */
   /* align-items: center; */
-  /* justify-content: flex-start; */
+  /* justify-content: center; */
   font-size: 20px;
-  /* flex-direction: column; */
+  flex-direction: column;
   overflow-y: auto;
   padding-top: 72px;
 
@@ -116,6 +154,7 @@ const TakeAssess = styled.div`
     justify-content: space-between;
     align-items: center;
     flex-direction: row;
+    /* flex:1; */
   }
 
   .title {
@@ -124,6 +163,7 @@ const TakeAssess = styled.div`
     font-weight: 400;
     font-size: 19px;
     margin: 20px;
+    margin-left:40px;
   }
 
   .timer {
@@ -132,6 +172,7 @@ const TakeAssess = styled.div`
     font-weight: 400;
     font-size: 19px;
     margin: 20px;
+    margin-right:40px;
   }
 
   .question {
@@ -140,9 +181,12 @@ const TakeAssess = styled.div`
     /* align-items: center; */
     flex-direction: column;
     /* border: 1px solid white; */
-    margin: 20px 20px 0 20px;
+    margin: 20px 40px 0 40px;
     /* margin-left: 20px; */
-    /* border-radius: 10px; */
+
+    /* New Lines */
+    border-radius: 10px;
+    background: #61dafb;
   }
 
   .question-number {
@@ -151,15 +195,13 @@ const TakeAssess = styled.div`
     font-weight: 400;
     font-size: 18px;
     padding: 15px;
+    padding-left: 20px;
     color: black;
     background: #61dafb;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    border: 1px solid #61dafb;
-    /* border: 1px solid black; */
-    /* border-top: 1px solid black; */
-    /* border-left: 1px solid black; */
-    /* border-right: 1px solid black; */
+    /* border: 1px solid #61dafb; */
+    border-bottom: 1px solid #282c34;
   }
 
   .question-text {
@@ -167,9 +209,10 @@ const TakeAssess = styled.div`
     font-weight: 400;
     font-size: 18px;
     padding: 20px;
-    border: 3px solid #61dafb;
+    /* border: 2px solid #61dafb; */
+    border-bottom: 1px solid #282c34;
     border-top: 0;
-    color: white;
+    color: black;
   }
 
   .question-options {
@@ -179,7 +222,7 @@ const TakeAssess = styled.div`
     font-size: 18px;
     padding: 20px;
     color: white;
-    border: 3px solid #61dafb;
+    border: 2px solid #61dafb;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
     display: flex;
@@ -192,7 +235,7 @@ const TakeAssess = styled.div`
 
   .question-options-sub {
     display: flex;
-    flex-diretion: row;
+    flex-direction: row;
     justify-content: space-evenly;
     align-items: center;
     margin: 10px 0 10px 0;
@@ -204,14 +247,26 @@ const TakeAssess = styled.div`
     text-align: center;
     border-radius: 10px;
     padding: 10px;
-    border: 2px solid #61dafb;
+    border: 1px solid #61dafb;
+    color:white;
+    border:1px solid black;
+    background-color: #282c34;
   }
+  
+  .highlight{
+    color:#282c34;
+    /* font-weight: bold; */
+    border:2px solid black;
+    background-color: #F5EDF0;
+    /* F5EDF0 */
+  }
+
 
   .question-option:hover {
     cursor: pointer;
-    color: black;
-    background-color: #fffff7;
-    border: 2px solid black;
+    /* color: black; */
+    /* background-color: #fffff7; */
+    /* border: 1px solid black; */
   }
 
   .submit-button {
@@ -220,19 +275,18 @@ const TakeAssess = styled.div`
     color: black;
     background-color: #61dafb;
     font-family: "Sourse Sans Pro ", sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    width: 20%;
+    font-size: 17px;
+    font-weight: 400;
+    width: 30%;
     border-radius: 10px;
-    padding: 15px 20px 15px 20px;
+    padding: 10px 20px 10px 20px;
     /* background-color: #f2cc8f; */
     /* color: #0b1118;  */
   }
 
-  .submit-button:hover{
+  .submit-button:hover {
     cursor: pointer;
   }
-
 `;
 
 export default TakeAssessments;

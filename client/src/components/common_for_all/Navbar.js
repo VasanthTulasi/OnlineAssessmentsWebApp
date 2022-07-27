@@ -178,10 +178,10 @@ const MenuBar = styled.div`
   .signout {
     /* border: 1px solid cornflowerblue; */
     color: #0b1118;
+    background-color: #f2cc8f;
     /* background: #84f7d1; */
     /* background-color: #f4ac45; */
     /* background-color: #0CF574; */
-    background-color: #f2cc8f;
     /* background-color: #C5D86D; */
     /* background-color: ; */
     border-radius: 20px;

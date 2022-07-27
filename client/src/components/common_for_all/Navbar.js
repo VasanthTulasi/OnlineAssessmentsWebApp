@@ -34,7 +34,7 @@ function HomePage() {
     if(role === "professor")
     navigate("/createAssessments");
     if(role === "student")
-    navigate("/modules");
+    navigate("/viewTakeAssessments/viewAssessments");
   },[role]);
 
   return (
@@ -45,12 +45,7 @@ function HomePage() {
         {role === "student" && (
           <ul className="menus">
             <li>
-              <Link to="/modules" className="menu">
-                Modules
-              </Link>
-            </li>
-            <li>
-              <Link to="/Assessments" className="menu">
+              <Link to="/viewTakeAssessments/viewAssessments" className="menu">
                 Assessments
               </Link>
             </li>

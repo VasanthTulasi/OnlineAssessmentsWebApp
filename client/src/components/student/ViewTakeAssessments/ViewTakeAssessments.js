@@ -1,13 +1,13 @@
 import React from 'react';
 import ViewAssessments from "./ViewAssessments";
-import EditAssessments from "./EditAssessments";
+import TakeAssessments from "./TakeAssessments";
 import { Route, Routes } from "react-router-dom";
 
 function ViewEditAssessments() {
   return (
       <Routes>
         <Route path="/viewAssessments" element={<ViewAssessments/>}/>
-        <Route path="/editAssessments" element={<EditAssessments/>}/>
+        <Route path="/takeAssessments" element={<TakeAssessments/>}/>
       </Routes>
   )
 }

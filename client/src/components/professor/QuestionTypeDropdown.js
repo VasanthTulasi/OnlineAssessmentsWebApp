@@ -9,6 +9,15 @@ function QuestionTypeDropdown(props) {
     { label: "Essay", value: "essay" },
     { label: "Coding", value: "coding" },
   ];
+
+  const questionTypePairs = {
+    "mcq": "Multiple Choice Question",
+    "fib": "Fill in the Blank",
+    "essay": "Essay",
+    "coding": "Coding",
+  }
+
+
   const setQuestionType = (selOption) => {
     const questionId = questionTypeComponent.current.props.id.split("_")[2];
     props.changeQuestionType(questionId, selOption.value);
@@ -57,7 +66,7 @@ function QuestionTypeDropdown(props) {
       options={questionTypesDropdown}
       styles={customStyles}
       onChange={setQuestionType}
-      defaultValue={() => {}}
+      defaultValue={{label: questionTypePairs[props.questionType], value: props.questionType}}
       noOptionsMessage={() => "Question Type Not Found"}
     />
   );

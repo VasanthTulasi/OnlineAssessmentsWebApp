@@ -7,11 +7,11 @@ function CodingTemplate(props) {
   const codingLanguageComponent = useRef(null);
 
   const programmingLanguages = [
-    { label: "Any", value: "any" },
-    { label: "Java", value: "java" },
-    { label: "Python", value: "python" },
-    { label: "C++", value: "c++" },
-    { label: "C", value: "c" }
+    { label: "Any", value: "Any" },
+    { label: "Java", value: "Java" },
+    { label: "Python", value: "Python" },
+    { label: "C++", value: "C++" },
+    { label: "C", value: "C" }
   ];
 
   const saveCodingQuestion = (event) => {
@@ -83,6 +83,7 @@ function CodingTemplate(props) {
           placeholder="Select or Search the Programming Language"
           onChange={saveCodingLanguage}
           noOptionsMessage={() => "This programming language is not available"}
+          defaultValue={{label:props.codingLanguage,value:props.codingLanguage}}
         />
       </div>
     </Coding>

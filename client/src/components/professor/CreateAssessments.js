@@ -334,7 +334,7 @@ function CreateAssessments() {
           alert(
             "Error in question number " +
               (i + 1) +
-              ". There must at least be one blank and a valid correct answer."
+              ". There must at least be one blank AND a valid correct answer."
           );
           return false;
         }
@@ -478,6 +478,7 @@ function CreateAssessments() {
                   <QuestionTypeDropdown
                     indexVal={index}
                     changeQuestionType={changeQuestionType}
+                    questionType={ele.questionType}
                   />
                   {ele.questionType === "mcq" && (
                     <MCQTemplate

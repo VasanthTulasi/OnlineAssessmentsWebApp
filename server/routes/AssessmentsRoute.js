@@ -2,7 +2,7 @@ const router = require("express").Router();
 const AssessmentsModel = require("../models/AssessmentsModel");
 
 router.post("/saveNewAssessment", async (req, res) => {
-  console.log(JSON.stringify(req.body));
+  // console.log(JSON.stringify(req.body));
   const assessment = new AssessmentsModel(req.body);
   assessment
     .save()

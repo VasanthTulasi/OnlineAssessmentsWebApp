@@ -4,9 +4,7 @@ import CreatableSelect from "react-select/creatable";
 import SingleSelect from "react-select";
 
 function MCQTemplate(props) {
-
   const [availableOptions, setAvailableOptions] = useState([]);
-
   const optionsComponent = useRef(null);
   const textAreaComponent = useRef(null);
   const correctOptionComponent = useRef(null);
@@ -14,7 +12,6 @@ function MCQTemplate(props) {
   function formatCreateLabel(value) {
     return 'Add Option "' + value + '"';
   }
-
 
   const customStyles = {
     container: (provided) => ({
@@ -75,7 +72,11 @@ function MCQTemplate(props) {
     setAvailableOptions(selOptions);
     const questionId = optionsComponent.current.props.id.split("_")[2];
     props.saveMCQQuestionOptions(questionId, optionsArray);
-    props.saveMCQCorrectAnswer(questionId, "");
+    console.log(correctOptionComponent.current.props.value.value);
+    if (
+      !optionsArray.includes(correctOptionComponent.current.props.value.value)
+    )
+      props.saveMCQCorrectAnswer(questionId, "");
   };
 
   const saveMCQCorrectAnswer = (selOption) => {

@@ -12,7 +12,6 @@ import { LoginContext } from "../../../contexts/LoginContext";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function EditAssessments() {
-  console.log("Rendered \n");
   const navigate = useNavigate();
   const { state } = useLocation();
   const { loggedInUserDetails } = useContext(LoginContext);
@@ -105,6 +104,7 @@ function EditAssessments() {
   };
 
   const saveMCQCorrectAnswer = (index, correctAnswer) => {
+    console.log("setting correct answer: "+correctAnswer);
     let modQuestionArr = [...questions];
     modQuestionArr[index].correctAnswer = correctAnswer;
     setQuestions(modQuestionArr);
@@ -306,6 +306,7 @@ function EditAssessments() {
           };
       });
       assessment.questions = questionsWithoutIDs;
+      console.log("Final: "+JSON.stringify(assessment));
       axios2
         .post("/updateAssessmentById", { _id: state._id, assessment })
         .then((res) => alert(JSON.stringify(res.data.message)));
@@ -365,7 +366,7 @@ function EditAssessments() {
           alert(
             "Error in question number " +
               (i + 1) +
-              ". There must at least be one blank and a valid correct answer."
+              ". There must at least be one blank and a non-empty correct answer."
           );
           return false;
         }
@@ -564,6 +565,7 @@ function EditAssessments() {
                       saveCodingQuestion={saveCodingQuestion}
                       saveCodingLanguage={saveCodingLanguage}
                       questionText={ele.questionText}
+                      codingLanguage={ele.codingLanguage}
                     />
                   )}
                 <button
@@ -586,10 +588,10 @@ function EditAssessments() {
           width: "100%",
           backgroundColor: "#282c34",
           // bacgroundColor: "#f2cc8f",
-          paddingTop: "5px",
-          paddingBottom: "5px",
-          position: "fixed",
-          bottom: 0,
+          paddingTop: "10px",
+          paddingBottom: "10px",
+          // position: "fixed",
+          // bottom: 0,
           // borderTop: "1px solid #f2cc8f"
         }}
       >

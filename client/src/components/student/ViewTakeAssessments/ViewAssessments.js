@@ -15,7 +15,7 @@ function ViewAssessments() {
   const navigate = useNavigate();
   const axios = Axios.create({
     withCredentials: true,
-    baseURL: "http://localhost:3001/modules",
+    baseURL: "http://localhost:3001/users",
     crossDomain: true,
   });
 
@@ -28,8 +28,7 @@ function ViewAssessments() {
   const beginAssessment = (event) => {
     const itemIndex = event.currentTarget.id.split("_")[1];
     navigate("../takeAssessments", {
-      state: { _id: assessmentsArray[itemIndex]._id,
-              assessment: assessmentsArray[itemIndex]},
+      state: { assessment: assessmentsArray[itemIndex]},
     });
   };
 

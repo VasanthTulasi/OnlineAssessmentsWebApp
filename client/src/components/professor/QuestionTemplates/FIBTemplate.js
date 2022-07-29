@@ -67,8 +67,6 @@ function FIBTemplate(props) {
         onChange={saveFIBQuestion}
         rows="3"
         defaultValue={props.questionText}
-        // onFocus={() => setButtonVisibility("add-blank-button")}
-        // onBlur={checkBlanks}
       />
       <button
         className="add-blank-button"

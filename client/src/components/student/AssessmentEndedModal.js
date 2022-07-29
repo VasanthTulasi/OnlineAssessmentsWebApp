@@ -1,41 +1,24 @@
 import React, {useState} from "react";
 import styled from "styled-components";
 
-function ConfirmDeleteModal(props) {
+function AssessmentEndedModal(props) {
   return (
     <Main>
       <ModalBox>
-        <div className="main-heading">Assessment Instructions</div>
-        <br/>
-        <br/>
-        <label className="modal-heading">Assesment Title: {props.assessmentTitle}</label>
+        <div className="main-heading">Assessment Successfully Finished!</div>
         <br/>
         <br/>
         <label className="modal-heading">
-           (1) The questions will be shown one at a time.<br/>
-           (2) Only after the answer for a question is submitted, the next question will be displayed.<br/>
-           (3) Once the answer for a question is submitted, it is not possible to go back and change it.<br/>
-           (4) Please click on 'Save and Next' button once you have written or chosen your answer for the question.<br/>
-           (5) Please do not refresh the browser window or close it during the assessment.<br/>
-           (6) Close all the other tabs in the browser and do not open any new tags during the assessment.<br/>
-           (7) You can see the timer to keep track of the remaining time during the assessment. <br/>
-           (8) The timer runs on the server and you can login again to continue the assessment even you lose your internet connection.<br/>
-           (9) Click on 'Proceed' button below to being the assessment.<br/>
+           Please click the below button to go back to the home page.<br/>
         </label>
         <br />
         <br />
         <div className="modal-buttons">
           <button
             className="modal-button"
-            onClick={props.doNotProceed}
+            onClick={props.okayClicked}
           >
-            Cancel and Go Back
-          </button>
-          <button
-            className="modal-button"
-            onClick={props.proceedWithAssessment}
-          >
-            Proceed
+            OK
           </button>
         </div>
       </ModalBox>
@@ -104,7 +87,7 @@ const ModalBox = styled.div`
     font-weight: 400;
     width: max-content;
     /* height: 40px; */
-    /* letter-spacing: 3px; */
+    letter-spacing: 1px;
     border-radius: 25px;
     padding: 7px 20px 7px 20px;
   }
@@ -114,4 +97,4 @@ const ModalBox = styled.div`
   }
 `;
 
-export default ConfirmDeleteModal;
+export default AssessmentEndedModal;

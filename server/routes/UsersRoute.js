@@ -180,15 +180,27 @@ router.get("/signOut", (req, res) => {
 router.post("/usersForModule", async (req, res) => {
   const { moduleCode } = req.body;
   const users = await UsersModel.find({
-    assigned_modules: { $in: moduleCode }
+    assigned_modules: { $in: moduleCode },
   });
-  if (users){ 
-  let moduleUsers = users;
-  moduleUsers = moduleUsers.map((ele) =>{
-    return {first_name: ele.first_name, last_name: ele.last_name, email: ele.email, uni_id :ele.uni_id, role: ele.role};
-  });
-  res.send(moduleUsers);
-  // console.log(moduleUsers);
+  if (users) {
+    let moduleUsers = users;
+    moduleUsers = moduleUsers.map((ele) => {
+      return {
+        first_name: ele.first_name,
+        last_name: ele.last_name,
+        email: ele.email,
+        uni_id: ele.uni_id,
+        role: ele.role,
+      };
+    });
+    res.send(moduleUsers);
+  }
+});
+
+router.post("/assignedModuleCodes", async (req, res) => {
+  const user = await UsersModel.findOne({ uni_id: req.body.uni_id});
+  if (user) {
+    res.send(user.assigned_modules);
   }
 });
 

@@ -70,18 +70,6 @@ router.get("/moduleCodes", async (req, res) => {
   }
 });
 
-router.post("/assignedModuleCodes", async (req, res) => {
-  let moduleCodes = [];
-  // console.log("User is:"+);
-  const modules = await ModulesModel.find({ assigned_users: req.body.uni_id });
-  if (modules) {
-    modules.forEach((ele) => {
-      moduleCodes.push(ele.module_code);
-    });
-    res.send(moduleCodes);
-  }
-});
-
 router.post("/assignUsers", async (req, res) => {
   const { moduleCode, newUsers } = req.body;
   let validUsers = [],
@@ -94,36 +82,24 @@ router.post("/assignUsers", async (req, res) => {
     else invalidUsers.push(newUsers[i]);
   }
 
-  await ModulesModel.updateOne(
-    { module_code: moduleCode },
-    { $addToSet: { assigned_users: { $each: validUsers } } }
-  )
-    .then(async () => {
-      for (let i = 0; i < validUsers.length; i++) {
-        await UsersModel.updateOne(
-          { uni_id: validUsers[i] },
-          { $addToSet: { assigned_modules: { $each: [moduleCode] } } }
-        );
-      }
-      res.json({ message: "success", invalidUsers: invalidUsers });
-    })
-    .catch((err) => {
-      console.log("reached");
-      res.json({ message: err.message });
-    });
+  for (let i = 0; i < validUsers.length; i++) {
+    await UsersModel.updateOne(
+      { uni_id: validUsers[i]},
+      { $addToSet: { assigned_modules: { $each: [moduleCode] } } }
+    );
+  }
+  res.json({ message: "success", invalidUsers: invalidUsers });
+ 
 });
 
 router.post("/deleteUserFromModule", async (req, res) => {
   const { uni_id, module_code } = req.body;
-  await ModulesModel.updateOne(
-    { module_code: module_code },
-    { $pull: { assigned_users: uni_id }}
-  ).then(async () => {
-    await UsersModel.updateOne(
-      { uni_id: uni_id },
-      { $pull: { assigned_modules: module_code } }
-    );
-  }).then(()=>res.json({"message":"success"})).catch(err => res.json({"message":err}));
+  await UsersModel.updateOne(
+    { uni_id: uni_id },
+    { $pull: { assigned_modules: module_code } }
+  )
+  .then(() => res.json({ message: "success" }))
+  .catch((err) => res.json({ message: err }));
 });
 
 module.exports = router;

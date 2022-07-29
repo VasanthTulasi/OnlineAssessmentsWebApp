@@ -49,8 +49,7 @@ router.post("/deleteAssessmentFromModule", (req,res) =>{
 
 
 router.post("/assessmentsbyId", async (req, res) => {
-  // console.log("Reached");
-  // console.log(req.body._id);
+
   const assessments = await AssessmentsModel.find({
     _id: req.body._id
   });

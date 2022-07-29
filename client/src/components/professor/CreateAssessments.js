@@ -24,8 +24,8 @@ function CreateAssessments() {
   const [selectedDurationNumber, setSelectedDurationNumber] = useState(10);
   const [windowStartTime, setWindowStartTime] = useState("");
   const [windowEndTime, setWindowEndTime] = useState("");
-
   const [showfirstQuestion, setShowFirstQuestion] = useState(true);
+  
 
   const axios = Axios.create({
     withCredentials: true,
@@ -283,10 +283,10 @@ function CreateAssessments() {
           };
       });
       assessment.questions = questionsWithoutIDs;
-      console.log("final object: "+JSON.stringify(assessment));
-      axios2
-        .post("saveNewAssessment", assessment)
-        .then((res) => alert(JSON.stringify(res.data.message)));
+      console.log("final object: " + JSON.stringify(assessment));
+      // axios2
+      //   .post("saveNewAssessment", assessment)
+      //   .then((res) => alert(JSON.stringify(res.data.message)));
     }
   };
 
@@ -318,13 +318,14 @@ function CreateAssessments() {
           return false;
         }
       } else if (questions[i].questionType === "fib") {
-        
-        for(let j=0;j<questions[i].correctFIBAnswers.length;j++){
-          if(questions[i].correctFIBAnswers[j].length === 0){
+        for (let j = 0; j < questions[i].correctFIBAnswers.length; j++) {
+          if (questions[i].correctFIBAnswers[j].length === 0) {
             alert(
               "Error in question number " +
                 (i + 1) +
-                ". The correct answer for question "+(j+1) + " cannot be empty."
+                ". The correct answer for question " +
+                (j + 1) +
+                " cannot be empty."
             );
             return false;
           }
@@ -338,7 +339,6 @@ function CreateAssessments() {
           );
           return false;
         }
-
       } else if (questions[i].questionType === "coding") {
         if (questions[i].codingLanguage === "") {
           alert(
@@ -463,7 +463,7 @@ function CreateAssessments() {
       <div className="questions">
         {moduleCode !== "" && (
           <label className="assessment-info-label" style={{ width: "80%" }}>
-            Create Questions
+            Add Questions
           </label>
         )}
         {moduleCode !== "" &&

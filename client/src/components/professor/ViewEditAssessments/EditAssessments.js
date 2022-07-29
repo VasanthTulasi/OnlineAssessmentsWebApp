@@ -514,7 +514,7 @@ function EditAssessments() {
       <div className="questions">
         {/* {moduleCode !== "" && ( */}
         <label className="assessment-info-label" style={{ width: "80%" }}>
-          Add Questions
+          Edit or Add Questions
         </label>
         {/* )} */}
         {/* {moduleCode !== "" && */}

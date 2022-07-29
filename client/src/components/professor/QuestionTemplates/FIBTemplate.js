@@ -1,58 +1,93 @@
 //FIBTemplate
 import styled from "styled-components";
 import React, { useState, useRef, useEffect } from "react";
-import CreatableSelect from "react-select/creatable";
-import SingleSelect from "react-select";
 
 function FIBTemplate(props) {
   const textAreaComponent = useRef(null);
-  const [blanksCount, setBlanksCount] = useState(props.correctFIBAnswers.length);
-  const [correctBlankAnswers, setCorrectBlankAnswers] = useState(props.correctFIBAnswers);
+  const [blanksCount, setBlanksCount] = useState(
+    props.correctFIBAnswers.length
+  );
+  const [correctBlankAnswers, setCorrectBlankAnswers] = useState(
+    props.correctFIBAnswers
+  );
+  const [latestKeyEvent, setLatestKeyEvent] = useState("");
+  const [optionKeyId, setOptionKeyId] = useState(0);
 
   const saveFIBQuestion = (event) => {
-    // console.log("triggered");
-    let val = event.target.value;
-    let changedVal = val.replace(" ___________ ", "");
-    event.target.value = changedVal;
-    
-    try {
-      let numberOfBlanks = changedVal.match(/____________/g).length;
-      setBlanksCount(numberOfBlanks);
-    } catch (err) {
-      if (err.message === "Cannot read properties of null (reading 'length')")
-      setBlanksCount(0);
-    }
+    if (checkIfEditingInsideBlank()) return;
+    let quesTextArr = event.target.value.split("____________");
+    // console.log(JSON.stringify(quesTextArr));
+    const finalQuesTextArr = removeUnwantedBlanks(quesTextArr);
+    // console.log(finalQuesTextArr);
+    event.target.value = finalQuesTextArr.join("____________");
+    setBlanksCount(quesTextArr.length - 1);
     const questionId = textAreaComponent.current.id.split("_")[3];
     props.saveFIBQuestion(questionId, event.target.value);
-    if(changedVal !== val){
-      props.removeFIBAnswer(questionId);  
+    // if (changedVal !== val) {
+    // props.removeFIBAnswer(questionId);
+    // }
+  };
+
+  const checkIfEditingInsideBlank = () => {
+    if (latestKeyEvent === "Backspace" || latestKeyEvent === "Delete") return;
+
+    const position = textAreaComponent.current.selectionStart;
+    const prevChar = textAreaComponent.current.value[position - 2];
+    const nextChar = textAreaComponent.current.value[position];
+    if (prevChar === "_" && nextChar === "_") {
+      alert(
+        "Invalid Operation! Cannot insert text inside a blank."
+      );
+      let cleanText = String(textAreaComponent.current.value);
+      cleanText =
+        cleanText.substring(0, position - 1) + cleanText.substring(position);
+      textAreaComponent.current.value = cleanText;
+      return true;
     }
+    return false;
+  };
+
+  const checkIfAddingInBlank = () => {
+    const position = textAreaComponent.current.selectionStart;
+    const prevChar = textAreaComponent.current.value[position - 2];
+    const nextChar = textAreaComponent.current.value[position];
+    if (prevChar === "_" && nextChar === "_") {
+      alert("Invalid operation! Cannot insert a blank inside another blank.");
+      return true;
+    }
+    return false;
+  };
+
+  const removeUnwantedBlanks = (quesTextArr) => {
+    for (let i = 0; i < quesTextArr.length; i++) {
+      quesTextArr[i] = quesTextArr[i].replace("___________", "");
+    }
+    return quesTextArr;
   };
 
   const setCorrectAnswers = (event) => {
-      const index = event.target.id.split("_")[2];
-      const questionId = textAreaComponent.current.id.split("_")[3];
-      props.saveFIBAnswers(questionId,index,event.target.value);
-  }
+    const index = event.target.id.split("_")[2];
+    const questionId = textAreaComponent.current.id.split("_")[3];
+    props.saveFIBAnswers(questionId, index, event.target.value);
+  };
 
   const addBlank = () => {
+    if (checkIfAddingInBlank()) return;
     let curText = textAreaComponent.current.value;
     let curPosition = textAreaComponent.current.selectionStart;
+    let blankCount = curText.split("____________").length;
+    // console.log("Number of blanks: " + blankCount);
+
     let finalText =
       curText.substring(0, curPosition) +
       " ____________ " +
       curText.substring(curPosition);
     textAreaComponent.current.value = finalText;
     textAreaComponent.current.focus();
+    setOptionKeyId((prevVal) => prevVal + 1);
     const questionId = textAreaComponent.current.id.split("_")[3];
     props.saveFIBQuestion(questionId, textAreaComponent.current.value);
-    try {
-      let numberOfBlanks = finalText.match(/____________/g).length;
-      setBlanksCount(numberOfBlanks);
-    } catch (err) {
-      if (err.message === "Cannot read properties of null (reading 'length')")
-        setBlanksCount(0);
-    }
+    setBlanksCount(blankCount);
   };
 
   return (
@@ -64,6 +99,7 @@ function FIBTemplate(props) {
         ref={textAreaComponent}
         id={"fib_text_area_" + props.indexVal}
         className="text-area"
+        onKeyDown={(event) => setLatestKeyEvent(event.code)}
         onChange={saveFIBQuestion}
         rows="3"
         defaultValue={props.questionText}
@@ -76,18 +112,18 @@ function FIBTemplate(props) {
         Add a blank at cursor
       </button>
       <br />
-      {Array.from({ length: blanksCount }).map((ele,index) => {
+      {Array.from({ length: blanksCount }).map((ele, index) => {
         return (
           <>
             <br />
             <label className="label-class">
-              Enter Correct Answer for Blank {index+1}
+              Enter Correct Answer for Blank {index + 1}
             </label>
             <br />
             <input
               onChange={(event) => setCorrectAnswers(event)}
               className="blanks-answer-field"
-              id={"blank_answer_"+index}
+              id={"blank_answer_" + index}
               placeholder="Correct Answer"
               defaultValue={props.correctFIBAnswers[index]}
             />

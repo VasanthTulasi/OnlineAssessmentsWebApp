@@ -21,22 +21,19 @@ function FIBTemplate(props) {
   //   setNextOptionKeyId(correctBlankAnswersWithKeys.length);
   // }, []);
 
-  const saveFIBQuestion = (event) => {
-    if (checkIfEditingInsideBlank()) return;
-    let quesTextArr = event.target.value.split("____________");
-    // console.log(JSON.stringify(quesTextArr));
+  const saveFIBQuestion = () => {
+    console.log("save fib triggered");
+    // if (checkIfEditingInsideBlank()) return;
+    let quesTextArr = textAreaComponent.current.value.split("____________");
     const finalQuesTextArr = removeUnwantedBlanks(quesTextArr);
-    // console.log(finalQuesTextArr);
-    event.target.value = finalQuesTextArr.join("____________");
-    // modifyBlanks(quesTextArr.length - 1)
+    textAreaComponent.current.value = finalQuesTextArr.join("____________");
     setBlanksCount(quesTextArr.length - 1);
     const questionId = textAreaComponent.current.id.split("_")[3];
-    props.saveFIBQuestion(questionId, event.target.value);
+    props.saveFIBQuestion(questionId, textAreaComponent.current.value);
   };
 
-  const checkIfEditingInsideBlank = () => {
-    if (latestKeyEvent === "Backspace" || latestKeyEvent === "Delete") return;
-
+  const checkIfEditingInsideBlank = (eventType) => {
+    if (eventType === "Backspace" || eventType === "Delete" || eventType==="ArrowLeft" || eventType === "ArrowRight") return;
     const position = textAreaComponent.current.selectionStart;
     const prevChar = textAreaComponent.current.value[position - 2];
     const nextChar = textAreaComponent.current.value[position];
@@ -53,8 +50,10 @@ function FIBTemplate(props) {
 
   const checkIfAddingInBlank = () => {
     const position = textAreaComponent.current.selectionStart;
-    const prevChar = textAreaComponent.current.value[position - 2];
+    const prevChar = textAreaComponent.current.value[position - 1];
     const nextChar = textAreaComponent.current.value[position];
+    console.log("Prev char "+prevChar);
+    console.log("Next char "+nextChar)
     if (prevChar === "_" && nextChar === "_") {
       alert("Invalid operation! Cannot insert a blank inside another blank.");
       return true;
@@ -87,7 +86,6 @@ function FIBTemplate(props) {
     let curPosition = textAreaComponent.current.selectionStart;
     let blankCount = curText.split("____________").length;
     // console.log("Number of blanks: " + blankCount);
-
     let finalText =
       curText.substring(0, curPosition) +
       " ____________ " +
@@ -100,6 +98,17 @@ function FIBTemplate(props) {
     props.saveFIBQuestion(questionId, textAreaComponent.current.value);
   };
 
+  const keyPressed = (event) => {
+    // setLatestKeyEvent(event.code);
+    checkIfEditingInsideBlank(event.code);
+    if (event.code === "Backspace" || event.code === "Delete"){
+        // if(textAreaComponent.current.value[curPosition] === "_" || )
+        // console.log(textAreaComponent.current.value[curPosition-1]);
+        // console.log(textAreaComponent.current.value[curPosition]);
+        saveFIBQuestion();
+    }
+  };
+
   return (
     <FIB>
       <label className="label-class" style={{ marginTop: 0 }}>
@@ -109,8 +118,8 @@ function FIBTemplate(props) {
         ref={textAreaComponent}
         id={"fib_text_area_" + props.indexVal}
         className="text-area"
-        onKeyDown={(event) => setLatestKeyEvent(event.code)}
-        onChange={saveFIBQuestion}
+        onKeyUp={keyPressed}
+        onBlur={saveFIBQuestion}
         rows="3"
         defaultValue={props.questionText}
       />
@@ -146,7 +155,6 @@ function FIBTemplate(props) {
 
 const FIB = styled.div`
   margin-top: 10px;
-  /* border: 1px solid red; */
 
   .label-class {
     display: inline-block;
@@ -169,30 +177,6 @@ const FIB = styled.div`
     height: 35px;
     padding-left: 10px;
   }
-
-  /* .icon-class {
-    display: inline-block;
-    position: relative;
-    color: white;
-    font-family: "Source Sans Pro", sans-serif;
-    font-size: 17px;
-    font-weight: 400;
-    margin-top: 5px;
-  }
-
-  .icon-text {
-    visibility: hidden;
-    position: absolute;
-    z-index: 1;
-    border: 1px solid red;
-    background-color: #282c34;
-    width: 150px;
-    padding: 0 5px;
-  }
-
-  .icon-class:hover .icon-text {
-    visibility: visible;
-  } */
 
   .text-area {
     width: 100%;

@@ -24,8 +24,8 @@ function CreateAssessments() {
   const [selectedDurationNumber, setSelectedDurationNumber] = useState(10);
   const [windowStartTime, setWindowStartTime] = useState("");
   const [windowEndTime, setWindowEndTime] = useState("");
+  const [totalMarks, setTotalMarks] = useState();
   const [showfirstQuestion, setShowFirstQuestion] = useState(true);
-  
 
   const axios = Axios.create({
     withCredentials: true,
@@ -256,6 +256,7 @@ function CreateAssessments() {
         duration_measure: selectedDurationMeasure,
         window_start_time: windowStartTime,
         window_end_time: windowEndTime,
+        total_marks: totalMarks,
       };
       const questionsWithoutIDs = questions.map((ele) => {
         if (ele.questionType === "mcq")
@@ -447,6 +448,17 @@ function CreateAssessments() {
           placeholder="Assessment Title"
           onChange={(e) => {
             setWindowEndTime(e.target.value);
+          }}
+        />
+        <label className="assessment-info-label">
+          Enter Total Marks Awarded
+        </label>
+        <input
+          type="Number"
+          className="assessment-text-field"
+          placeholder="Total Marks Awarded"
+          onChange={(e) => {
+            setTotalMarks(parseInt(e.target.value));
           }}
         />
         <label className="assessment-info-label">Select Module Code</label>

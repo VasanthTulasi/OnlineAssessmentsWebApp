@@ -10,9 +10,8 @@ function FIBTemplate(props) {
   const [correctBlankAnswers, setCorrectBlankAnswers] = useState(
     props.correctFIBAnswers
   );
-  const [latestKeyEvent, setLatestKeyEvent] = useState("");
-  // const [nextOptionKeyId, setNextOptionKeyId] = useState(0);
-
+  const [errorMessageStyle,setErrorMessageStyle]  = useState({display:"none"})
+  const [errorMessage,setErrorMessage] = useState("");
   // useEffect(() => {
   //   const correctBlankAnswersWithKeys = correctBlankAnswers;
   //   correctBlankAnswersWithKeys.map((ele,index) => {
@@ -38,24 +37,25 @@ function FIBTemplate(props) {
     const prevChar = textAreaComponent.current.value[position - 2];
     const nextChar = textAreaComponent.current.value[position];
     if (prevChar === "_" && nextChar === "_") {
-      alert("Invalid Operation! Cannot insert text inside a blank.");
       let cleanText = String(textAreaComponent.current.value);
       cleanText =
         cleanText.substring(0, position - 1) + cleanText.substring(position);
       textAreaComponent.current.value = cleanText;
-      return true;
+      // alert("Invalid Operation! Cannot insert text inside a blank.");
+      setErrorMessage("Invalid Operation! Cannot insert text inside a blank.");
+      setErrorMessageStyle({display:"block"})
+      // return true;
     }
-    return false;
+    // return false;
   };
 
   const checkIfAddingInBlank = () => {
-    const position = textAreaComponent.current.selectionStart;
-    const prevChar = textAreaComponent.current.value[position - 1];
-    const nextChar = textAreaComponent.current.value[position];
-    console.log("Prev char "+prevChar);
-    console.log("Next char "+nextChar)
+    const currentPos = textAreaComponent.current.selectionStart;
+    const prevChar = textAreaComponent.current.value[currentPos - 1];
+    const nextChar = textAreaComponent.current.value[currentPos];
     if (prevChar === "_" && nextChar === "_") {
-      alert("Invalid operation! Cannot insert a blank inside another blank.");
+      setErrorMessage("Invalid operation! Cannot insert a blank inside another blank.");
+      setErrorMessageStyle({display:"block"});
       return true;
     }
     return false;
@@ -80,33 +80,28 @@ function FIBTemplate(props) {
   };
 
   const addBlank = () => {
+    setErrorMessageStyle({display:"none"})
     if (checkIfAddingInBlank()) return;
     console.log("continue");
     let curText = textAreaComponent.current.value;
     let curPosition = textAreaComponent.current.selectionStart;
     let blankCount = curText.split("____________").length;
-    // console.log("Number of blanks: " + blankCount);
     let finalText =
       curText.substring(0, curPosition) +
       " ____________ " +
       curText.substring(curPosition);
     textAreaComponent.current.value = finalText;
     textAreaComponent.current.focus();
-    // setNextOptionKeyId((prevVal) => prevVal + 1);
     setBlanksCount(blankCount);
     const questionId = textAreaComponent.current.id.split("_")[3];
     props.saveFIBQuestion(questionId, textAreaComponent.current.value);
   };
 
   const keyPressed = (event) => {
-    // setLatestKeyEvent(event.code);
+    setErrorMessageStyle({display:"none"})
     checkIfEditingInsideBlank(event.code);
-    if (event.code === "Backspace" || event.code === "Delete"){
-        // if(textAreaComponent.current.value[curPosition] === "_" || )
-        // console.log(textAreaComponent.current.value[curPosition-1]);
-        // console.log(textAreaComponent.current.value[curPosition]);
+    if (event.code === "Backspace" || event.code === "Delete")
         saveFIBQuestion();
-    }
   };
 
   return (
@@ -123,6 +118,7 @@ function FIBTemplate(props) {
         rows="3"
         defaultValue={props.questionText}
       />
+      <div style={errorMessageStyle}>{errorMessage}</div>
       <button
         className="add-blank-button"
         id={"add_blank_" + props.indexVal}

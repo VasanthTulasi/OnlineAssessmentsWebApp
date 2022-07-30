@@ -5,16 +5,16 @@ function MCQTemplate(props) {
   const { question, questionIndex, totalQuestions } = props;
   const [selectedOptionIndex, setSelectedOptionIndex] = useState("");
 
-  const optionClicked = (highlightIndex, selVal) => {
+  const mcqOptionClicked = (highlightIndex, selVal) => {
     setSelectedOptionIndex(String(highlightIndex));
-    props.optionClicked(questionIndex, selVal);
+    props.mcqOptionClicked(questionIndex, selVal);
   };
-  //   const [availableOptions, setAvailableOptions] = useState();
 
   useEffect(() => {
     console.log("Triggered");
     setSelectedOptionIndex("");
   }, [question]);
+  
 
   const getOptionDivs = () => {
     let options = [];
@@ -26,7 +26,7 @@ function MCQTemplate(props) {
                 ? "question-option highlight"
                 : "question-option"
             }
-            onClick={(event) => optionClicked(i, event.target.textContent)}
+            onClick={(event) => mcqOptionClicked(i, event.target.textContent)}
           >
             {question.options[i]}
           </div>
@@ -56,57 +56,13 @@ function MCQTemplate(props) {
   };
 
   return (
-    <MCQAnswer className="question">
+    <MCQAnswer>
       <div className="question-number">
         Question {questionIndex + 1} / {totalQuestions}
       </div>
       <div className="question-text">{question.questionText}</div>
       <div className="question-options">
         {getOptionSubDivs().map((ele) => ele)}
-        {/* <div className="question-options-sub">
-          <div
-            className={
-              selectedOptionIndex == "0"
-                ? "question-option highlight"
-                : "question-option"
-            }
-            onClick={(event) => optionClicked(0, event.target.textContent)}
-          >
-            {question.options[0]}
-          </div>
-          <div
-            className={
-              selectedOptionIndex == "1"
-                ? "question-option highlight"
-                : "question-option"
-            }
-            onClick={(event) => optionClicked(1, event.target.textContent)}
-          >
-            {question.options[1]}
-          </div>
-        </div>
-        <div className="question-options-sub">
-          <div
-            className={
-              selectedOptionIndex == "2"
-                ? "question-option highlight"
-                : "question-option"
-            }
-            onClick={(event) => optionClicked(2, event.target.textContent)}
-          >
-            {question.options[2]}
-          </div>
-          <div
-            className={
-              selectedOptionIndex == "3"
-                ? "question-option highlight"
-                : "question-option"
-            }
-            onClick={(event) => optionClicked(3, event.target.textContent)}
-          >
-            {question.options[3]}
-          </div>
-        </div> */}
       </div>
     </MCQAnswer>
   );

@@ -5,6 +5,7 @@ import AssessmentInstructionsModal from "../AssessmentInstructionsModal";
 import AssessmentEndedModal from "../AssessmentEndedModal";
 import Axios from "axios";
 import MCQTemplate from "../AnswerTemplates/MCQTemplate";
+import FIBTemplate from "../AnswerTemplates/FIBTemplate";
 import { LoginContext } from "../../../contexts/LoginContext";
 
 function TakeAssessments() {
@@ -31,12 +32,11 @@ function TakeAssessments() {
   };
 
   const saveAndNext = () => {
-    // if (answers[questionIndex] === "") {
-    //   console.log("Cannot move forward without an answer..");
-    //   return;
-    // }
+    if (answers[questionIndex] === "") {
+      console.log("Cannot move forward without an answer..");
+      return;
+    }
 
-    //Save
     axios
       .post("/saveAnswers", {
         assessment_id: state.assessment._id,
@@ -45,7 +45,6 @@ function TakeAssessments() {
         answer: answers[questionIndex],
       })
       .then((res) => {
-        //Next
         console.log(res.data.message);
         if (questionIndex < questions.length - 1) {
           setQuestionIndex((prevVal) => prevVal + 1);
@@ -57,10 +56,24 @@ function TakeAssessments() {
       });
   };
 
-  const optionClicked = (quesIndex, selVal) => {
-    let answersArr = [...answers];
-    answersArr[quesIndex] = selVal;
-    setAnswers(answersArr);
+  const mcqOptionClicked = (quesIndex, selVal) => {
+    let modArr = [...answers];
+    modArr[quesIndex] = selVal;
+    setAnswers(modArr);
+  };
+
+  const saveFIBAnswers = (quesIndex, answerValue, changedIndex = null) => {
+    if (changedIndex != null) {
+      console.log("modified array");
+      let modArr = [...answers];
+      modArr[quesIndex][changedIndex] = answerValue;
+      setAnswers(modArr);
+    } else {
+      console.log("Empty array set");
+      let modArr = [...answers];
+      modArr[quesIndex] = answerValue;
+      setAnswers(modArr);
+    }
   };
 
   const proceedWithAssessment = () => {
@@ -72,7 +85,11 @@ function TakeAssessments() {
       })
       .then((res) => {
         console.log(res.data.message);
-        if (res.data.message === "success" || res.data.message === "already exists") setIsInstuctionsModalVisible(false);
+        if (
+          res.data.message === "success" ||
+          res.data.message === "already exists"
+        )
+          setIsInstuctionsModalVisible(false);
         else alert("Error! Please try again later.");
       });
   };
@@ -99,12 +116,28 @@ function TakeAssessments() {
         <div className="title">Java MCQ Test</div>
         <div className="timer">Remaining Time: 34:00</div>
       </div>
-      <MCQTemplate
-        questionIndex={questionIndex}
-        totalQuestions={questions.length}
-        question={questions[questionIndex]}
-        optionClicked={optionClicked}
-      />
+      {questions[questionIndex].questionType === "mcq" && (
+        <MCQTemplate
+          questionIndex={questionIndex}
+          question={questions[questionIndex]}
+          mcqOptionClicked={mcqOptionClicked}
+          totalQuestions={questions.length}
+        />
+      )}
+      {questions[questionIndex].questionType === "fib" && (
+        <FIBTemplate
+          questionIndex={questionIndex}
+          question={questions[questionIndex]}
+          totalQuestions={questions.length}
+          saveFIBAnswers={saveFIBAnswers}
+        />
+      )}
+      {questions[questionIndex].questionType === "essay" && (
+        <div>This is an essay question</div>
+      )}
+      {questions[questionIndex].questionType === "coding" && (
+        <div>This is an mcq question</div>
+      )}
       <div style={{ display: "flex", justifyContent: "center" }}>
         <button
           className="submit-button"

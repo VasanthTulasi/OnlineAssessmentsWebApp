@@ -153,7 +153,7 @@ function EditAssessments() {
   };
 
   useEffect(() => {
-    console.log("Default use effect");
+    // console.log("Default use effect");
     axios
       .post("/assignedModuleCodes", { uni_id: loggedInUserDetails.uni_id })
       .then((res) => {
@@ -165,7 +165,7 @@ function EditAssessments() {
       });
 
     axios2.post("/assessmentsbyId", { _id: state._id }).then((res) => {
-      console.log("Returned assessment is:" + JSON.stringify(res.data));
+      // console.log("Returned assessment is:" + JSON.stringify(res.data));
       const assessment = res.data;
       setAssessmentTitle(assessment.title);
       setSelectedDurationMeasure(assessment.duration_measure);

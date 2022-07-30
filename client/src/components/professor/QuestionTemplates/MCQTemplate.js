@@ -94,7 +94,7 @@ function MCQTemplate(props) {
         ref={textAreaComponent}
         id={"mcq_text_area_" + props.indexVal}
         className="text-area"
-        onChange={saveMCQQuestion}
+        onBlur={saveMCQQuestion}
         rows="3"
         defaultValue={props.questionText}
         placeholder="MCQ Question"

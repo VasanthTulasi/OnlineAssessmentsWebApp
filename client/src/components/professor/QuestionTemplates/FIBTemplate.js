@@ -82,6 +82,7 @@ function FIBTemplate(props) {
 
   const addBlank = () => {
     if (checkIfAddingInBlank()) return;
+    console.log("continue");
     let curText = textAreaComponent.current.value;
     let curPosition = textAreaComponent.current.selectionStart;
     let blankCount = curText.split("____________").length;
@@ -130,7 +131,7 @@ function FIBTemplate(props) {
             </label>
             <br />
             <input
-              onChange={(event) => setCorrectAnswers(event)}
+              onBlur={(event) => setCorrectAnswers(event)}
               className="blanks-answer-field"
               id={"blank_answer_" + index}
               placeholder="Correct Answer"

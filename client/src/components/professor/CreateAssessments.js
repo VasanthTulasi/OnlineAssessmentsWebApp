@@ -226,7 +226,8 @@ function CreateAssessments() {
   };
 
   const save = () => {
-    // console.log("\n" + JSON.stringify(questions));
+    console.log("\n" + JSON.stringify(questions));
+    return;
     // console.log(assessmentTitle);
     // console.log(selectedDurationNumber);
     // console.log(selectedDurationMeasure);
@@ -284,9 +285,9 @@ function CreateAssessments() {
       });
       assessment.questions = questionsWithoutIDs;
       console.log("final object: " + JSON.stringify(assessment));
-      // axios2
-      //   .post("saveNewAssessment", assessment)
-      //   .then((res) => alert(JSON.stringify(res.data.message)));
+      axios2
+        .post("saveNewAssessment", assessment)
+        .then((res) => alert(JSON.stringify(res.data.message)));
     }
   };
 

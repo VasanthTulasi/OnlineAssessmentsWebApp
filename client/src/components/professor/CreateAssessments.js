@@ -24,7 +24,7 @@ function CreateAssessments() {
   const [selectedDurationNumber, setSelectedDurationNumber] = useState(10);
   const [windowStartTime, setWindowStartTime] = useState("");
   const [windowEndTime, setWindowEndTime] = useState("");
-  const [totalMarks, setTotalMarks] = useState();
+  const [totalMarks, setTotalMarks] = useState(null);
   const [showfirstQuestion, setShowFirstQuestion] = useState(true);
 
   const axios = Axios.create({
@@ -44,6 +44,7 @@ function CreateAssessments() {
     let modQuestionArr = [...questions];
     modQuestionArr[index].questionType = val;
     modQuestionArr[index].questionText = "";
+    modQuestionArr[index].questionMarks = "";
 
     if (val === "mcq") {
       deletePropertiesExcept(
@@ -149,6 +150,15 @@ function CreateAssessments() {
     setQuestions(modQuestionArr);
   };
 
+  //Save Marks
+  const saveMarks = (event) => {
+    const index = event.currentTarget.id.split("_")[2];
+    const marks = event.currentTarget.value;
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].questionMarks = parseInt(marks);
+    setQuestions(modQuestionArr);
+  };
+
   useEffect(() => {
     axios
       .post("/assignedModuleCodes", { uni_id: loggedInUserDetails.uni_id })
@@ -200,6 +210,7 @@ function CreateAssessments() {
         questionText: "",
         options: [],
         correctAnswer: "",
+        questionMarks: "",
       },
     ]);
   };
@@ -213,6 +224,7 @@ function CreateAssessments() {
         questionText: "",
         options: [],
         correctAnswer: "",
+        questionMarks: "",
       },
     ]);
     setNextKeyId((currentId) => currentId + 1);
@@ -226,8 +238,8 @@ function CreateAssessments() {
   };
 
   const save = () => {
-    console.log("\n" + JSON.stringify(questions));
-    return;
+    // console.log("\n" + JSON.stringify(questions));
+    // return;
     // console.log(assessmentTitle);
     // console.log(selectedDurationNumber);
     // console.log(selectedDurationMeasure);
@@ -237,7 +249,8 @@ function CreateAssessments() {
     if (
       assessmentTitle === "" ||
       windowStartTime === "" ||
-      windowEndTime === ""
+      windowEndTime === "" ||
+      totalMarks === ""
     ) {
       alert("Fields cannot be empty. All the fields must be filled.");
     } else if (windowStartTime <= getCurrentTime()) {
@@ -265,23 +278,27 @@ function CreateAssessments() {
             questionText: ele.questionText,
             options: ele.options,
             correctAnswer: ele.correctAnswer,
+            questionMarks: ele.questionMarks,
           };
         else if (ele.questionType === "fib")
           return {
             questionType: ele.questionType,
             questionText: ele.questionText,
             correctFIBAnswers: ele.correctFIBAnswers,
+            questionMarks: ele.questionMarks,
           };
         else if (ele.questionType === "coding")
           return {
             questionType: ele.questionType,
             questionText: ele.questionText,
             codingLanguage: ele.codingLanguage,
+            questionMarks: ele.questionMarks,
           };
         else
           return {
             questionType: ele.questionType,
             questionText: ele.questionText,
+            questionMarks: ele.questionMarks,
           };
       });
       assessment.questions = questionsWithoutIDs;
@@ -295,6 +312,21 @@ function CreateAssessments() {
   const getCurrentTime = () => new Date().toISOString().slice(0, 16);
 
   const validateQuestions = () => {
+    let marksSum = 0;
+    for (let i = 0; i < questions.length; i++) {
+      marksSum += questions[i].questionMarks;
+    }
+    console.log(marksSum);
+    console.log(totalMarks);
+    if (marksSum != totalMarks) {
+      alert(
+        "Total Marks Awarded and the sum of all the individual marks do not match. "
+      );
+      return false;
+    } else {
+      alert("marks ok");
+    }
+
     for (let i = 0; i < questions.length; i++) {
       if (questions[i].questionText === "") {
         alert(
@@ -457,7 +489,7 @@ function CreateAssessments() {
           type="Number"
           className="assessment-text-field"
           placeholder="Total Marks Awarded"
-          onChange={(e) => {
+          onBlur={(e) => {
             setTotalMarks(parseInt(e.target.value));
           }}
         />
@@ -529,6 +561,19 @@ function CreateAssessments() {
                       questionText={ele.questionText}
                     />
                   )}
+                  <div style={{ marginTop: "5px" }}>
+                    <label className="assessment-info-label">
+                      Marks Awarded
+                    </label>
+                    <br />
+                    <input
+                      id={"question_marks_" + index}
+                      type="Number"
+                      className="assessment-text-field"
+                      placeholder="Marks Awarded"
+                      onBlur={saveMarks}
+                    />
+                  </div>
                   <button
                     className="remove-question-button"
                     id={"remove_question_" + index}

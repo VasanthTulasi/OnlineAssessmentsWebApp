@@ -26,6 +26,10 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    total_marks:{
+      type: Number,
+      required: true,
+    },
     questions: {
       type:Array,
       required: true,

@@ -6,6 +6,7 @@ import AssessmentEndedModal from "../AssessmentEndedModal";
 import Axios from "axios";
 import MCQTemplate from "../AnswerTemplates/MCQTemplate";
 import FIBTemplate from "../AnswerTemplates/FIBTemplate";
+import EssayTemplate from "../AnswerTemplates/EssayTemplate";
 import { LoginContext } from "../../../contexts/LoginContext";
 
 function TakeAssessments() {
@@ -76,6 +77,12 @@ function TakeAssessments() {
     }
   };
 
+  const saveEssayAnswer = (quesIndex, answer) => {
+    let modArr = [...answers];
+    modArr[quesIndex] = answer;
+    setAnswers(modArr);
+  }
+  
   const proceedWithAssessment = () => {
     axios
       .post("/createNewSubmission", {
@@ -133,7 +140,12 @@ function TakeAssessments() {
         />
       )}
       {questions[questionIndex].questionType === "essay" && (
-        <div>This is an essay question</div>
+        <EssayTemplate
+        questionIndex={questionIndex}
+        question={questions[questionIndex]}
+        totalQuestions={questions.length}
+        saveEssayAnswer={saveEssayAnswer}
+      />
       )}
       {questions[questionIndex].questionType === "coding" && (
         <div>This is an mcq question</div>

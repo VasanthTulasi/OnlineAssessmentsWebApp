@@ -57,6 +57,12 @@ function TakeAssessments() {
       });
   };
 
+
+  useEffect(()=>{
+    if(questions[questionIndex].questionType === "essay")
+      answers[questionIndex] = localStorage.getItem(state.assessment._id+"_answer_"+String(questionIndex));
+  },[questionIndex]);
+
   const mcqOptionClicked = (quesIndex, selVal) => {
     let modArr = [...answers];
     modArr[quesIndex] = selVal;
@@ -81,8 +87,8 @@ function TakeAssessments() {
     let modArr = [...answers];
     modArr[quesIndex] = answer;
     setAnswers(modArr);
-  }
-  
+  };
+
   const proceedWithAssessment = () => {
     axios
       .post("/createNewSubmission", {
@@ -141,11 +147,12 @@ function TakeAssessments() {
       )}
       {questions[questionIndex].questionType === "essay" && (
         <EssayTemplate
-        questionIndex={questionIndex}
-        question={questions[questionIndex]}
-        totalQuestions={questions.length}
-        saveEssayAnswer={saveEssayAnswer}
-      />
+          questionIndex={questionIndex}
+          question={questions[questionIndex]}
+          totalQuestions={questions.length}
+          saveEssayAnswer={saveEssayAnswer}
+          assessment_id={state.assessment._id}
+        />
       )}
       {questions[questionIndex].questionType === "coding" && (
         <div>This is an mcq question</div>

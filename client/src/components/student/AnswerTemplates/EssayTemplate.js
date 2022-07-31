@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 function EssayTemplate(props) {
   
-  const { question, questionIndex, totalQuestions } = props;
+  const { question, questionIndex, totalQuestions, assessment_id } = props;
   return (
     <EssayAnswer>
       <div className="question-number">
@@ -14,7 +14,9 @@ function EssayTemplate(props) {
         className="text-area"
         onBlur={(event) => props.saveEssayAnswer(questionIndex, event.target.value)}
         rows="10"
-        placeholder="Write Your Answer Here"
+        placeholder="Write your answer here... Your answer will be autosaved as you write."
+        onChange={(event) => localStorage.setItem(assessment_id+"_answer_"+String(questionIndex), event.target.value)}
+        defaultValue={localStorage.getItem(assessment_id+"_answer_"+String(questionIndex))}
       />
     </EssayAnswer>
   );

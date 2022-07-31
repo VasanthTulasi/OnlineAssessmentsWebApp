@@ -26,6 +26,7 @@ function CreateAssessments() {
   const [windowEndTime, setWindowEndTime] = useState("");
   const [totalMarks, setTotalMarks] = useState(null);
   const [showfirstQuestion, setShowFirstQuestion] = useState(true);
+  const selectedDurationNumberDiv = useRef(null);
 
   const axios = Axios.create({
     withCredentials: true,
@@ -193,7 +194,7 @@ function CreateAssessments() {
     setSelectedDurationMeasure(event.target.value);
     if (event.target.value === "minutes") {
       let newNumbers = [];
-      for (let i = 10; i <= 59; i = i + 10) newNumbers.push(i);
+      for (let i = 10; i <= 50; i = i + 10) newNumbers.push(i);
       setAssessmentDurationNumberOptions(newNumbers);
     } else {
       let newNumbers = [];
@@ -201,6 +202,11 @@ function CreateAssessments() {
       setAssessmentDurationNumberOptions(newNumbers);
     }
   };
+
+  useEffect(() => {
+    setSelectedDurationNumber(assessmentDurationNumberOptions[0]);
+    selectedDurationNumberDiv.current.value = assessmentDurationNumberOptions[0];
+  }, [assessmentDurationNumberOptions]);
 
   const displayFirstQuestion = () => {
     setQuestions([
@@ -369,7 +375,7 @@ function CreateAssessments() {
           alert(
             "Error in question number " +
               (i + 1) +
-              ". There must at least be one blank AND a valid correct answer."
+              ". There must at least be one blank and a non-empty correct answer."
           );
           return false;
         }
@@ -445,6 +451,7 @@ function CreateAssessments() {
             onChange={(e) => {
               setSelectedDurationNumber(e.target.value);
             }}
+            ref={selectedDurationNumberDiv}
           >
             {assessmentDurationNumberOptions.map((e) => {
               return <option value={e}>{e}</option>;

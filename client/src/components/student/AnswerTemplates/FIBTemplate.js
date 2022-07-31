@@ -21,12 +21,12 @@ function FIBTemplate(props) {
               className="fib-answer-text-field"
               id={"fib_answer_" + idIndex++}
               onChange={setAnswers}
-              placeholder={"Type Your Answer Here"}
+              placeholder={"Write Your Answer Here"}
             />
             &nbsp;
           </>
         );
-      } else return ele + " ";
+      } else return ele.trim() + " ";
     });
     return quesTextArr;
   };

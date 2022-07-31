@@ -49,11 +49,11 @@ function EditAssessments() {
     let modQuestionArr = [...questions];
     modQuestionArr[index].questionType = val;
     modQuestionArr[index].questionText = "";
-    modQuestionArr[index].questionMarks = "";
+    // modQuestionArr[index].questionMarks = "";
 
     if (val === "mcq") {
       deletePropertiesExcept(
-        ["id", "questionType", "questionText", "options", "correctAnswer"],
+        ["id", "questionType", "questionMarks", "questionText", "options", "correctAnswer"],
         modQuestionArr,
         index
       );
@@ -61,20 +61,20 @@ function EditAssessments() {
       modQuestionArr[index].correctAnswer = "";
     } else if (val === "fib") {
       deletePropertiesExcept(
-        ["id", "questionType", "questionText", "correctFIBAnswers"],
+        ["id", "questionType","questionMarks", "questionText", "correctFIBAnswers"],
         modQuestionArr,
         index
       );
       modQuestionArr[index].correctFIBAnswers = [];
     } else if (val === "essay") {
       deletePropertiesExcept(
-        ["id", "questionType", "questionText"],
+        ["id", "questionType", "questionMarks","questionText"],
         modQuestionArr,
         index
       );
     } else {
       deletePropertiesExcept(
-        ["id", "questionType", "questionText", "codingLanguage"],
+        ["id", "questionType","questionMarks", "questionText", "codingLanguage"],
         modQuestionArr,
         index
       );
@@ -357,7 +357,7 @@ function EditAssessments() {
   const validateQuestions = () => {
     let marksSum = 0;
     for (let i = 0; i < questions.length; i++) {
-      marksSum += questions[i].questionMarks;
+      marksSum += parseInt(questions[i].questionMarks);
     }
     console.log(marksSum);
     console.log(totalMarks);

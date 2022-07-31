@@ -14,7 +14,7 @@ function EssayTemplate(props) {
         className="text-area"
         onBlur={(event) => props.saveEssayAnswer(questionIndex, event.target.value)}
         rows="10"
-        placeholder="Write your answer here... Your answer will be autosaved as you write."
+        placeholder="Write your answer here... It will be autosaved as you write."
         onChange={(event) => localStorage.setItem(assessment_id+"_answer_"+String(questionIndex), event.target.value)}
         defaultValue={localStorage.getItem(assessment_id+"_answer_"+String(questionIndex))}
       />

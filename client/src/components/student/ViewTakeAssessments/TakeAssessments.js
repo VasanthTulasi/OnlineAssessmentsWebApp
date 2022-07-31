@@ -7,6 +7,7 @@ import Axios from "axios";
 import MCQTemplate from "../AnswerTemplates/MCQTemplate";
 import FIBTemplate from "../AnswerTemplates/FIBTemplate";
 import EssayTemplate from "../AnswerTemplates/EssayTemplate";
+import CodingTemplate from "../AnswerTemplates/CodingTemplate";
 import { LoginContext } from "../../../contexts/LoginContext";
 
 function TakeAssessments() {
@@ -33,6 +34,16 @@ function TakeAssessments() {
   };
 
   const saveAndNext = () => {
+    // console.log(answers[questionIndex]);
+    // if (questionIndex < questions.length - 1) {
+    //   setQuestionIndex((prevVal) => prevVal + 1);
+    //   if (questionIndex === questions.length - 2)
+    //     submitButton.current.textContent = "Submit & Finish";
+    // } else {
+    //   setIsAssessmentEndedModalVisible(true);
+    // }
+    // return;
+
     if (answers[questionIndex] === "") {
       console.log("Cannot move forward without an answer..");
       return;
@@ -57,11 +68,13 @@ function TakeAssessments() {
       });
   };
 
-
-  useEffect(()=>{
-    if(questions[questionIndex].questionType === "essay")
-      answers[questionIndex] = localStorage.getItem(state.assessment._id+"_answer_"+String(questionIndex));
-  },[questionIndex]);
+  useEffect(() => {
+    if (questions[questionIndex].questionType === "essay") {
+      answers[questionIndex] = localStorage.getItem(
+        state.assessment._id + "_answer_" + String(questionIndex)
+      );
+    }
+  }, [questionIndex]);
 
   const mcqOptionClicked = (quesIndex, selVal) => {
     let modArr = [...answers];
@@ -86,6 +99,24 @@ function TakeAssessments() {
   const saveEssayAnswer = (quesIndex, answer) => {
     let modArr = [...answers];
     modArr[quesIndex] = answer;
+    setAnswers(modArr);
+  };
+
+  const saveInitialCodingArray = (quesIndex, initArray) => {
+    let modArr = [...answers];
+    modArr[quesIndex] = initArray;
+    setAnswers(modArr);
+  };
+
+  const saveCodingLanguage = (quesIndex, selectedCodingLanguage) => {
+    let modArr = [...answers];
+    modArr[quesIndex][0] = selectedCodingLanguage;
+    setAnswers(modArr);
+  };
+
+  const saveCodingAnswer = (quesIndex, answer) => {
+    let modArr = [...answers];
+    modArr[quesIndex][1] = answer;
     setAnswers(modArr);
   };
 
@@ -155,7 +186,15 @@ function TakeAssessments() {
         />
       )}
       {questions[questionIndex].questionType === "coding" && (
-        <div>This is an mcq question</div>
+        <CodingTemplate
+          questionIndex={questionIndex}
+          question={questions[questionIndex]}
+          totalQuestions={questions.length}
+          assessment_id={state.assessment._id}
+          saveCodingAnswer={saveCodingAnswer}
+          saveCodingLanguage={saveCodingLanguage}
+          saveInitialCodingArray={saveInitialCodingArray}
+        />
       )}
       <div style={{ display: "flex", justifyContent: "center" }}>
         <button

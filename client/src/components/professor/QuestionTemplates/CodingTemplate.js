@@ -11,7 +11,7 @@ function CodingTemplate(props) {
     { label: "Java", value: "Java" },
     { label: "Python", value: "Python" },
     { label: "C++", value: "C++" },
-    { label: "C", value: "C" }
+    { label: "C Language", value: "C Language" }
   ];
 
   const saveCodingQuestion = (event) => {
@@ -69,7 +69,7 @@ function CodingTemplate(props) {
         ref={textAreaComponent}
         id={"coding_text_area_" + props.indexVal}
         className="text-area"
-        onChange={saveCodingQuestion}
+        onBlur={saveCodingQuestion}
         rows="3"
         defaultValue={props.questionText}
       />

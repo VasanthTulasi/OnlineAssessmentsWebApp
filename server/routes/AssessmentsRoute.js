@@ -6,7 +6,7 @@ router.post("/saveNewAssessment", async (req, res) => {
   const assessment = new AssessmentsModel(req.body);
   assessment
     .save()
-    .then(() => res.json({ message: "success" }))
+    .then(() => res.json({ message: "Assessment saved successfully!" }))
     .catch((err) => res.json({ message: err }));
 });
 
@@ -16,7 +16,7 @@ router.post("/updateAssessmentById", async (req, res) => {
   // console.log(JSON.stringify(req.body.assessment));
   const assessments = await AssessmentsModel.replaceOne({
     _id: req.body._id
-  },{...req.body.assessment}).then(() => res.json({ "message": "success" })).catch(err => res.json({"message":err}));
+  },{...req.body.assessment}).then(() => res.json({ "message": "Assessment Edited Successfully!" })).catch(err => res.json({"message":err}));
 
 });
 
@@ -49,7 +49,6 @@ router.post("/deleteAssessmentFromModule", (req,res) =>{
 
 
 router.post("/assessmentsbyId", async (req, res) => {
-
   const assessments = await AssessmentsModel.find({
     _id: req.body._id
   });

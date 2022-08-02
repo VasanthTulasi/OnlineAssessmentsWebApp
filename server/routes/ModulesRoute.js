@@ -60,6 +60,7 @@ router.post("/addNewModule", async (req, res) => {
 });
 
 router.get("/moduleCodes", async (req, res) => {
+  console.log(req.params);
   let moduleCodes = [];
   const modules = await ModulesModel.find();
   if (modules) {

@@ -56,7 +56,7 @@ function HomePage() {
             </li>
             <li>
               <Link to="/myprofile/profilecontent" className="menu">
-                My Profile
+                Profile
               </Link>
             </li>
           </ul>

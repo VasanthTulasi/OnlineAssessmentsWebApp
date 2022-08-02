@@ -16,6 +16,7 @@ function TakeAssessments() {
     useState(true);
   const [isAssessmentEndedModalVisible, setIsAssessmentEndedModalVisible] =
     useState(false);
+  const [timeLeft, setTimeLeft] = useState("");
   const { state } = useLocation();
   const navigate = useNavigate();
   const axios = Axios.create({
@@ -28,6 +29,7 @@ function TakeAssessments() {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState(Array(questions.length).fill(""));
   const submitButton = useRef(null);
+  let countdownTimer = null;
 
   const goBack = () => {
     navigate("../viewAssessments");
@@ -45,7 +47,7 @@ function TakeAssessments() {
     // return;
 
     if (answers[questionIndex] === "") {
-      console.log("Cannot move forward without an answer..");
+      alert("Please select an option before proceeding further.");
       return;
     }
 
@@ -67,6 +69,10 @@ function TakeAssessments() {
         }
       });
   };
+
+  useEffect(() => {
+    return () => clearTimeout(countdownTimer);
+  }, []);
 
   useEffect(() => {
     if (questions[questionIndex].questionType === "essay") {
@@ -121,21 +127,95 @@ function TakeAssessments() {
   };
 
   const proceedWithAssessment = () => {
+    let durationInMilliSec = calculateAssesmentDuration(
+      state.assessment.duration_number,
+      state.assessment.duration_measure
+    );
+
+    if (state.submissionData == "") {
+      axios
+        .post("/createNewSubmission", {
+          assessment_id: state.assessment._id,
+          student_uni_id: loggedInUserDetails.uni_id,
+          session_details: { attempts_left: 2, time_left: durationInMilliSec },
+          numberOfQuestions: questions.length,
+        })
+        .then((res) => {
+          console.log(res.data.message);
+          if (res.data.message === "success") {
+            setIsInstuctionsModalVisible(false);
+            startCountDownTimer(durationInMilliSec);
+          } else alert("Error! Please try again later.");
+        });
+    } else {
+      axios
+        .post("/updateAttemptsLeft", {
+          assessment_id: state.assessment._id,
+          student_uni_id: loggedInUserDetails.uni_id,
+          attempts_left: state.submissionData.session_details.attempts_left - 1,
+        })
+        .then((res) => {
+          if (res.data.message === "success") {
+            setIsInstuctionsModalVisible(false);
+            startCountDownTimer(state.submissionData.session_details.time_left);
+          } else alert("Error! Please try again later.");
+        });
+    }
+  };
+
+  const calculateAssesmentDuration = (durNumber, durMeasure) => {
+    let durInMilliSec;
+    if (durMeasure == "hours") durInMilliSec = durNumber * 60 * 60 * 1000;
+    else durInMilliSec = durNumber * 60 * 1000;
+
+    return durInMilliSec;
+  };
+
+  const startCountDownTimer = (durInMilliSec) => {
+    let time = getTimeLeft(durInMilliSec);
+    setTimeLeft(time);
+    let timeChangedCounter = 0;
+
+    countdownTimer = setInterval(() => {
+      console.log("running");
+      durInMilliSec -= 1000;
+      time = getTimeLeft(durInMilliSec);
+      setTimeLeft(time);
+      timeChangedCounter++;
+      if (timeChangedCounter == 5) {
+        updateTimeLeftInDb(durInMilliSec);
+        timeChangedCounter = 0;
+      }
+      if (durInMilliSec === 0) {
+        clearInterval(countdownTimer);
+      }
+    }, 1000);
+  };
+
+  const getTimeLeft = (durInMilliSec) => {
+    let hours, minutes, seconds;
+    hours = Math.floor(durInMilliSec / (1000 * 60 * 60));
+    minutes = Math.floor((durInMilliSec % (1000 * 60 * 60)) / (60 * 1000));
+    seconds = Math.floor(
+      ((durInMilliSec % (1000 * 60 * 60)) % (60 * 1000)) / 1000
+    );
+
+    if (hours < 10) hours = "0" + hours;
+    if (minutes < 10) minutes = "0" + minutes;
+    if (seconds < 10) seconds = "0" + seconds;
+
+    return hours + ":" + minutes + ":" + seconds;
+  };
+
+  const updateTimeLeftInDb = (durInMilliSec) => {
+    console.log("updated in db");
     axios
-      .post("/createNewSubmission", {
+      .post("/updateTimeLeft", {
         assessment_id: state.assessment._id,
         student_uni_id: loggedInUserDetails.uni_id,
-        numberOfQuestions: questions.length,
+        time_left: durInMilliSec,
       })
-      .then((res) => {
-        console.log(res.data.message);
-        if (
-          res.data.message === "success" ||
-          res.data.message === "already exists"
-        )
-          setIsInstuctionsModalVisible(false);
-        else alert("Error! Please try again later.");
-      });
+      .then((res) => console.log("Updated"));
   };
 
   return (
@@ -158,7 +238,7 @@ function TakeAssessments() {
       {/* {questions[questionIndex].questionText} */}
       <div className="title-timer">
         <div className="title">Java MCQ Test</div>
-        <div className="timer">Remaining Time: 34:00</div>
+        <div className="timer">Time Left: {timeLeft}</div>
       </div>
       {questions[questionIndex].questionType === "mcq" && (
         <MCQTemplate

@@ -17,7 +17,6 @@ function EditAssessments() {
   const { loggedInUserDetails } = useContext(LoginContext);
   const [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
   const [moduleCode, setModuleCode] = useState("");
-  // console.log("State Questions \n"+JSON.stringify(state.questions));
   const [questions, setQuestions] = useState([]);
   const [nextKeyId, setNextKeyId] = useState(1);
   const [assessmentDurationNumberOptions, setAssessmentDurationNumberOptions] =
@@ -363,7 +362,7 @@ function EditAssessments() {
     console.log(totalMarks);
     if (marksSum != totalMarks) {
       alert(
-        "Total Marks and the sum of all the individual marks do not match. "
+        "Total marks and the sum of the individual marks do not match. Please make sure they match."
       );
       return false;
     }
@@ -510,7 +509,7 @@ function EditAssessments() {
         </label>
         <input
           type="datetime-local"
-          min={getCurrentTime}
+          min={String(new Date().toISOString().slice(0, 16))}
           className="assessment-text-field"
           //   placeholder="Assessment Title"
           onChange={(e) => {
@@ -623,7 +622,7 @@ function EditAssessments() {
                 )}
                 <div style={{ marginTop: "5px" }}>
                   <label className="assessment-info-label">
-                    Marks Awarded for Correct Answer
+                      Marks Awarded
                   </label>
                   <br />
                   <input

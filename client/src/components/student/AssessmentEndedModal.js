@@ -37,6 +37,8 @@ const Main = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top:72px;
+  z-index: 9999;
 `;
 
 const ModalBox = styled.div`
@@ -50,7 +52,7 @@ const ModalBox = styled.div`
   border-radius: 10px;
   border: 1px solid black;
   /* bottom: 60px; */
-  margin-top: 60px;
+  /* margin-top: 60px; */
   overflow-y: auto;
   
   .modal-heading {

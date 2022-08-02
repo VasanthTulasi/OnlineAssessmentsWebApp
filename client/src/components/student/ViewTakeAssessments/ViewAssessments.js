@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import styled from "styled-components";
 import Axios from "axios";
-// import ConfirmDeleteModal from "../ConfirmDeletionModal";
 import SingleSelect from "react-select";
 import { LoginContext } from "../../../contexts/LoginContext";
 import { useNavigate } from "react-router-dom";
@@ -9,8 +8,10 @@ import { useNavigate } from "react-router-dom";
 function ViewAssessments() {
   const { loggedInUserDetails } = useContext(LoginContext);
   let [assessmentsArray, setAssessmentsArray] = useState([]);
+  let [submissionsDataArray, setSubmissionsDataArray] = useState([]);
   let [moduleCode, setModuleCode] = useState("");
   let [assessmentsLoaded, setAssessmentsLoaded] = useState(false);
+  let [submissionDataLoaded, setSubmissionDataLoaded] = useState(false);
   let [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
   const navigate = useNavigate();
   const axios = Axios.create({
@@ -25,10 +26,19 @@ function ViewAssessments() {
     crossDomain: true,
   });
 
+  const axios3 = Axios.create({
+    withCredentials: true,
+    baseURL: "http://localhost:3001/submissions",
+    crossDomain: true,
+  });
+
   const beginAssessment = (event) => {
     const itemIndex = event.currentTarget.id.split("_")[1];
     navigate("../takeAssessments", {
-      state: { assessment: assessmentsArray[itemIndex]},
+      state: {
+        assessment: assessmentsArray[itemIndex],
+        submissionData: submissionsDataArray[itemIndex],
+      },
     });
   };
 
@@ -46,14 +56,30 @@ function ViewAssessments() {
 
   useEffect(() => {
     setAssessmentsLoaded(false);
-    setAssessmentsArray([]);
+    // setAssessmentsArray([]);
     axios2.post("/assessmentsForModule", { moduleCode }).then((res) => {
       const assessments = res.data;
       if (assessments.length === 0) {
         setAssessmentsLoaded(true);
       } else {
-        setAssessmentsLoaded(true);
         setAssessmentsArray(assessments);
+        setAssessmentsLoaded(true);
+        //get submission data for each assessment
+        let assessmentIds = [];
+        for (let i = 0; i < assessments.length; i++)
+          assessmentIds.push(assessments[i]._id);
+
+        if (assessmentIds.length !== 0)
+          axios3
+            .post("/getSubmissionData", {
+              assessmentIds: assessmentIds,
+              student_uni_id: loggedInUserDetails.uni_id,
+            })
+            .then((res) => {
+              // console.log(JSON.stringify(res.data))
+              setSubmissionsDataArray(res.data);
+              setSubmissionDataLoaded(true);
+            });
       }
     });
   }, [moduleCode]);
@@ -100,7 +126,7 @@ function ViewAssessments() {
               options={moduleCodesFromDB}
               styles={customStyles}
               placeholder="Select or Enter Module Code"
-              onChange={(selOption)=>setModuleCode(selOption.value)}
+              onChange={(selOption) => setModuleCode(selOption.value)}
             />
           </div>
           <div className="heading" style={{ fontSize: "17px" }}>
@@ -114,63 +140,105 @@ function ViewAssessments() {
                 <td className="module-data headers-color">
                   Assessment Start Time
                 </td>
-                <td className="module-data end headers-color">
-                  Assessment Status
+                <td className="module-data headers-color">
+                  Assessment End Time
                 </td>
+                <td className="module-data headers-color">Assesment Status</td>
+                <td className="module-data headers-color">Your Submission Status</td>
+                <td className="module-data end headers-color">Attempts Left</td>
               </tr>
-              {assessmentsArray.map((ele, index) => {
-                return (
-                  <tr>
-                    <td className="module-data start">{index + 1}</td>
-                    <td className="module-data mid">{ele.title}</td>
-                    <td className="module-data mid">
-                      {new Date(ele.window_start_time).toString().slice(0, 21)}
-                    </td>
-                    <td className="module-data end">
-                      {new Date() > new Date(ele.window_end_time)
-                        ? "Closed"
-                        : new Date() > new Date(ele.window_start_time)
-                        ? "Open"
-                        : "Yet to Start"}
-                    </td>
-                    <td>
-                      <button
-                        id={"beginAssessment_" + index}
-                        onClick={beginAssessment}
-                        disabled={
-                          new Date() >= new Date(ele.window_start_time)
-                            ? new Date() <= new Date(ele.window_end_time)
-                              ? false
+              {submissionsDataArray.length !== 0 &&
+                assessmentsArray.map((ele, index) => {
+                  // console.log("Suv "+JSON.stringify(submissionsDataArray[index]));
+                  // return;
+                  return (
+                    <tr>
+                      <td className="module-data start">{index + 1}</td>
+                      <td className="module-data mid">{ele.title}</td>
+                      <td className="module-data mid">
+                        {new Date(ele.window_start_time)
+                          .toString()
+                          .slice(0, 21)}
+                      </td>
+                      <td className="module-data mid">
+                        {new Date(ele.window_end_time).toString().slice(0, 21)}
+                      </td>
+                      <td className="module-data mid">
+                        {new Date() > new Date(ele.window_end_time)
+                          ? "Completed"
+                          : new Date() > new Date(ele.window_start_time)
+                          ? "Ongoing"
+                          : "Yet To Start"}
+                      </td>
+                      <td className="module-data mid">
+                        {submissionsDataArray[index] !== ""
+                          ? submissionsDataArray[index].session_details
+                              .attempts_left === 0
+                            ? "Submitted"
+                            : "To Be Continued"
+                          : "Yet to Attempt"}
+                      </td>
+                      <td className="module-data end">
+                        {submissionsDataArray[index] !== ""
+                          ? submissionsDataArray[index].session_details
+                              .attempts_left
+                          : 3}
+                      </td>
+                      <td>
+                        <button
+                          id={"beginAssessment_" + index}
+                          onClick={beginAssessment}
+                          disabled={
+                            new Date() >= new Date(ele.window_start_time)
+                              ? new Date() <= new Date(ele.window_end_time)
+                                ? submissionsDataArray[index] !== ""
+                                  ? submissionsDataArray[index].session_details
+                                      .attempts_left === 0
+                                    ? true
+                                    : false
+                                  : false
+                                : true
                               : true
-                            : true
-                        }
-                        className={
-                          new Date() >= new Date(ele.window_start_time)
-                            ? new Date() <= new Date(ele.window_end_time)
-                              ? "module-data-button"
+                          }
+                          className={
+                            new Date() >= new Date(ele.window_start_time)
+                              ? new Date() <= new Date(ele.window_end_time)
+                                ? submissionsDataArray[index] !== ""
+                                  ? submissionsDataArray[index].session_details
+                                      .attempts_left === 0
+                                    ? "module-data-button button-disabled"
+                                    : "module-data-button"
+                                  : "module-data-button"
+                                : "module-data-button button-disabled"
                               : "module-data-button button-disabled"
-                            : "module-data-button button-disabled"
-                        }
-                      >
-                        Begin Assessment
-                      </button>
+                          }
+                        >
+                          {submissionsDataArray[index] !== ""
+                            ? submissionsDataArray[index].session_details
+                                .attempts_left === 0
+                              ? "Begin Assessment"
+                              : "Continue Assessment"
+                            : "Begin Assessment"}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+
+              {moduleCode !== "" &&
+                !assessmentsLoaded &&
+                !submissionDataLoaded && (
+                  <tr>
+                    <td colSpan="7" className="no-user-data">
+                      Loading Assesments for the Selected Module...
                     </td>
                   </tr>
-                );
-              })}
-
-              {moduleCode !== "" && !assessmentsLoaded && (
-                <tr>
-                  <td colSpan="6" className="no-user-data">
-                    Loading Assesments for the Selected Module...
-                  </td>
-                </tr>
-              )}
+                )}
               {moduleCode !== "" &&
                 assessmentsLoaded &&
                 assessmentsArray.length === 0 && (
                   <tr>
-                    <td colSpan="6" className="no-user-data">
+                    <td colSpan="7" className="no-user-data">
                       No assessments found for this module.
                     </td>
                   </tr>
@@ -178,7 +246,7 @@ function ViewAssessments() {
 
               {moduleCode === "" && (
                 <tr>
-                  <td colSpan="6" className="no-user-data">
+                  <td colSpan="7" className="no-user-data">
                     No module selected. Please select a module first to see its
                     assessments.
                   </td>
@@ -223,7 +291,7 @@ const ViewEditMod = styled.div`
     align-items: flex-start;
     flex-direction: column;
     /* border:1px solid red; */
-    width: 80%;
+    width: 90%;
   }
 
   .select-module-label {
@@ -296,6 +364,9 @@ const ViewEditMod = styled.div`
 
   .button-disabled {
     background-color: gray;
+  }
+  .button-disabled:hover {
+    cursor: default;
   }
 
   .no-user-data {

@@ -95,7 +95,7 @@ const Users = styled.div`
       color: white;
       font-family: "Source Sans Pro", sans-serif;
       font-weight: 400;
-      font-size: 25px;
+      font-size: 20px;
       /* border: 1px solid red; */
       vertical-align: middle;
       /* text-decoration: underline; */
@@ -116,7 +116,7 @@ const Users = styled.div`
     border: 1px solid white;
     font-family: "Source Sans Pro", sans-serif;
     font-weight: 400;
-    font-size: 20px;
+    font-size: 18px;
     padding: 15px;
     border-top-left-radius: 15px;
     border-bottom-left-radius: 15px;
@@ -127,7 +127,7 @@ const Users = styled.div`
     border: 1px solid white;
     font-family: "Source Sans Pro", sans-serif;
     font-weight: 400;
-    font-size: 20px;
+    font-size: 18px;
     padding: 15px;
     background-color: #282c34;
   }

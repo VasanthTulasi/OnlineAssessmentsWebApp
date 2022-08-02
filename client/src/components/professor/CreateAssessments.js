@@ -45,11 +45,18 @@ function CreateAssessments() {
     let modQuestionArr = [...questions];
     modQuestionArr[index].questionType = val;
     modQuestionArr[index].questionText = "";
-    modQuestionArr[index].questionMarks = "";
+    // modQuestionArr[index].questionMarks = "";
 
     if (val === "mcq") {
       deletePropertiesExcept(
-        ["id", "questionType", "questionText", "options", "correctAnswer"],
+        [
+          "id",
+          "questionType",
+          "questionText",
+          "questionMarks",
+          "options",
+          "correctAnswer",
+        ],
         modQuestionArr,
         index
       );
@@ -57,20 +64,32 @@ function CreateAssessments() {
       modQuestionArr[index].correctAnswer = "";
     } else if (val === "fib") {
       deletePropertiesExcept(
-        ["id", "questionType", "questionText", "correctFIBAnswers"],
+        [
+          "id",
+          "questionType",
+          "questionText",
+          "questionMarks",
+          "correctFIBAnswers",
+        ],
         modQuestionArr,
         index
       );
       modQuestionArr[index].correctFIBAnswers = [];
     } else if (val === "essay") {
       deletePropertiesExcept(
-        ["id", "questionType", "questionText"],
+        ["id", "questionType", "questionMarks", "questionText"],
         modQuestionArr,
         index
       );
     } else {
       deletePropertiesExcept(
-        ["id", "questionType", "questionText", "codingLanguage"],
+        [
+          "id",
+          "questionType",
+          "questionText",
+          "questionMarks",
+          "codingLanguage",
+        ],
         modQuestionArr,
         index
       );
@@ -84,7 +103,6 @@ function CreateAssessments() {
   const deletePropertiesExcept = (exceptionVals, modQuestionArr, index) => {
     for (let val in modQuestionArr[index]) {
       if (!exceptionVals.includes(String(val))) {
-        // console.log("deleting " + val);
         delete modQuestionArr[index][val];
       }
     }
@@ -205,7 +223,8 @@ function CreateAssessments() {
 
   useEffect(() => {
     setSelectedDurationNumber(assessmentDurationNumberOptions[0]);
-    selectedDurationNumberDiv.current.value = assessmentDurationNumberOptions[0];
+    selectedDurationNumberDiv.current.value =
+      assessmentDurationNumberOptions[0];
   }, [assessmentDurationNumberOptions]);
 
   const displayFirstQuestion = () => {
@@ -308,14 +327,17 @@ function CreateAssessments() {
           };
       });
       assessment.questions = questionsWithoutIDs;
-      console.log("final object: " + JSON.stringify(assessment));
-      axios2
-        .post("saveNewAssessment", assessment)
-        .then((res) => alert(JSON.stringify(res.data.message)));
+      // console.log("final object: " + JSON.stringify(assessment));
+      axios2.post("/saveNewAssessment", assessment).then((res) => {
+        alert(JSON.stringify(res.data.message));
+      });
     }
   };
 
-  const getCurrentTime = () => new Date().toISOString().slice(0, 16);
+  const getCurrentTime = () => {
+    console.log(new Date().toISOString().slice(0, 16));
+    return new Date().toISOString().slice(0, 16);
+  };
 
   const validateQuestions = () => {
     let marksSum = 0;
@@ -326,11 +348,9 @@ function CreateAssessments() {
     console.log(totalMarks);
     if (marksSum != totalMarks) {
       alert(
-        "Total Marks Awarded and the sum of all the individual marks do not match. "
+        "Total marks and the sum of the individual marks do not match. Please make sure they match."
       );
       return false;
-    } else {
-      alert("marks ok");
     }
 
     for (let i = 0; i < questions.length; i++) {
@@ -470,7 +490,7 @@ function CreateAssessments() {
         </label>
         <input
           type="datetime-local"
-          min={getCurrentTime}
+          min={String(new Date().toISOString().slice(0, 16))}
           className="assessment-text-field"
           placeholder="Assessment Title"
           onChange={(e) => {
@@ -493,7 +513,6 @@ function CreateAssessments() {
           Enter Total Marks Awarded
         </label>
         <input
-          type="Number"
           className="assessment-text-field"
           placeholder="Total Marks Awarded"
           onBlur={(e) => {
@@ -575,7 +594,6 @@ function CreateAssessments() {
                     <br />
                     <input
                       id={"question_marks_" + index}
-                      type="Number"
                       className="assessment-text-field"
                       placeholder="Marks Awarded"
                       onBlur={saveMarks}

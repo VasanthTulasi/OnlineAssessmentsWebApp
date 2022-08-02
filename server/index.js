@@ -16,7 +16,6 @@ const corsConfig = {
 };
 
 app.use(cookieParser());
-// app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsConfig));
 app.use(express.json());
 mongoose.connect(

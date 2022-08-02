@@ -11,9 +11,9 @@ const transporter = nodemailer.createTransport({
   });
 
 const sendPasswordResetMail = async (recipientID,token) => await transporter.sendMail({
-    from: 'Admin OnlineAssess <noreply@OnlineAssess.com>',
+    from: 'Admin AssessOnline <noreply@AssessOnline.com>',
     to: recipientID,
-    subject: "Password Reset - OnlineAssess",
+    subject: "Password Reset Link - AssessOnline",
     text: "Please click on the below email link or paste is in the browser to reset your password. The link will expire in 10 minutes.\nLink: http://localhost:3000/resetPassword/" + token
   }, function(err, inf){
     if(err)
@@ -23,10 +23,10 @@ const sendPasswordResetMail = async (recipientID,token) => await transporter.sen
   });
 
   const sendRegActivationMail = async (recipientID,token) => await transporter.sendMail({
-    from: 'Admin OnlineAssess <noreply@OnlineAssess.com>',
+    from: 'Admin AssessOnline <noreply@AssessOnline.com>',
     to: recipientID,
-    subject: "Account Activation - OnlineAssessm",
-    text: "Dear User,\n\nYour OnlineAssess account has been successfully approved by the admin.\n\nPlease click on the below email link or paste is in the browser to activate your account. \nLink: http://localhost:3000/accountActivate/" + token
+    subject: "Account Approved - AssessOnline",
+    text: "Dear User,\n\nYour AssessOnline account has been successfully approved by the admin.\n\nPlease click on the below email link or paste is in the browser to activate your account. \nLink: http://localhost:3000/accountActivate/" + token
   }, function(err, inf){
     if(err)
     console.log("Error is "+err.message);
@@ -35,10 +35,10 @@ const sendPasswordResetMail = async (recipientID,token) => await transporter.sen
   });
 
   const sendRegApprovalMail = async (recipientID) => await transporter.sendMail({
-    from: 'Admin OnlineAssess <noreply@OnlineAssess.com>',
+    from: 'Admin AssessOnline <noreply@AssessOnline.com>',
     to: recipientID,
-    subject: "Registration Approved - Admin OnlineAssess",
-    text: "Dear User,\n\nYour OnlineAssess account is activated. You can now login to the application.\n\nPlease reach out to the admin in case of any issues.\n\nRegards,\nOnlineAssess."
+    subject: "Account Activated - Admin AssessOnline",
+    text: "Dear User,\n\nYour AssessOnline account is activated. You can now login to the application.\n\nPlease reach out to the admin in case of any issues.\n\nRegards,\nAssessOnline."
   }, function(err, inf){
     if(err)
     console.log("Error is "+err.message);
@@ -47,10 +47,10 @@ const sendPasswordResetMail = async (recipientID,token) => await transporter.sen
   });
 
   const sendRegRejectionMail = async (recipientID,rejectionReason) => await transporter.sendMail({
-    from: 'Admin OnlineAssess <noreply@OnlineAssess.com>',
+    from: 'Admin AssessOnline <noreply@AssessOnline.com>',
     to: recipientID,
-    subject: "Registration Denied - Admin OnlineAssess",
-    text: "Dear User,\n\nYour request for OnlineAssess account has been denied by the admin with the reason mentioned below. Please reach out to the admin for further details.\n\nReason: "+rejectionReason+"\n\nRegards,\nOnlineAssess."
+    subject: "Registration Denied - Admin AssessOnline",
+    text: "Dear User,\n\nYour request for AssessOnline account has been denied by the admin with the reason mentioned below. Please reach out to the admin for further details.\n\nReason: "+rejectionReason+"\n\nRegards,\nAssessOnline."
   }, function(err, inf){
     if(err)
     console.log("Error is "+err.message);

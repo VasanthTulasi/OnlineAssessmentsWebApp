@@ -72,7 +72,6 @@ function MCQTemplate(props) {
     setAvailableOptions(selOptions);
     const questionId = optionsComponent.current.props.id.split("_")[2];
     props.saveMCQQuestionOptions(questionId, optionsArray);
-    console.log(correctOptionComponent.current.props.value.value);
     if (
       !optionsArray.includes(correctOptionComponent.current.props.value.value)
     )
@@ -135,9 +134,11 @@ function MCQTemplate(props) {
           placeholder="Correct Answer"
           onChange={saveMCQCorrectAnswer}
           noOptionsMessage={() => "This is not one of the added options"}
-          defaultValue={{
-            label: props.correctAnswer,
-            value: props.correctAnswer,
+          defaultValue={() => {
+            return {
+              label: props.correctAnswer,
+              value: props.correctAnswer,
+            };
           }}
         />
       </div>

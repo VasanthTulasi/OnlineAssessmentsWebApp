@@ -148,6 +148,9 @@ function ViewAssessments() {
                 <td className="module-data headers-color">
                   Assessment Start Time
                 </td>
+                <td className="module-data headers-color">
+                  Assessment End Time
+                </td>
                 <td className="module-data end headers-color">
                   Assessment Status
                 </td>
@@ -160,12 +163,15 @@ function ViewAssessments() {
                     <td className="module-data mid">
                       {new Date(ele.window_start_time).toString().slice(0, 21)}
                     </td>
+                    <td className="module-data mid">
+                      {new Date(ele.window_end_time).toString().slice(0, 21)}
+                    </td>
                     <td className="module-data end">
                       {new Date() > new Date(ele.window_end_time)
                         ? "Completed"
                         : new Date() > new Date(ele.window_start_time)
                         ? "Ongoing"
-                        : "Upcoming"}
+                        : "Yet To Start"}
                     </td>
                     <td>
                       <button

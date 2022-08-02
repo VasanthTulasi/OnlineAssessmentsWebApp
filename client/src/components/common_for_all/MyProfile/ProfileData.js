@@ -22,6 +22,10 @@ return user === undefined ?  <div>Profile data not found</div> : (
           <td className="user-data-heading">University ID Number</td>
           <td className="user-data-value">{user.uni_id}</td>
         </tr>
+        <tr>
+          <td className="user-data-heading">Role</td>
+          <td className="user-data-value">{user.role}</td>
+        </tr>
       </table>
   )
 }

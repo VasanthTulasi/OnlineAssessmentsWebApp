@@ -94,7 +94,7 @@ function ViewAssessments() {
   return (
     <>
       <ViewEditMod>
-        <div className="heading">View Student Submissions For Assessments</div>
+        <div className="heading">View Student Submissions for Assessments</div>
         <div className="whole-content">
           <label className="select-module-label">Select Module Code</label>
           <div className="select-module-dropdown">

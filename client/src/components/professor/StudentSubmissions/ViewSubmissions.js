@@ -4,11 +4,12 @@ import Axios from "axios";
 import ConfirmDeleteModal from "../ConfirmDeletionModal";
 import SingleSelect from "react-select";
 import { LoginContext } from "../../../contexts/LoginContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function ViewSubmissions() {
-  let [assessmentsArray, setAssessmentsArray] = useState([]);
-  let [assessmentsLoaded, setAssessmentsLoaded] = useState(false);
+  let [submissionsArray, setSubmissionsArray] = useState([]);
+  let [submissionsLoaded, setSubmissionsLoaded] = useState(false);
+  const { state } = useLocation();
   const navigate = useNavigate();
   const axios = Axios.create({
     withCredentials: true,
@@ -16,122 +17,119 @@ function ViewSubmissions() {
     crossDomain: true,
   });
 
-  const axios2 = Axios.create({
+  // const axios2 = Axios.create({
+  //   withCredentials: true,
+  //   baseURL: "http://localhost:3001/assessments",
+  //   crossDomain: true,
+  // });
+
+  const axios3 = Axios.create({
     withCredentials: true,
-    baseURL: "http://localhost:3001/assessments",
+    baseURL: "http://localhost:3001/submissions",
     crossDomain: true,
   });
 
-  const viewSubmissions = (event) => {
+  const evaluateSubmission = (event) => {
     const itemIndex = event.currentTarget.id.split("_")[1];
-    navigate("../viewSubmissions", {
-      state: { _id: assessmentsArray[itemIndex]._id },
+    navigate("../evaluateSubmission", {
+      state: {
+        assessment_id: state._id,
+        student_uni_id: submissionsArray[itemIndex].uni_id,
+      },
     });
   };
 
-//   useEffect(() => {
-//     axios
-//       .post("/assignedModuleCodes", { uni_id: loggedInUserDetails.uni_id })
-//       .then((res) => {
-//         let moduleCodes = res.data;
-//         moduleCodes = moduleCodes.map((ele) => {
-//           return { value: ele, label: ele };
-//         });
-//         setModuleCodesFromDB(moduleCodes);
-//       });
-//   }, []);
+  useEffect(() => {
+    axios3
+      .post("/getSubmissionsForAssessment", { assessment_id: state._id })
+      .then((res) => {
+        if (res.data.message === "no submissions") setSubmissionsLoaded(true);
+        else {
+          setSubmissionsLoaded(true);
+          setSubmissionsArray(res.data);
+        }
+      });
+  }, []);
 
-//   useEffect(() => {
-//     setAssessmentsLoaded(false);
-//     setAssessmentsArray([]);
-//     axios2.post("/assessmentsForModule", { moduleCode }).then((res) => {
-//       const assessments = res.data;
-//       if (assessments.length === 0) {
-//         setAssessmentsLoaded(true);
-//       } else {
-//         setAssessmentsLoaded(true);
-//         setAssessmentsArray(assessments);
-//       }
-//     });
-//   }, [moduleCode]);
+  //   useEffect(() => {
+  //     setSubmissionsLoaded(false);
+  //     S([]);
+  //     axios2.post("/assessmentsForModule", { moduleCode }).then((res) => {
+  //       const assessments = res.data;
+  //       if (assessments.length === 0) {
+  //         setSubmissionsLoaded(true);
+  //       } else {
+  //         setSubmissionsLoaded(true);
+  //         S(assessments);
+  //       }
+  //     });
+  //   }, [moduleCode]);
 
-//   const customStyles = {
-//     valueContainer: (provided) => ({
-//       ...provided,
-//       width: "400px",
-//       paddingLeft: "10px",
-//       color: "black",
-//       font: "17px",
-//       fontFamily: '"Source Sans Pro", sans-serif',
-//       fontSize: "17px",
-//       fontWeight: 400,
-//       color: "#282c34",
-//     }),
-//     option: (provided, state) => ({
-//       ...provided,
-//       color: "black",
-//       font: "17px",
-//       fontFamily: '"Source Sans Pro", sans-serif',
-//       fontSize: "17px",
-//       fontWeight: 400,
-//       color: "#282c34",
-//       backgroundColor: state.isSelected ? "#61dafb" : "white",
-//       "&:hover": {
-//         backgroundColor: "rgba(189,197,209,.3)",
-//       },
-//     }),
-//     placeholder: (provided) => ({
-//       ...provided,
-//       fontSize: "17px",
-//     }),
-//   };
+  //   const customStyles = {
+  //     valueContainer: (provided) => ({
+  //       ...provided,
+  //       width: "400px",
+  //       paddingLeft: "10px",
+  //       color: "black",
+  //       font: "17px",
+  //       fontFamily: '"Source Sans Pro", sans-serif',
+  //       fontSize: "17px",
+  //       fontWeight: 400,
+  //       color: "#282c34",
+  //     }),
+  //     option: (provided, state) => ({
+  //       ...provided,
+  //       color: "black",
+  //       font: "17px",
+  //       fontFamily: '"Source Sans Pro", sans-serif',
+  //       fontSize: "17px",
+  //       fontWeight: 400,
+  //       color: "#282c34",
+  //       backgroundColor: state.isSelected ? "#61dafb" : "white",
+  //       "&:hover": {
+  //         backgroundColor: "rgba(189,197,209,.3)",
+  //       },
+  //     }),
+  //     placeholder: (provided) => ({
+  //       ...provided,
+  //       fontSize: "17px",
+  //     }),
+  //   };
 
- 
   return (
     <>
       <ViewSubs>
-        <div className="heading">Submissions for the Assesment</div>
+        <div className="heading">Submissions for the Assessment</div>
         <div className="whole-content">
-          <div className="heading" style={{ fontSize: "17px" }}>
-            Submissions for the Assessment:
-          </div>
+          {/* <div className="heading" style={{ fontSize: "17px" }}>
+            Student Submissions for the Assessment:
+          </div> */}
           <table className="module-data-content">
             <tbody>
               <tr>
                 <td className="module-data start headers-color">S. No</td>
-                <td className="module-data headers-color">Student First Name</td>
                 <td className="module-data headers-color">
-                  Student Last Name
+                  Student First Name
                 </td>
-                <td className="module-data headers-color">
+                <td className="module-data headers-color">Student Last Name</td>
+                <td className="module-data end headers-color">
                   Student University ID
                 </td>
-                <td className="module-data end headers-color">
+                {/* <td className="module-data end headers-color">
                   Evaluation Status
-                </td>
+                </td> */}
               </tr>
-              {assessmentsArray.map((ele, index) => {
+              {submissionsArray.map((ele, index) => {
                 return (
                   <tr>
                     <td className="module-data start">{index + 1}</td>
-                    <td className="module-data mid">{ele.title}</td>
-                    <td className="module-data mid">
-                      {new Date(ele.window_start_time).toString().slice(0, 21)}
-                    </td>
-                    <td className="module-data mid">
-                      {new Date(ele.window_end_time).toString().slice(0, 21)}
-                    </td>
-                    <td className="module-data end">
-                      {new Date() > new Date(ele.window_end_time)
-                        ? "Completed"
-                        : new Date() > new Date(ele.window_start_time)
-                        ? "Ongoing"
-                        : "Yet To Start"}
-                    </td>
+                    <td className="module-data mid">{ele.first_name}</td>
+                    <td className="module-data mid">{ele.last_name}</td>
+                    <td className="module-data end">{ele.uni_id}</td>
                     <td>
                       <button
                         id={"viewSubmissionsButton_" + index}
-                        onClick={viewSubmissions}
+                        onClick={evaluateSubmission}
                         disabled={
                           new Date() < new Date(ele.window_start_time)
                             ? true
@@ -166,31 +164,20 @@ function ViewSubmissions() {
                 );
               })}
 
-              {/* {moduleCode !== "" && !assessmentsLoaded && (
+              {!submissionsLoaded && (
                 <tr>
                   <td colSpan="6" className="no-user-data">
-                    Loading Assesments for the Selected Module...
+                    Loading submissions for the selected assessment...
                   </td>
                 </tr>
               )}
-              {moduleCode !== "" &&
-                assessmentsLoaded &&
-                assessmentsArray.length === 0 && (
-                  <tr>
-                    <td colSpan="6" className="no-user-data">
-                      No assessments found for this module.
-                    </td>
-                  </tr>
-                )}
-
-              {moduleCode === "" && (
+              {submissionsLoaded && submissionsArray.length === 0 && (
                 <tr>
                   <td colSpan="6" className="no-user-data">
-                    No module selected. Please select a module first to see its
-                    assessments.
+                    No submissions found for this assessment.
                   </td>
                 </tr>
-              )} */}
+              )}
             </tbody>
           </table>
         </div>
@@ -258,7 +245,7 @@ const ViewSubs = styled.div`
   .module-data-content {
     color: white;
     /* border: 1px solid red; */
-    margin-top: 5px;
+    margin-top: 40px;
     width: 100%;
     /* border: 1; */
     border-collapse: separate;

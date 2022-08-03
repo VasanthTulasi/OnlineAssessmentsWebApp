@@ -1,5 +1,6 @@
 const router = require("express").Router();
-const SubmissionsModel = require("../models/SubmissionsModel");
+const SubmissionsModel = require("../Models/SubmissionsModel");
+const UsersModel = require("../Models/UsersModel");
 
 router.post("/saveAnswers", async (req, res) => {
   const { assessment_id, student_uni_id, index, answer } = req.body;
@@ -86,6 +87,28 @@ router.post("/updateLastAttemptedQuestion", (req, res) => {
       res.json({ message: "success" });
     }
   );
+});
+
+router.post("/getSubmissionsForAssessment", async (req, res) => {
+  const { assessment_id } = req.body;
+  let userInfo = [];
+  const submissions = await SubmissionsModel.find(
+    { assessment_id: assessment_id },
+    { student_uni_id: true, _id: false }
+  );
+  if (submissions.length !== 0) {
+    for (let i = 0; i < submissions.length; i++) {
+      const user = await UsersModel.findOne(
+        { uni_id: submissions[i].student_uni_id },
+        { assigned_modules: false, role:false, password:false,email: false }
+      );
+      if (user.length !== 0) userInfo.push(user);
+    }
+    console.log(userInfo);
+    res.send(userInfo);
+  } else {
+    res.json({ message: "no submissions" });
+  }
 });
 
 module.exports = router;

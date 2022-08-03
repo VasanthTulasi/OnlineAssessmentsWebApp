@@ -45,6 +45,7 @@ function CodingTemplate(props) {
     else initialArray.push(codingLanguage);
 
     initialArray.push(codingAnswer);
+    console.log("init arry"+ initialArray);
     props.saveInitialCodingArray(questionIndex, initialArray);
   }, []);
 

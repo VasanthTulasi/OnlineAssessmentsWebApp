@@ -35,7 +35,7 @@ function FIBTemplate(props) {
     const numberOfBlanks =
       question.questionText.split("____________").length - 1;
     const emptyAnswersArray = [];
-    for (let i = 0; i < numberOfBlanks; i++) emptyAnswersArray.push(" ");
+    for (let i = 0; i < numberOfBlanks; i++) emptyAnswersArray.push("");
     props.saveFIBAnswers(questionIndex,emptyAnswersArray);
   }, []);
 

@@ -1,13 +1,14 @@
-import React, { useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { LoginContext } from "../../contexts/LoginContext";
+
 import Axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
-
-function HomePage() {
+function NavBar(props) {
   const { setIsUserLoggedIn, loggedInUserDetails } = useContext(LoginContext);
+
   const navigate = useNavigate();
   const role = loggedInUserDetails.role;
   const axios = Axios.create({
@@ -22,20 +23,17 @@ function HomePage() {
         console.log("Sign out failed. Try again");
       else {
         setIsUserLoggedIn(false);
-        navigate('/');
+        navigate("/");
         console.log("Signout successful");
       }
     });
   };
 
-  useEffect(() =>{
-    if(role === "admin")
-    navigate("/manageusers/userslist");
-    if(role === "professor")
-    navigate("/createAssessments");
-    if(role === "student")
-    navigate("/viewTakeAssessments/viewAssessments");
-  },[role]);
+  useEffect(() => {
+    if (role === "admin") navigate("/manageusers/userslist");
+    if (role === "professor") navigate("/createAssessments");
+    if (role === "student") navigate("/viewTakeAssessments/viewAssessments");
+  }, [role]);
 
   return (
     <div>
@@ -43,19 +41,26 @@ function HomePage() {
         <div className="app-name">AssessOnline</div>
 
         {role === "student" && (
+          // <ul className={}>
           <ul className="menus">
             <li>
-              <Link to="/viewTakeAssessments/viewAssessments" className="menu">
+              <Link
+                to="/viewTakeAssessments/viewAssessments"
+                className={props.navLinksAccess}
+              >
                 Assessments
               </Link>
             </li>
             <li>
-              <Link to="/results" className="menu">
+              <Link to="/results" className={props.navLinksAccess}>
                 Results
               </Link>
             </li>
             <li>
-              <Link to="/myprofile/profilecontent" className="menu">
+              <Link
+                to="/myprofile/profilecontent"
+                className={props.navLinksAccess}
+              >
                 Profile
               </Link>
             </li>
@@ -69,14 +74,14 @@ function HomePage() {
                 Create Assessments
               </Link>
             </li>
-            <li>  
+            <li>
               <Link to="/viewEditAssessments/viewAssessments" className="menu">
                 View Assessments
               </Link>
             </li>
             <li>
-              <Link to="/studentResults" className="menu">
-                Student Results
+              <Link to="/studentSubmissions/viewAssessments" className="menu">
+                Student Submissions
               </Link>
             </li>
             <li>
@@ -95,7 +100,10 @@ function HomePage() {
               </Link>
             </li>
             <li>
-              <Link to="/managemodules/vieweditmodules/viewmodules" className="menu">
+              <Link
+                to="/managemodules/vieweditmodules/viewmodules"
+                className="menu"
+              >
                 Manage Modules
               </Link>
             </li>
@@ -104,14 +112,26 @@ function HomePage() {
                 My Profile
               </Link>
             </li>
-            
           </ul>
         )}
 
         <div className="profile-options">
-          <div onClick={signOutClicked} className="signout">
-            Sign Out
-          </div>
+          {role !== "student" && (
+            <div onClick={signOutClicked} className="signout">
+              Sign Out
+            </div>
+          )}
+          {role === "student" ? (
+            props.navLinksAccess === "menu disabled-menu" ? (
+              <div className="signout disabled-signout">Sign Out</div>
+            ) : (
+              <div onClick={signOutClicked} className="signout">
+                Sign Out
+              </div>
+            )
+          ) : (
+            ""
+          )}
         </div>
       </MenuBar>
     </div>
@@ -164,6 +184,11 @@ const MenuBar = styled.div`
     text-decoration: none;
   }
 
+  .disabled-menu {
+    pointer-events: none;
+    color: gray;
+  }
+
   .menu:hover {
     color: #282c34;
     border: 1px solid #84f7d1;
@@ -201,6 +226,16 @@ const MenuBar = styled.div`
     /* font-weight: 600; */
     /* border-radius:0 20px 0 20px; */
   }
+  .disabled-signout {
+    color: #0b1118;
+    background-color: gray;
+  }
+
+  .disabled-signout:hover {
+    cursor: default;
+    color: #0b1118;
+    background-color: gray;
+  }
 `;
 
-export default HomePage;
+export default NavBar;

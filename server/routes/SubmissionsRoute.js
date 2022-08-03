@@ -72,4 +72,20 @@ router.post("/updateTimeLeft", (req, res) => {
   );
 });
 
+router.post("/updateLastAttemptedQuestion", (req, res) => {
+  const { assessment_id, student_uni_id, last_attempted_question } = req.body;
+  SubmissionsModel.findOneAndUpdate(
+    { assessment_id: assessment_id, student_uni_id: student_uni_id },
+    {
+      $set: {
+        "session_details.last_attempted_question": last_attempted_question,
+      },
+    },
+    function (err) {
+      if (err) res.json({ message: err });
+      res.json({ message: "success" });
+    }
+  );
+});
+
 module.exports = router;

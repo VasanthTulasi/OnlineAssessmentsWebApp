@@ -1,11 +1,11 @@
 import React, {useState} from "react";
 import styled from "styled-components";
 
-function AssessmentEndedModal(props) {
+function AssessmentTimeElapsedModal(props) {
   return (
     <Main>
       <ModalBox>
-        <div className="main-heading">Assessment Submitted Successfully!</div>
+        <div className="main-heading">Time Elapsed!</div>
         <br/>
         <br/>
         <label className="modal-heading">
@@ -99,4 +99,4 @@ const ModalBox = styled.div`
   }
 `;
 
-export default AssessmentEndedModal;
+export default AssessmentTimeElapsedModal;

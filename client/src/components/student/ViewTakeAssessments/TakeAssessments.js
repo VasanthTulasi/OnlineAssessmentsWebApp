@@ -3,19 +3,27 @@ import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
 import AssessmentInstructionsModal from "../AssessmentInstructionsModal";
 import AssessmentEndedModal from "../AssessmentEndedModal";
+import AssessmentTimeElapsedModal from "../AssessmentTimeElapsedModal";
 import Axios from "axios";
 import MCQTemplate from "../AnswerTemplates/MCQTemplate";
 import FIBTemplate from "../AnswerTemplates/FIBTemplate";
 import EssayTemplate from "../AnswerTemplates/EssayTemplate";
 import CodingTemplate from "../AnswerTemplates/CodingTemplate";
 import { LoginContext } from "../../../contexts/LoginContext";
+import { AssessmentContext } from "../../../contexts/AssessmentContext";
 
 function TakeAssessments() {
   const { loggedInUserDetails } = useContext(LoginContext);
+  const { setNavLinksStyle } = useContext(AssessmentContext);
+
   const [isInstuctionsModalVisible, setIsInstuctionsModalVisible] =
     useState(true);
   const [isAssessmentEndedModalVisible, setIsAssessmentEndedModalVisible] =
     useState(false);
+  const [
+    isAssessmentTimeElapsedModalVisible,
+    setIsAssessmentTimeElapsedModalVisible,
+  ] = useState(false);
   const [timeLeft, setTimeLeft] = useState("");
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -28,29 +36,65 @@ function TakeAssessments() {
   const questions = state.assessment.questions;
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState(Array(questions.length).fill(""));
+  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessageWithOptions, setErrorMessageWithOptions] = useState("");
   const submitButton = useRef(null);
-  let countdownTimer = null;
+  let countdownTimer;
 
   const goBack = () => {
+    setNavLinksStyle("menu");
     navigate("../viewAssessments");
   };
 
-  const saveAndNext = () => {
-    // console.log(answers[questionIndex]);
-    // if (questionIndex < questions.length - 1) {
-    //   setQuestionIndex((prevVal) => prevVal + 1);
-    //   if (questionIndex === questions.length - 2)
-    //     submitButton.current.textContent = "Submit & Finish";
-    // } else {
-    //   setIsAssessmentEndedModalVisible(true);
-    // }
-    // return;
+  const validateAnswer = (questionIndex) => {
+    if (
+      questions[questionIndex].questionType === "mcq" &&
+      answers[questionIndex] === ""
+    ) {
+      setErrorMessage("Please select an option before proceeding further!");
+      return false;
+    } else if (questions[questionIndex].questionType === "fib") {
+      let blanks = [];
+      for (let i = 0; i < answers[questionIndex].length; i++) {
+        if (answers[questionIndex][i] === "") {
+          blanks.push(i + 1);
+        }
+      }
+      if (blanks.length !== 0) {
+        setErrorMessageWithOptions(
+          "Are you sure you want to continue with empty values for the following blank(s): " +
+            blanks
+        );
+        return false;
+      }
+    } else if (
+      questions[questionIndex].questionType === "essay" &&
+      answers[questionIndex] === ""
+    ) {
+      setErrorMessageWithOptions("Are you sure you want to continue with an empty response for this question.");
+      return false;
+    } else if (questions[questionIndex].questionType === "coding") {
+      if (answers[questionIndex][1] === "") {
+        setErrorMessageWithOptions("Are you sure you want to continue with an empty response for this question.");
+        return false;
+      } else {
+        if (answers[questionIndex][0] === "") {
+          setErrorMessage("Please select the programming language before proceedind further!");
+          return false;
+        }
+      }
+    }
+    return true;
+  };
 
-    if (answers[questionIndex] === "") {
-      alert("Please select an option before proceeding further.");
+  const saveAndNext = () => {
+    if (!validateAnswer(questionIndex)) {
       return;
     }
+    saveAnswerInDB();
+  };
 
+  const saveAnswerInDB = () => {
     axios
       .post("/saveAnswers", {
         assessment_id: state.assessment._id,
@@ -58,23 +102,43 @@ function TakeAssessments() {
         index: questionIndex,
         answer: answers[questionIndex],
       })
-      .then((res) => {
-        console.log(res.data.message);
-        if (questionIndex < questions.length - 1) {
+      .then(() => {
+        if (questionIndex < questions.length - 1)
           setQuestionIndex((prevVal) => prevVal + 1);
-          if (questionIndex === questions.length - 2)
-            submitButton.current.textContent = "Submit & Finish";
-        } else {
+        else {
           setIsAssessmentEndedModalVisible(true);
+          updateAttemptsLeftToZero();
+          setNavLinksStyle("menu");
         }
       });
   };
 
+  const updateLastAttemptedQuestionInDb = (quesIndex) => {
+    console.log("Updated last question: " + quesIndex);
+    axios.post("/updateLastAttemptedQuestion", {
+      assessment_id: state.assessment._id,
+      student_uni_id: loggedInUserDetails.uni_id,
+      last_attempted_question: quesIndex,
+    });
+  };
+
   useEffect(() => {
-    return () => clearTimeout(countdownTimer);
+    return () => {
+      clearInterval(countdownTimer);
+      setNavLinksStyle("menu");
+    };
   }, []);
 
   useEffect(() => {
+    console.log("Question Index: " + questionIndex);
+    setErrorMessage("");
+    setErrorMessageWithOptions("");
+    if (questionIndex < questions.length) {
+      updateLastAttemptedQuestionInDb(questionIndex);
+      if (questionIndex === questions.length - 1)
+        submitButton.current.textContent = "Submit & Finish";
+    }
+
     if (questions[questionIndex].questionType === "essay") {
       answers[questionIndex] = localStorage.getItem(
         state.assessment._id + "_answer_" + String(questionIndex)
@@ -86,9 +150,11 @@ function TakeAssessments() {
     let modArr = [...answers];
     modArr[quesIndex] = selVal;
     setAnswers(modArr);
+    setErrorMessage("");
   };
 
   const saveFIBAnswers = (quesIndex, answerValue, changedIndex = null) => {
+    setErrorMessageWithOptions("");
     if (changedIndex != null) {
       console.log("modified array");
       let modArr = [...answers];
@@ -137,13 +203,18 @@ function TakeAssessments() {
         .post("/createNewSubmission", {
           assessment_id: state.assessment._id,
           student_uni_id: loggedInUserDetails.uni_id,
-          session_details: { attempts_left: 2, time_left: durationInMilliSec },
+          session_details: {
+            attempts_left: 2,
+            time_left: durationInMilliSec,
+            last_attempted_question: 0,
+          },
           numberOfQuestions: questions.length,
         })
         .then((res) => {
           console.log(res.data.message);
           if (res.data.message === "success") {
             setIsInstuctionsModalVisible(false);
+            setNavLinksStyle("menu disabled-menu");
             startCountDownTimer(durationInMilliSec);
           } else alert("Error! Please try again later.");
         });
@@ -156,6 +227,12 @@ function TakeAssessments() {
         })
         .then((res) => {
           if (res.data.message === "success") {
+            const lastAttemptedQuestion =
+              state.submissionData.session_details.last_attempted_question;
+            setQuestionIndex(lastAttemptedQuestion);
+            if (lastAttemptedQuestion === questions.length - 1)
+              submitButton.current.textContent = "Submit & Finish";
+            setNavLinksStyle("menu disabled-menu");
             setIsInstuctionsModalVisible(false);
             startCountDownTimer(state.submissionData.session_details.time_left);
           } else alert("Error! Please try again later.");
@@ -172,6 +249,7 @@ function TakeAssessments() {
   };
 
   const startCountDownTimer = (durInMilliSec) => {
+    // durInMilliSec = 10000;
     let time = getTimeLeft(durInMilliSec);
     setTimeLeft(time);
     let timeChangedCounter = 0;
@@ -183,13 +261,24 @@ function TakeAssessments() {
       setTimeLeft(time);
       timeChangedCounter++;
       if (timeChangedCounter == 5) {
-        updateTimeLeftInDb(durInMilliSec);
+        // updateTimeLeftInDb(durInMilliSec);
         timeChangedCounter = 0;
       }
       if (durInMilliSec === 0) {
         clearInterval(countdownTimer);
+        setIsAssessmentTimeElapsedModalVisible(true);
+        setNavLinksStyle("menu");
+        updateAttemptsLeftToZero();
       }
     }, 1000);
+  };
+
+  const updateAttemptsLeftToZero = () => {
+    axios.post("/updateAttemptsLeft", {
+      assessment_id: state.assessment._id,
+      student_uni_id: loggedInUserDetails.uni_id,
+      attempts_left: 0,
+    });
   };
 
   const getTimeLeft = (durInMilliSec) => {
@@ -208,14 +297,20 @@ function TakeAssessments() {
   };
 
   const updateTimeLeftInDb = (durInMilliSec) => {
-    console.log("updated in db");
-    axios
-      .post("/updateTimeLeft", {
-        assessment_id: state.assessment._id,
-        student_uni_id: loggedInUserDetails.uni_id,
-        time_left: durInMilliSec,
-      })
-      .then((res) => console.log("Updated"));
+    axios.post("/updateTimeLeft", {
+      assessment_id: state.assessment._id,
+      student_uni_id: loggedInUserDetails.uni_id,
+      time_left: durInMilliSec,
+    });
+  };
+
+  const proceedToSave = () => {
+    setErrorMessageWithOptions("");
+    saveAnswerInDB();
+  };
+
+  const doNotSave = () => {
+    setErrorMessageWithOptions("");
   };
 
   return (
@@ -227,6 +322,15 @@ function TakeAssessments() {
           doNotProceed={goBack}
         />
       )}
+      {isAssessmentTimeElapsedModalVisible && (
+        <AssessmentTimeElapsedModal
+          okayClicked={() => {
+            setIsAssessmentTimeElapsedModalVisible(false);
+            navigate("../viewAssessments");
+          }}
+        />
+      )}
+
       {isAssessmentEndedModalVisible && (
         <AssessmentEndedModal
           okayClicked={() => {
@@ -276,15 +380,31 @@ function TakeAssessments() {
           saveInitialCodingArray={saveInitialCodingArray}
         />
       )}
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <button
-          className="submit-button"
-          onClick={saveAndNext}
-          ref={submitButton}
-        >
-          {"Save & Next"}
-        </button>
-      </div>
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
+      {errorMessageWithOptions && (
+        <div className="error-message-options">
+          <div className="error-message-text">{errorMessageWithOptions}</div>
+          <div>
+            <button className="error-option-button" onClick={proceedToSave}>
+              Yes
+            </button>
+            <button className="error-option-button" onClick={doNotSave}>
+              No
+            </button>
+          </div>
+        </div>
+      )}
+      {!errorMessageWithOptions && (
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <button
+            className="submit-button"
+            onClick={saveAndNext}
+            ref={submitButton}
+          >
+            {"Save & Next"}
+          </button>
+        </div>
+      )}
     </TakeAssess>
   );
 }
@@ -341,6 +461,60 @@ const TakeAssess = styled.div`
   .submit-button:hover {
     cursor: pointer;
   }
+
+  .error-message-options {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid red;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 40px;
+  }
+
+  .error-message{
+    color: red;
+    font-family: "Source Sans Pro", sans-serif;
+    font-weight: 400;
+    font-size: 19px;
+    text-align: center;
+    border: 1px solid red;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 40px;
+    margin-left: 40px;
+    margin-right: 40px;
+  }
+
+  .error-message-text {
+    color: red;
+    font-family: "Source Sans Pro", sans-serif;
+    font-weight: 400;
+    font-size: 19px;
+    text-align: center;
+  }
+
+  .error-option-button {
+    margin-top: 20px;
+    margin-left: 50px;
+    border: 1px solid red;
+    color: red;
+    background-color: #282c34;
+    font-family: "Sourse Sans Pro ", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    width: max-content;
+    border-radius: 25px;
+    padding: 7px 20px 7px 20px;
+  }
+
+  .error-option-button:hover{
+    cursor: pointer;
+    color: white;
+    border: 1px solid white;
+  }
+
 `;
 
 export default TakeAssessments;

@@ -11,12 +11,11 @@ function QuestionTypeDropdown(props) {
   ];
 
   const questionTypePairs = {
-    "mcq": "Multiple Choice Question",
-    "fib": "Fill in the Blank",
-    "essay": "Essay",
-    "coding": "Coding",
-  }
-
+    mcq: "Multiple Choice Question",
+    fib: "Fill in the Blank",
+    essay: "Essay",
+    coding: "Coding",
+  };
 
   const setQuestionType = (selOption) => {
     const questionId = questionTypeComponent.current.props.id.split("_")[2];
@@ -24,7 +23,7 @@ function QuestionTypeDropdown(props) {
   };
 
   const customStyles = {
-    valueContainer: (provided) => ({
+    valueContainer: (provided, { isDisabled }) => ({
       ...provided,
       width: "400px",
       paddingLeft: "10px",
@@ -33,7 +32,6 @@ function QuestionTypeDropdown(props) {
       fontFamily: '"Source Sans Pro", sans-serif',
       fontSize: "17px",
       fontWeight: 400,
-      color: "#282c34",
     }),
     option: (provided, state) => ({
       ...provided,
@@ -57,17 +55,38 @@ function QuestionTypeDropdown(props) {
       width: "400px",
       marginTop: "5px",
     }),
+    control: (provided, { isDisabled }) => ({
+      ...provided,
+      backgroundColor: isDisabled ? "rgba(239, 239, 239, 0.3)" : "white",
+      border: isDisabled ? "none" : "1px solid white",
+    }),
+    singleValue: (provided, { isDisabled }) => ({
+      ...provided,
+      color: isDisabled ? "white" : "#282c34",
+    }),
   };
 
   return (
     <SingleSelect
+      isDisabled={props.isDisabled}
       ref={questionTypeComponent}
       id={"question_type_" + props.indexVal}
       options={questionTypesDropdown}
       styles={customStyles}
       onChange={setQuestionType}
-      defaultValue={{label: questionTypePairs[props.questionType], value: props.questionType}}
+      defaultValue={{
+        label: questionTypePairs[props.questionType],
+        value: props.questionType,
+      }}
       noOptionsMessage={() => "Question Type Not Found"}
+      components={
+        props.isDisabled
+          ? {
+              DropdownIndicator: () => null,
+              IndicatorSeparator: () => null,
+            }
+          : {}
+      }
     />
   );
 }

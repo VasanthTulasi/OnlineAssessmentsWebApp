@@ -4,7 +4,6 @@ import CreatableSelect from "react-select/creatable";
 import SingleSelect from "react-select";
 
 function EssayTemplate(props) {
-
   const textAreaComponent = useRef(null);
 
   const saveEssayQuestion = (event) => {
@@ -15,7 +14,7 @@ function EssayTemplate(props) {
   return (
     <Essay>
       <label className="label-class">
-        Enter the Essay Question
+        {props.isDisabled ? "Question" : "Enter the Essay Question"}
       </label>
       <br />
       <textarea
@@ -25,6 +24,7 @@ function EssayTemplate(props) {
         onChange={saveEssayQuestion}
         rows="3"
         defaultValue={props.questionText}
+        disabled={props.isDisabled}
       />
     </Essay>
   );
@@ -51,6 +51,10 @@ const Essay = styled.div`
     padding: 5px;
     border-radius: 5px;
     margin-top: 5px;
+  }
+
+  textarea:disabled {
+    color: white;
   }
 `;
 

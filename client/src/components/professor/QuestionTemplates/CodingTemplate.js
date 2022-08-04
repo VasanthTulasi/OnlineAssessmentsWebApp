@@ -11,7 +11,7 @@ function CodingTemplate(props) {
     { label: "Java", value: "Java" },
     { label: "Python", value: "Python" },
     { label: "C++", value: "C++" },
-    { label: "C Language", value: "C Language" }
+    { label: "C Language", value: "C Language" },
   ];
 
   const saveCodingQuestion = (event) => {
@@ -57,12 +57,21 @@ function CodingTemplate(props) {
       ...provided,
       fontSize: "17px",
     }),
+    control: (provided, { isDisabled }) => ({
+      ...provided,
+      backgroundColor: isDisabled ? "rgba(239, 239, 239, 0.3)" : "white",
+      border: isDisabled ? "none" : "1px solid white",
+    }),
+    singleValue: (provided, { isDisabled }) => ({
+      ...provided,
+      color: isDisabled ? "white" : "#282c34",
+    }),
   };
 
   return (
     <Coding>
       <label className="label-class" style={{ marginTop: 0 }}>
-        Enter the Coding question
+        {props.isDisabled ? "Question" : "Enter the Coding Question"}
       </label>
       <br />
       <textarea
@@ -72,10 +81,16 @@ function CodingTemplate(props) {
         onBlur={saveCodingQuestion}
         rows="3"
         defaultValue={props.questionText}
+        disabled={props.isDisabled}
       />
-      <label className="label-class">Select the Programming Language</label>
+      <label className="label-class">
+        {props.isDisabled
+          ? "Programming Language"
+          : "Select the Programming Language"}
+      </label>
       <div style={{ marginTop: "5px" }}>
         <SingleSelect
+          isDisabled={props.isDisabled}
           ref={codingLanguageComponent}
           id={"coding_language_" + props.indexVal}
           options={programmingLanguages}
@@ -83,7 +98,18 @@ function CodingTemplate(props) {
           placeholder="Select or Search the Programming Language"
           onChange={saveCodingLanguage}
           noOptionsMessage={() => "This programming language is not available"}
-          defaultValue={{label:props.codingLanguage,value:props.codingLanguage}}
+          defaultValue={{
+            label: props.codingLanguage,
+            value: props.codingLanguage,
+          }}
+          components={
+            props.isDisabled
+              ? {
+                  DropdownIndicator: () => null,
+                  IndicatorSeparator: () => null,
+                }
+              : {}
+          }
         />
       </div>
     </Coding>
@@ -111,6 +137,9 @@ const Coding = styled.div`
     padding: 5px;
     border-radius: 5px;
     margin-top: 5px;
+  }
+  textarea:disabled {
+    color: white;
   }
 `;
 

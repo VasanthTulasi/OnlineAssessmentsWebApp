@@ -35,6 +35,8 @@ function ViewSubmissions() {
       state: {
         assessment_id: state._id,
         student_uni_id: submissionsArray[itemIndex].uni_id,
+        student_first_name: submissionsArray[itemIndex].first_name,
+        student_last_name: submissionsArray[itemIndex].last_name,
       },
     });
   };

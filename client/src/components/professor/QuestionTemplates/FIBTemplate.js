@@ -10,8 +10,10 @@ function FIBTemplate(props) {
   const [correctBlankAnswers, setCorrectBlankAnswers] = useState(
     props.correctFIBAnswers
   );
-  const [errorMessageStyle,setErrorMessageStyle]  = useState({display:"none"})
-  const [errorMessage,setErrorMessage] = useState("");
+  const [errorMessageStyle, setErrorMessageStyle] = useState({
+    display: "none",
+  });
+  const [errorMessage, setErrorMessage] = useState("");
   // useEffect(() => {
   //   const correctBlankAnswersWithKeys = correctBlankAnswers;
   //   correctBlankAnswersWithKeys.map((ele,index) => {
@@ -32,7 +34,13 @@ function FIBTemplate(props) {
   };
 
   const checkIfEditingInsideBlank = (eventType) => {
-    if (eventType === "Backspace" || eventType === "Delete" || eventType==="ArrowLeft" || eventType === "ArrowRight") return;
+    if (
+      eventType === "Backspace" ||
+      eventType === "Delete" ||
+      eventType === "ArrowLeft" ||
+      eventType === "ArrowRight"
+    )
+      return;
     const position = textAreaComponent.current.selectionStart;
     const prevChar = textAreaComponent.current.value[position - 2];
     const nextChar = textAreaComponent.current.value[position];
@@ -43,7 +51,7 @@ function FIBTemplate(props) {
       textAreaComponent.current.value = cleanText;
       // alert("Invalid Operation! Cannot insert text inside a blank.");
       setErrorMessage("Invalid Operation! Cannot insert text inside a blank.");
-      setErrorMessageStyle({display:"block"})
+      setErrorMessageStyle({ display: "block" });
       // return true;
     }
     // return false;
@@ -54,8 +62,10 @@ function FIBTemplate(props) {
     const prevChar = textAreaComponent.current.value[currentPos - 1];
     const nextChar = textAreaComponent.current.value[currentPos];
     if (prevChar === "_" && nextChar === "_") {
-      setErrorMessage("Invalid operation! Cannot insert a blank inside another blank.");
-      setErrorMessageStyle({display:"block"});
+      setErrorMessage(
+        "Invalid operation! Cannot insert a blank inside another blank."
+      );
+      setErrorMessageStyle({ display: "block" });
       return true;
     }
     return false;
@@ -80,7 +90,7 @@ function FIBTemplate(props) {
   };
 
   const addBlank = () => {
-    setErrorMessageStyle({display:"none"})
+    setErrorMessageStyle({ display: "none" });
     if (checkIfAddingInBlank()) return;
     console.log("continue");
     let curText = textAreaComponent.current.value;
@@ -98,16 +108,16 @@ function FIBTemplate(props) {
   };
 
   const keyPressed = (event) => {
-    setErrorMessageStyle({display:"none"})
+    setErrorMessageStyle({ display: "none" });
     checkIfEditingInsideBlank(event.code);
     if (event.code === "Backspace" || event.code === "Delete")
-        saveFIBQuestion();
+      saveFIBQuestion();
   };
 
   return (
     <FIB>
       <label className="label-class" style={{ marginTop: 0 }}>
-        Enter the Fill-in-the-blank Question
+        {props.isDisabled ? "Question" : "Enter the Fill-in-the-blank Question"}
       </label>
       <textarea
         ref={textAreaComponent}
@@ -117,12 +127,14 @@ function FIBTemplate(props) {
         onBlur={saveFIBQuestion}
         rows="3"
         defaultValue={props.questionText}
+        disabled={props.isDisabled}
       />
       <div style={errorMessageStyle}>{errorMessage}</div>
       <button
         className="add-blank-button"
         id={"add_blank_" + props.indexVal}
         onClick={addBlank}
+        disabled={props.isDisabled}
       >
         Add a blank at the cursor
       </button>
@@ -132,7 +144,9 @@ function FIBTemplate(props) {
           <>
             <br />
             <label className="label-class">
-              Enter Correct Answer for Blank {index + 1}
+              {props.isDisabled
+                ? "Correct Answer for Blank " + (index + 1)
+                : "Enter Correct Answer for Blank " + (index + 1)}
             </label>
             <br />
             <input
@@ -141,6 +155,7 @@ function FIBTemplate(props) {
               id={"blank_answer_" + index}
               placeholder="Correct Answer"
               defaultValue={props.correctFIBAnswers[index]}
+              disabled={props.isDisabled}
             />
           </>
         );
@@ -206,6 +221,19 @@ const FIB = styled.div`
 
   .add-blank-button:hover {
     cursor: pointer;
+  }
+
+  button:disabled {
+    background-color: gray;
+    border: none;
+  }
+
+  textarea:disabled {
+    color: white;
+  }
+
+  input:disabled {
+    color: white;
   }
 `;
 

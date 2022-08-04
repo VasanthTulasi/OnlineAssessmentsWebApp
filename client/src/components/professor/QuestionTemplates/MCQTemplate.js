@@ -26,7 +26,6 @@ function MCQTemplate(props) {
     }),
     option: (provided, state) => ({
       ...provided,
-      color: "black",
       fontFamily: '"Source Sans Pro", sans-serif',
       fontSize: "17px",
       fontWeight: 400,
@@ -40,16 +39,33 @@ function MCQTemplate(props) {
       ...provided,
       fontSize: "17px",
     }),
-    multiValue: (provided) => ({
+    singleValue: (provided, { isDisabled }) => ({
+      ...provided,
+      color: isDisabled ? "white" : "#282c34",
+    }),
+    multiValue: (provided, { isDisabled }) => ({
       ...provided,
       fontSize: "20px",
+      backgroundColor: isDisabled
+        ? "rgba(239, 239, 239,0.3)"
+        : provided.backgroundColor,
     }),
-    multiValueRemove: (provided) => ({
+    multiValueLabel: (provided, { isDisabled }) => ({
       ...provided,
+      color: isDisabled ? "white" : "#282c34",
+    }),
+    multiValueRemove: (provided, { isDisabled }) => ({
+      ...provided,
+      display: isDisabled ? "none" : provided.display,
       "&:hover": {
         backgroundColor: "#282c34",
         color: "white",
       },
+    }),
+    control: (provided, { isDisabled }) => ({
+      ...provided,
+      backgroundColor: isDisabled ? "rgba(239, 239, 239, 0.3)" : "white",
+      border: isDisabled ? "none" : "1px solid white",
     }),
   };
 
@@ -86,7 +102,7 @@ function MCQTemplate(props) {
   return (
     <MCQ>
       <label className="label-class" style={{ marginTop: 0 }}>
-        Enter the MCQ Question
+        {props.isDisabled ? "Question" : "Enter the MCQ Question"}
       </label>
       <br />
       <textarea
@@ -98,10 +114,14 @@ function MCQTemplate(props) {
         defaultValue={props.questionText}
         placeholder="MCQ Question"
         spellCheck="false"
+        disabled={props.isDisabled}
       />
-      <label className="label-class">Enter Options for this Question</label>
+      <label className="label-class">
+        {props.isDisabled ? "Options" : "Enter Options"}
+      </label>
       <div style={{ marginTop: "5px" }}>
         <CreatableSelect
+          isDisabled={props.isDisabled}
           ref={optionsComponent}
           styles={customStyles}
           placeholder="Please Type Here And Add Them"
@@ -123,9 +143,12 @@ function MCQTemplate(props) {
           }}
         />
       </div>
-      <label className="label-class">Select the Correct Answer</label>
+      <label className="label-class">
+        {props.isDisabled ? "Correct Answer" : "Select the Correct Answer"}
+      </label>
       <div style={{ marginTop: "5px" }}>
         <SingleSelect
+          isDisabled={props.isDisabled}
           isSearchable={false}
           ref={correctOptionComponent}
           options={availableOptions}
@@ -140,6 +163,14 @@ function MCQTemplate(props) {
               value: props.correctAnswer,
             };
           }}
+          components={
+            props.isDisabled
+              ? {
+                  DropdownIndicator: () => null,
+                  IndicatorSeparator: () => null,
+                }
+              : {}
+          }
         />
       </div>
     </MCQ>
@@ -168,6 +199,11 @@ const MCQ = styled.div`
     padding: 5px;
     border-radius: 5px;
     margin-top: 5px;
+    resize: none;
+  }
+
+  textarea:disabled {
+    color: white;
   }
 `;
 

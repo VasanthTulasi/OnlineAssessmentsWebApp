@@ -94,21 +94,93 @@ router.post("/getSubmissionsForAssessment", async (req, res) => {
   let userInfo = [];
   const submissions = await SubmissionsModel.find(
     { assessment_id: assessment_id },
-    { student_uni_id: true, _id: false }
+    {
+      student_uni_id: true,
+      marks_awarded: true,
+      marks_released: true,
+      _id: false,
+    }
   );
   if (submissions.length !== 0) {
     for (let i = 0; i < submissions.length; i++) {
-      const user = await UsersModel.findOne(
+      let user = await UsersModel.findOne(
         { uni_id: submissions[i].student_uni_id },
-        { assigned_modules: false, role:false, password:false,email: false }
+        { first_name: true, last_name: true, uni_id: true, _id: false }
       );
-      if (user.length !== 0) userInfo.push(user);
+      // if (submissions[i].marks_awarded !== undefined) {
+      //   console.log("entered");
+      //   user.marks_awarded = "hello";
+      // }
+      console.log();
+      const finalUser = {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        uni_id: user.uni_id,
+        marks_awarded: submissions[i].marks_awarded,
+        marks_released: submissions[i].marks_released,
+      };
+
+      // console.log(finalUser);
+      if (user.length !== 0) userInfo.push(finalUser);
+      // console.log(userInfo);
     }
-    console.log(userInfo);
+    // console.log(userInfo);
     res.send(userInfo);
   } else {
     res.json({ message: "no submissions" });
   }
+});
+
+router.post("/getStudentAnswersAndMarks", async (req, res) => {
+  const { assessment_id, student_uni_id } = req.body;
+  const stuAnswersAndMarks = await SubmissionsModel.findOne(
+    {
+      assessment_id: assessment_id,
+      student_uni_id: student_uni_id,
+    },
+    { answers: true, marks_awarded: true, feedback: true, _id: false }
+  );
+  if (stuAnswersAndMarks) {
+    // console.log(stuAnswersAndMarks.answers);
+    // console.log(stuAnswersAndMarks.marks_awarded);
+    res.send(stuAnswersAndMarks);
+  }
+});
+
+router.post("/saveMarksAwarded", (req, res) => {
+  const {
+    assessment_id,
+    student_uni_id,
+    marks_awarded,
+    feedback,
+    marks_released,
+  } = req.body;
+  SubmissionsModel.findOneAndUpdate(
+    { assessment_id: assessment_id, student_uni_id: student_uni_id },
+    {
+      $set: {
+        marks_awarded: marks_awarded,
+        feedback: feedback,
+        marks_released: marks_released,
+      },
+    },
+    function (err) {
+      if (err) res.json({ message: err });
+      res.json({ message: "success" });
+    }
+  );
+});
+
+router.post("/updateMarksReleased", (req, res) => {
+  const { assessment_id, student_uni_id } = req.body;
+  SubmissionsModel.findOneAndUpdate(
+    { assessment_id: assessment_id, student_uni_id: student_uni_id },
+    { $set: { marks_released: true } },
+    function (err) {
+      if (err) res.json({ message: err });
+      res.json({ message: "success" });
+    }
+  );
 });
 
 module.exports = router;

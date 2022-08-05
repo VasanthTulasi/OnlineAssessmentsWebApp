@@ -18,6 +18,18 @@ const schema = new mongoose.Schema(
       type: Array,
       required: true,
     },
+    marks_awarded: {
+      type:Array,
+      required: false
+    },
+    feedback:{
+      type: String,
+      required: false
+    },
+    marks_released:{
+      type: Boolean,
+      required:false
+    }
   },
   { collection: "Submissions", versionKey: false }
 );

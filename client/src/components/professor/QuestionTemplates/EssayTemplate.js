@@ -51,6 +51,7 @@ const Essay = styled.div`
     padding: 5px;
     border-radius: 5px;
     margin-top: 5px;
+    resize:none;
   }
 
   textarea:disabled {

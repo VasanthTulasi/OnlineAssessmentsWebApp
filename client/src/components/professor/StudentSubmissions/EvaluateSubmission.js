@@ -18,396 +18,168 @@ function EvaluateSubmission() {
   // const [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
   // const [moduleCode, setModuleCode] = useState("");
   const [questions, setQuestions] = useState([]);
-  // const [nextKeyId, setNextKeyId] = useState(1);
-  // const [assessmentDurationNumberOptions, setAssessmentDurationNumberOptions] =
-  //   useState([]);
-  // const [selectedDurationMeasure, setSelectedDurationMeasure] =
-  //   useState("minutes");
-  // const [assessmentTitle, setAssessmentTitle] = useState("");
-  // const [selectedDurationNumber, setSelectedDurationNumber] = useState(10);
-  // const [windowStartTime, setWindowStartTime] = useState("");
-  // const [windowEndTime, setWindowEndTime] = useState("");
+  const [studentAnswers, setStudentAnswers] = useState([]);
   const [totalMarks, setTotalMarks] = useState(null);
-  // const selectedDurationNumberDiv = useRef(null);
-  // const [changedMeasure,setChangedMeasure] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [marksAwarded, setMarksAwarded] = useState([]);
+  const [totalMarksAwarded, setTotalMarksAwarded] = useState(0);
 
-  // const axios = Axios.create({
-  //   withCredentials: true,
-  //   baseURL: "http://localhost:3001/users",
-  //   crossDomain: true,
-  // });
-
-  const axios2 = Axios.create({
+  const axios = Axios.create({
     withCredentials: true,
     baseURL: "http://localhost:3001/assessments",
     crossDomain: true,
   });
 
-  //Question Type Methods
-  // const changeQuestionType = (index, val) => {
-  //   let modQuestionArr = [...questions];
-  //   modQuestionArr[index].questionType = val;
-  //   modQuestionArr[index].questionText = "";
-
-  //   if (val === "mcq") {
-  //     deletePropertiesExcept(
-  //       ["id", "questionType", "questionMarks", "questionText", "options", "correctAnswer"],
-  //       modQuestionArr,
-  //       index
-  //     );
-  //     modQuestionArr[index].options = [];
-  //     modQuestionArr[index].correctAnswer = "";
-  //   } else if (val === "fib") {
-  //     deletePropertiesExcept(
-  //       ["id", "questionType","questionMarks", "questionText", "correctFIBAnswers"],
-  //       modQuestionArr,
-  //       index
-  //     );
-  //     modQuestionArr[index].correctFIBAnswers = [];
-  //   } else if (val === "essay") {
-  //     deletePropertiesExcept(
-  //       ["id", "questionType", "questionMarks","questionText"],
-  //       modQuestionArr,
-  //       index
-  //     );
-  //   } else {
-  //     deletePropertiesExcept(
-  //       ["id", "questionType","questionMarks", "questionText", "codingLanguage"],
-  //       modQuestionArr,
-  //       index
-  //     );
-  //     modQuestionArr[index].codingLanguage = "";
-  //   }
-
-  //   setQuestions(modQuestionArr);
-  // };
-
-  // const deletePropertiesExcept = (exceptionVals, modQuestionArr, index) => {
-  //   for (let val in modQuestionArr[index]) {
-  //     if (!exceptionVals.includes(String(val))) {
-  //       // console.log("deleting " + val);
-  //       delete modQuestionArr[index][val];
-  //     }
-  //   }
-  // };
-
-  //MCQ Methods
-  // const saveMCQQuestion = (index, question) => {
-  //   let modQuestionArr = [...questions];
-  //   modQuestionArr[index].questionText = question;
-  //   setQuestions(modQuestionArr);
-  // };
-
-  // const saveMCQQuestionOptions = (index, options) => {
-  //   let modQuestionArr = [...questions];
-  //   modQuestionArr[index].options = options;
-  //   setQuestions(modQuestionArr);
-  // };
-
-  // const saveMCQCorrectAnswer = (index, correctAnswer) => {
-  //   console.log("setting correct answer: " + correctAnswer);
-  //   let modQuestionArr = [...questions];
-  //   modQuestionArr[index].correctAnswer = correctAnswer;
-  //   setQuestions(modQuestionArr);
-  // };
-
-  // //Essay Methods
-  // const saveEssayQuestion = (index, question) => {
-  //   let modQuestionArr = [...questions];
-  //   modQuestionArr[index].questionText = question;
-  //   setQuestions(modQuestionArr);
-  // };
-
-  // //FIB Methods
-  // const saveFIBQuestion = (index, question) => {
-  //   let modQuestionArr = [...questions];
-  //   modQuestionArr[index].questionText = question;
-  //   setQuestions(modQuestionArr);
-  // };
-
-  // const saveFIBAnswers = (index, answerIndex, correctAnswer) => {
-  //   let modQuestionArr = [...questions];
-  //   modQuestionArr[index].correctFIBAnswers[answerIndex] = correctAnswer;
-  //   setQuestions(modQuestionArr);
-  // };
-
-  // const removeFIBAnswer = (index) => {
-  //   let modQuestionArr = [...questions];
-  //   modQuestionArr[index].correctFIBAnswers.splice(
-  //     modQuestionArr[index].correctFIBAnswers.length - 1,
-  //     1
-  //   );
-  //   setQuestions(modQuestionArr);
-  // };
-
-  // //Coding Methods
-  // const saveCodingQuestion = (index, question) => {
-  //   let modQuestionArr = [...questions];
-  //   modQuestionArr[index].questionText = question;
-  //   setQuestions(modQuestionArr);
-  // };
-
-  // const saveCodingLanguage = (index, codingLanguage) => {
-  //   let modQuestionArr = [...questions];
-  //   modQuestionArr[index].codingLanguage = codingLanguage;
-  //   setQuestions(modQuestionArr);
-  // };
-
-  // //Save Marks
-  const saveMarks = (event) => {
-    // const index = event.currentTarget.id.split("_")[2];
-    // const marks = event.currentTarget.value;
-    // let modQuestionArr = [...questions];
-    // modQuestionArr[index].questionMarks = parseInt(marks);
-    // setQuestions(modQuestionArr);
-  };
+  const axios2 = Axios.create({
+    withCredentials: true,
+    baseURL: "http://localhost:3001/submissions",
+    crossDomain: true,
+  });
 
   useEffect(() => {
-    // axios
-    //   .post("/assignedModuleCodes", { uni_id: loggedInUserDetails.uni_id })
-    //   .then((res) => {
-    //     let moduleCodes = res.data;
-    //     moduleCodes = moduleCodes.map((ele) => {
-    //       return { value: ele, label: ele };
-    //     });
-    //     setModuleCodesFromDB(moduleCodes);
-    //   });
+    axios.post("/assessmentsbyId", { _id: state.assessment_id }).then((res) => {
+      const assessment = res.data;
+      setTotalMarks(assessment.total_marks);
+      setQuestions(assessment.questions);
+    });
 
     axios2
-      .post("/assessmentsbyId", { _id: state.assessment_id })
+      .post("/getStudentAnswersAndMarks", {
+        assessment_id: state.assessment_id,
+        student_uni_id: state.student_uni_id,
+      })
       .then((res) => {
-        const assessment = res.data;
-        // setAssessmentTitle(assessment.title);
-        // setSelectedDurationMeasure(assessment.duration_measure);
-        // setSelectedDurationNumber(assessment.duration_number);
-        // setWindowStartTime(assessment.window_start_time);
-        // setWindowEndTime(assessment.window_end_time);
-        setTotalMarks(assessment.total_marks);
-        // setModuleCode(assessment.module_code);
+        const studentAnswers = res.data;
+        setStudentAnswers(studentAnswers.answers);
+        if (studentAnswers.marks_awarded.length !== 0)
+          setMarksAwarded(studentAnswers.marks_awarded);
+        else setMarksAwarded(Array(studentAnswers.answers.length).fill(""));
 
-        const finalQuestions = assessment.questions.map((ele, index) => {
-          return { id: index, ...ele };
-        });
-        setQuestions(finalQuestions);
-        // setNextKeyId(finalQuestions.length);
-
-        // if (assessment.duration_measure === "minutes") {
-        //   let newNumbers = [];
-        //   for (let i = 10; i <= 59; i = i + 10) newNumbers.push(i);
-        //   setAssessmentDurationNumberOptions(newNumbers);
-        // } else {
-        //   let newNumbers = [];
-        //   for (let i = 1; i <= 3; i = i + 0.5) newNumbers.push(i);
-        //   setAssessmentDurationNumberOptions(newNumbers);
-        // }
+        setFeedback(studentAnswers.feedback);
       });
   }, []);
 
-  // const changeDurationMeasure = (event) => {
-  //   setSelectedDurationMeasure(event.target.value);
-  //   if (event.target.value === "minutes") {
-  //     let newNumbers = [];
-  //     for (let i = 10; i <= 59; i = i + 10) newNumbers.push(i);
-  //     setAssessmentDurationNumberOptions(newNumbers);
-  //     setChangedMeasure(prevCount => prevCount +1);
-  //   } else {
-  //     let newNumbers = [];
-  //     for (let i = 1; i <= 3; i = i + 0.5) newNumbers.push(i);
-  //     setAssessmentDurationNumberOptions(newNumbers);
-  //     setChangedMeasure(prevCount => prevCount +1);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   console.log("Reached");
-  //   setSelectedDurationNumber(assessmentDurationNumberOptions[0]);
-  //   selectedDurationNumberDiv.current.value =
-  //     assessmentDurationNumberOptions[0];
-  // }, [changedMeasure]);
-
-  // const moduleCodeSelected = (selOption) => {
-  //   setModuleCode(selOption.value);
-  // };
-
-  // const addNewQuestion = () => {
-  //   setQuestions((prevState) => [
-  //     ...prevState,
-  //     {
-  //       id: nextKeyId,
-  //       questionType: "mcq",
-  //       questionText: "",
-  //       options: [],
-  //       correctAnswer: "",
-  //       questionMarks: "",
-  //     },
-  //   ]);
-  //   setNextKeyId((currentId) => currentId + 1);
-  // };
-
-  // const removeQuestion = (event) => {
-  //   const index = event.currentTarget.id.split("_")[2];
-  //   let modQuestionArray = [...questions];
-  //   modQuestionArray.splice(index, 1);
-  //   setQuestions(modQuestionArray);
-  // };
+  useEffect(() => {
+    calculateTotalMarks();
+  }, [marksAwarded]);
 
   const save = () => {
-    // console.log(state.title);
-    // console.log(state.duration_number);
-    // console.log(state.duration_measure);
-    // console.log(state.window_start_time);
-    // console.log(state.window_end_time);
-    // console.log("\n" + JSON.stringify(state.questions));
-    // console.log(state.module_code);
+    if (validateQuestions()) {
+      // console.log("All ok.. can save to server");
+      console.log(marksAwarded);
+      console.log(feedback);
 
-    // console.log("save: ");
-    // console.log(JSON.stringify(questions));
-    // console.log(assessmentTitle);
-    // console.log(selectedDurationNumber);
-    // console.log(selectedDurationMeasure);
-    // console.log(windowStartTime);
-    // console.log(windowEndTime);
-    // console.log(moduleCode);
-    // console.log(state._id);
-
-    // if (
-    //   assessmentTitle === "" ||
-    //   windowStartTime === "" ||
-    //   windowEndTime === "" ||
-    //   totalMarks === ""
-    // ) {
-    //   alert("Fields cannot be empty. All the fields must be filled.");
-    // }
-    //else if (windowStartTime <= getCurrentTime()) {
-    //   alert(
-    //     "Assessment Window Start Time cannot be in the past. Please select a future time."
-    //   );
-    // } else if (windowEndTime <= windowStartTime) {
-    //   alert(
-    //     "Assessment Window End Time cannot be same or earlier than the Start Time."
-    //   );
-    // }
-    //else
-    if (validateQuestions() === true) {
-      // let assessment = {
-      //   module_code: moduleCode,
-      //   title: assessmentTitle,
-      //   duration_number: selectedDurationNumber,
-      //   duration_measure: selectedDurationMeasure,
-      //   window_start_time: windowStartTime,
-      //   window_end_time: windowEndTime,
-      //   total_marks: totalMarks,
-      // };
-      // const questionsWithoutIDs = questions.map((ele) => {
-      //   if (ele.questionType === "mcq")
-      //     return {
-      //       questionType: ele.questionType,
-      //       questionText: ele.questionText,
-      //       options: ele.options,
-      //       correctAnswer: ele.correctAnswer,
-      //       questionMarks: ele.questionMarks,
-      //     };
-      //   else if (ele.questionType === "fib")
-      //     return {
-      //       questionType: ele.questionType,
-      //       questionText: ele.questionText,
-      //       correctFIBAnswers: ele.correctFIBAnswers,
-      //       questionMarks: ele.questionMarks,
-      //     };
-      //   else if (ele.questionType === "coding")
-      //     return {
-      //       questionType: ele.questionType,
-      //       questionText: ele.questionText,
-      //       codingLanguage: ele.codingLanguage,
-      //       questionMarks: ele.questionMarks,
-      //     };
-      //   else
-      //     return {
-      //       questionType: ele.questionType,
-      //       questionText: ele.questionText,
-      //       questionMarks: ele.questionMarks,
-      //     };
-      // });
-      // assessment.questions = questionsWithoutIDs;
-      // console.log("Final: " + JSON.stringify(assessment));
-      // axios2
-      //   .post("/updateAssessmentById", { _id: state._id, assessment })
-      //   .then((res) => alert(JSON.stringify(res.data.message)));
+      axios2
+        .post("/saveMarksAwarded", {
+          assessment_id: state.assessment_id,
+          student_uni_id: state.student_uni_id,
+          marks_awarded: marksAwarded,
+          feedback: feedback,
+          marks_released: false
+        })
+        .then((res) => {
+          if (res.data.message === "success") {
+            alert("Marks saved successfully!");
+            navigate("../viewSubmissions", {
+              state: {
+                _id: state.assessment_id,
+                total_marks: totalMarks,
+              },
+            });
+          }
+        });
     }
   };
 
-  const goBack = () => navigate("../viewSubmissions");
-
-  // const getCurrentTime = () => new Date().toISOString().slice(0, 16);
-
-  // const getDurationInSeconds = () => {
-  //   return (
-  //     selectedDurationNumber *
-  //     (selectedDurationMeasure === "minutes" ? 60 : 60 * 60)
-  //   );
-  // };
-
   const validateQuestions = () => {
+    for (let i = 0; i < marksAwarded.length; i++) {
+      if (marksAwarded[i] == "") {
+        console.log(
+          "Error in question number " +
+            (i + 1) +
+            ". Marks awarded cannot be empty."
+        );
+        return false;
+      }
+    }
+
+    for (let i = 0; i < marksAwarded.length; i++) {
+      if (marksAwarded[i] > questions[i].questionMarks) {
+        console.log(
+          "Error in question number " +
+            (i + 1) +
+            ". Marks awarded cannot exceed the maximum marks for this question."
+        );
+        return false;
+      }
+    }
+
     // let marksSum = 0;
-    // for (let i = 0; i < questions.length; i++) {
-    //   marksSum += parseInt(questions[i].questionMarks);
+    // for (let i = 0; i < marksAwarded.length; i++) {
+    //   marksSum += parseInt(marksAwarded[i]);
     // }
-    // console.log(marksSum);
-    // console.log(totalMarks);
-    // if (marksSum != totalMarks) {
-    //   alert(
-    //     "Total marks and the sum of the individual marks do not match. Please make sure they match."
+
+    // if (totalMarksAwarded > totalMarks) {
+    //   console.log(
+    //     "Sum of the individual marks cannot exceed the maximum marks for this assessment."
     //   );
     //   return false;
-    // }
-
-    // for (let i = 0; i < questions.length; i++) {
-    //   if (questions[i].questionText === "") {
-    //     alert(
-    //       "Error in question number " + (i + 1) + ". Marks awarded cannot be empty."
-    //     );
-    //     return false;
-    //   }
     // }
 
     return true;
   };
 
-  // const customStyles1 = {
-  //   container: (provided) => ({
-  //     ...provided,
-  //     width: "400px",
-  //     height: "35px",
-  //   }),
-  //   valueContainer: (provided) => ({
-  //     ...provided,
-  //     // width: "400px",
-  //     paddingLeft: "10px",
-  //     color: "black",
-  //     font: "17px",
-  //     fontFamily: '"Source Sans Pro", sans-serif',
-  //     fontSize: "17px",
-  //     fontWeight: 400,
-  //     color: "#282c34",
-  //   }),
-  //   option: (provided, state) => ({
-  //     ...provided,
-  //     color: "black",
-  //     font: "17px",
-  //     fontFamily: '"Source Sans Pro", sans-serif',
-  //     fontSize: "17px",
-  //     fontWeight: 400,
-  //     color: "#282c34",
-  //     backgroundColor: state.isSelected ? "#61dafb" : "white",
-  //     "&:hover": {
-  //       backgroundColor: "rgba(189,197,209,.3)",
-  //     },
-  //   }),
-  //   placeholder: (provided) => ({
-  //     ...provided,
-  //     fontSize: "17px",
-  //   }),
-  // };
+  const goBack = () => {
+    navigate("../viewSubmissions", {
+      state: {
+        _id: state.assessment_id,
+        total_marks: totalMarks,
+      },
+    });
+  };
+
+  const validateEntry = (event) => {
+    if (
+      event.which === 8 ||
+      event.which === 13 ||
+      event.which === 46 ||
+      event.which === 37 ||
+      event.which === 39
+    )
+      return;
+    if (event.which >= 48 && event.which <= 57) return;
+    if (event.which >= 96 && event.which <= 105) return;
+
+    alert("Only numeric values are allowed in this field");
+    event.preventDefault();
+  };
+
+  const calculateTotalMarks = () => {
+    let marksSum = 0;
+    for (let i = 0; i < marksAwarded.length; i++) {
+      if (marksAwarded[i] === "") continue;
+      marksSum += parseInt(marksAwarded[i]);
+    }
+    setTotalMarksAwarded(marksSum);
+  };
+
+  // const saveFeedback = (event) =>{
+
+  // }
+
+  //Save Marks
+  const saveAwardedMarks = (event) => {
+    console.log("triggered");
+    const index = event.target.id.split("_")[2];
+    let marks = event.target.value;
+    // if (marks.trim() === "") {
+    //   // console.log("yes");
+    //   marks = 0;
+    // }
+    let modMarksAwardedArr = [...marksAwarded];
+    modMarksAwardedArr[index] = marks;
+    setMarksAwarded(modMarksAwardedArr);
+  };
 
   return (
     <EvalSubmission>
@@ -501,11 +273,56 @@ function EvaluateSubmission() {
                     disabled="true"
                   />
                 </div>
+                <div style={{ marginTop: "5px" }}>
+                  <label className="submission-info-label">
+                    Student's Answer
+                  </label>
+                  <br />
+                  <div
+                    id={"student_answer_" + index}
+                    className="student-answer"
+                    // defaultValue={ele.questionMarks}
+                    disabled="true"
+                  >
+                    {studentAnswers[index]}
+                  </div>
+                </div>
+                <div style={{ marginTop: "5px" }}>
+                  <label className="submission-info-label">Marks Awarded</label>
+                  <br />
+                  <input
+                    id={"marks_awarded_" + index}
+                    className="submission-text-field"
+                    onChange={saveAwardedMarks}
+                    // onKeyDown={validateEntry}
+                    value={marksAwarded[index]}
+                  />
+                </div>
               </div>
             </div>
           );
         })}
       </div>
+      <div className="total-marks-and-feedback">
+        <div className="total-marks-awarded">
+          <label className="submission-info-label">Total Marks Awarded</label>
+          <input
+            className="submission-text-field"
+            disabled="true"
+            value={totalMarksAwarded + " out of " + totalMarks}
+          />
+        </div>
+        <div className="total-marks-awarded">
+          <label className="submission-info-label">Feedback for Student</label>
+          <textarea
+            rows="5"
+            className="feedback-text-area"
+            onBlur={(event) => setFeedback(event.currentTarget.value)}
+            defaultValue={feedback}
+          />
+        </div>
+      </div>
+
       {/* {moduleCode !== "" && ( */}
       <div
         style={{
@@ -642,7 +459,6 @@ const EvalSubmission = styled.div`
     align-items: center;
     flex-direction: column;
     /* border: 1px solid red; */
-    margin: 20px;
     margin-bottom: 0px;
     width: 100%;
     background-color: #282c34;
@@ -655,14 +471,9 @@ const EvalSubmission = styled.div`
     display: flex;
     width: 80%;
     justify-content: space-evenly;
-    /* align-self: center; */
     align-items: center;
     background-color: #282c34;
   }
-
-  /* .expand{
-    width: 75%;
-  } */
 
   .question-number {
     padding: 0px 20px 0px 20px;
@@ -720,6 +531,52 @@ const EvalSubmission = styled.div`
 
   input:disabled {
     color: white;
+  }
+
+  .student-answer {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    background-color: rgba(239, 239, 239, 0.3);
+    margin-top: 5px;
+    border-radius: 5px;
+    /* width: 400px; */
+    /* height: 35px; */
+    padding: 5px;
+    padding-left: 10px;
+  }
+
+  .total-marks-awarded {
+    /* border: 1px solid red; */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    width: 80%;
+  }
+
+  .total-marks-and-feedback {
+    /* border: 1px solid red; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .feedback-text-area {
+    width: 400px;
+    color: black;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    padding: 5px;
+    border-radius: 5px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    /* border: none; */
+    resize: none;
   }
 `;
 

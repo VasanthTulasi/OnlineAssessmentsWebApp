@@ -30,8 +30,10 @@ const sendPasswordResetMail = async (recipientID,token) => await transporter.sen
   }, function(err, inf){
     if(err)
     console.log("Error is "+err.message);
-    else
+    else{
     console.log("Success "+inf.response);
+    console.log("http://localhost:3000/accountActivate/" + token);
+    }
   });
 
   const sendRegApprovalMail = async (recipientID) => await transporter.sendMail({

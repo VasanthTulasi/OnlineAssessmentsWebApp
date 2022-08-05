@@ -134,7 +134,7 @@ function FIBTemplate(props) {
         className="add-blank-button"
         id={"add_blank_" + props.indexVal}
         onClick={addBlank}
-        disabled={props.isDisabled}
+        style={{display:props.isDisabled ? "none": "inline-block"}}
       >
         Add a blank at the cursor
       </button>

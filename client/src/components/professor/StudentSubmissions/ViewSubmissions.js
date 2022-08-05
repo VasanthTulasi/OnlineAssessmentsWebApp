@@ -9,6 +9,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 function ViewSubmissions() {
   let [submissionsArray, setSubmissionsArray] = useState([]);
   let [submissionsLoaded, setSubmissionsLoaded] = useState(false);
+  // let [areMarksAwarded, setAreMarksAwarded] = useState([]);
   const { state } = useLocation();
   const navigate = useNavigate();
   const axios = Axios.create({
@@ -49,6 +50,8 @@ function ViewSubmissions() {
         else {
           setSubmissionsLoaded(true);
           setSubmissionsArray(res.data);
+          console.log(res.data[0].marks_released);
+          console.log(res.data[1].marks_released);
         }
       });
   }, []);
@@ -98,6 +101,31 @@ function ViewSubmissions() {
   //     }),
   //   };
 
+  const calculateMarksAwarded = (index) => {
+    let marks = submissionsArray[index].marks_awarded;
+    let sum = 0;
+    for (let i = 0; i < marks.length; i++) sum += parseInt(marks[i]);
+    return sum;
+  };
+
+  const releaseMarks = (event) => {
+    const index = event.target.id.split("_")[1];
+    axios3
+      .post("/updateMarksReleased", {
+        assessment_id: state._id,
+        student_uni_id: submissionsArray[index].uni_id,
+      })
+      .then((res) => {
+        if (res.data.message === "success") {
+          let modSubmissionsArray = [...submissionsArray];
+          modSubmissionsArray[index].marks_released = true;
+          setSubmissionsArray(modSubmissionsArray);
+        } else {
+          alert("Error: "+ res.data.message);
+        }
+      });
+  };
+
   return (
     <>
       <ViewSubs>
@@ -114,9 +142,10 @@ function ViewSubmissions() {
                   Student First Name
                 </td>
                 <td className="module-data headers-color">Student Last Name</td>
-                <td className="module-data end headers-color">
+                <td className="module-data headers-color">
                   Student University ID
                 </td>
+                <td className="module-data end headers-color">Marks Awarded</td>
                 {/* <td className="module-data end headers-color">
                   Evaluation Status
                 </td> */}
@@ -127,39 +156,56 @@ function ViewSubmissions() {
                     <td className="module-data start">{index + 1}</td>
                     <td className="module-data mid">{ele.first_name}</td>
                     <td className="module-data mid">{ele.last_name}</td>
-                    <td className="module-data end">{ele.uni_id}</td>
+                    <td className="module-data mid">{ele.uni_id}</td>
+                    <td className="module-data end">
+                      {ele.marks_awarded.length !== 0
+                        ? calculateMarksAwarded(index) +
+                          " out of " +
+                          state.total_marks
+                        : "Not Yet Available"}
+                    </td>
+                    <td className="module-data mid" style={{ border: "none" }}>
+                      <button
+                        id={"evaluateSubmission_" + index}
+                        onClick={evaluateSubmission}
+                        // disabled={
+                        //   new Date() < new Date(ele.window_start_time)
+                        //     ? true
+                        //     : false
+                        // }
+                        // className={
+                        //   new Date() < new Date(ele.window_start_time)
+                        //     ? "module-data-button button-disabled"
+                        //     : "module-data-button"
+                        // }
+                        className="module-data-button"
+                      >
+                        {ele.marks_awarded.length !== 0
+                          ? "View / Edit Evalution"
+                          : "Evaluate"}
+                      </button>
+                    </td>
                     <td>
                       <button
-                        id={"viewSubmissionsButton_" + index}
-                        onClick={evaluateSubmission}
+                        id={"releaseMarks_" + index}
+                        onClick={releaseMarks}
                         disabled={
-                          new Date() < new Date(ele.window_start_time)
-                            ? true
-                            : false
+                          (ele.marks_released == undefined && true) ||
+                          (ele.marks_released == false && false) ||
+                          (ele.marks_released == true && true)
                         }
                         className={
-                          new Date() < new Date(ele.window_start_time)
-                            ? "module-data-button button-disabled"
-                            : "module-data-button"
+                          (ele.marks_released == undefined &&
+                            "module-data-button button-disabled") ||
+                          (ele.marks_released == false &&
+                            "module-data-button") ||
+                          (ele.marks_released == true &&
+                            "module-data-button button-disabled")
                         }
                       >
-                        Evaluate
-                      </button>
-                      <button
-                        id={"deleteButton_" + index}
-                        // onClick={deleteAssessment}
-                        disabled={
-                          new Date() > new Date(ele.window_start_time)
-                            ? true
-                            : false
-                        }
-                        className={
-                          new Date() > new Date(ele.window_start_time)
-                            ? "module-data-button button-disabled"
-                            : "module-data-button"
-                        }
-                      >
-                        View Result
+                        {ele.marks_released == undefined && "Release Marks"}
+                        {ele.marks_released == false && "Release Marks"}
+                        {ele.marks_released == true && "Marks Released"}
                       </button>
                     </td>
                   </tr>
@@ -276,14 +322,16 @@ const ViewSubs = styled.div`
   }
 
   .module-data-button {
-    margin-left: 15px;
+    /* margin-left: 15px; */
+    /* margin-right:   15px; */
     border: 1px solid black;
     color: #282c34;
     background-color: white;
     font-family: "Sourse Sans Pro ", sans-serif;
     font-size: 15px;
     font-weight: 600;
-    width: max-content;
+    /* width: max-content; */
+    width: 100%;
     /* height: 45px; */
     /* letter-spacing: 1px; */
     border-radius: 25px;

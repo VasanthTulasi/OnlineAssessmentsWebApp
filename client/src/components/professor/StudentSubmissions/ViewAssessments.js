@@ -29,7 +29,7 @@ function ViewAssessments() {
   const viewSubmissions = (event) => {
     const itemIndex = event.currentTarget.id.split("_")[1];
     navigate("../viewSubmissions", {
-      state: { _id: assessmentsArray[itemIndex]._id },
+      state: { _id: assessmentsArray[itemIndex]._id, total_marks: assessmentsArray[itemIndex].total_marks},
     });
   };
 

@@ -103,7 +103,6 @@ function ViewAssessments() {
     axios2
       .post("/deleteAssessmentFromModule", {
         _id: assessmentsArray[itemIndex]._id,
-        // obj: assessmentsArray[itemIndex]
       })
       .then((res) => {
         if (res.data.message === "success") {

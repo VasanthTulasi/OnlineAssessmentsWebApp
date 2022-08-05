@@ -7,29 +7,40 @@ function FIBTemplate(props) {
   const [blanksCount, setBlanksCount] = useState(
     props.correctFIBAnswers.length
   );
-  const [correctBlankAnswers, setCorrectBlankAnswers] = useState(
-    props.correctFIBAnswers
-  );
+  const [correctBlankAnswers, setCorrectBlankAnswers] = useState([]);
   const [errorMessageStyle, setErrorMessageStyle] = useState({
     display: "none",
   });
   const [errorMessage, setErrorMessage] = useState("");
-  // useEffect(() => {
-  //   const correctBlankAnswersWithKeys = correctBlankAnswers;
-  //   correctBlankAnswersWithKeys.map((ele,index) => {
-  //       return {keyId: index,...ele};
-  //   })
-  //   setNextOptionKeyId(correctBlankAnswersWithKeys.length);
-  // }, []);
+  const [nextKey, setNextKey] = useState(null);
+
+  useEffect(() => {
+    console.log("answers form prop: " + props.correctFIBAnswers);
+    const correctBlankAnswersWithKeys = props.correctFIBAnswers;
+    correctBlankAnswersWithKeys.map((ele, index) => {
+      return { key_id: index, answer: ele };
+    });
+    setCorrectBlankAnswers(correctBlankAnswersWithKeys);
+    setNextKey(correctBlankAnswersWithKeys.length);
+  }, []);
 
   const saveFIBQuestion = () => {
-    console.log("save fib triggered");
+    // console.log("save fib triggered");
     // if (checkIfEditingInsideBlank()) return;
-    let quesTextArr = textAreaComponent.current.value.split("____________");
-    const finalQuesTextArr = removeUnwantedBlanks(quesTextArr);
-    textAreaComponent.current.value = finalQuesTextArr.join("____________");
-    setBlanksCount(quesTextArr.length - 1);
     const questionId = textAreaComponent.current.id.split("_")[3];
+    if (textAreaComponent.current.value === "") {
+      props.saveFIBQuestion(questionId, "");
+      removeAllBlanksFromArray();
+      return;
+    }
+
+    let quesTextArr = textAreaComponent.current.value.split("____________");
+    const { finalQuesTextArr, removedIndex } =
+      removeUnwantedBlanks(quesTextArr);
+    textAreaComponent.current.value = finalQuesTextArr.join("____________");
+    // setBlanksCount(quesTextArr.length - 1);
+    if (removedIndex != null) removeBlankFromArray(removedIndex);
+
     props.saveFIBQuestion(questionId, textAreaComponent.current.value);
   };
 
@@ -72,27 +83,44 @@ function FIBTemplate(props) {
   };
 
   const removeUnwantedBlanks = (quesTextArr) => {
+    // console.log("Question text array :" + JSON.stringify(quesTextArr));
+    // return;
+    let removedIndex = null;
     for (let i = 0; i < quesTextArr.length; i++) {
       let textArr = quesTextArr[i];
       quesTextArr[i] = quesTextArr[i].replace("___________", "");
       if (textArr !== quesTextArr[i]) {
+        removedIndex = i;
         const questionId = textAreaComponent.current.id.split("_")[3];
-        props.removeFIBAnswer(questionId);
+        // props.removeFIBAnswer(questionId);
       }
     }
-    return quesTextArr;
+    const finalQuesTextArr = quesTextArr;
+    return { finalQuesTextArr, removedIndex };
   };
 
   const setCorrectAnswers = (event) => {
     const index = event.target.id.split("_")[2];
-    const questionId = textAreaComponent.current.id.split("_")[3];
-    props.saveFIBAnswers(questionId, index, event.target.value);
+    let modCorrectOptionsArr = [...correctBlankAnswers];
+    modCorrectOptionsArr[index].answer = event.target.value;
+    setCorrectBlankAnswers(modCorrectOptionsArr);
   };
+
+  useEffect(() => {
+    const questionId = textAreaComponent.current.id.split("_")[3];
+    const correctBlankAnswersWithoutKeys = correctBlankAnswers.map(
+      (ele, index) => {
+        return ele.answer;
+      }
+    );
+    // console.log(JSON.stringify(correctBlankAnswersWithoutKeys));
+    props.saveFIBAnswers(questionId, correctBlankAnswersWithoutKeys);
+  }, [correctBlankAnswers]);
 
   const addBlank = () => {
     setErrorMessageStyle({ display: "none" });
     if (checkIfAddingInBlank()) return;
-    console.log("continue");
+    // console.log("continue");
     let curText = textAreaComponent.current.value;
     let curPosition = textAreaComponent.current.selectionStart;
     let blankCount = curText.split("____________").length;
@@ -102,9 +130,33 @@ function FIBTemplate(props) {
       curText.substring(curPosition);
     textAreaComponent.current.value = finalText;
     textAreaComponent.current.focus();
-    setBlanksCount(blankCount);
+    // setBlanksCount(blankCount);
+    addNewBlankInArray();
     const questionId = textAreaComponent.current.id.split("_")[3];
     props.saveFIBQuestion(questionId, textAreaComponent.current.value);
+    // props.saveFIBAnswers(questionId, null, null);
+  };
+
+  const addNewBlankInArray = () => {
+    console.log("called add blank");
+    setCorrectBlankAnswers((prevState) => [
+      ...prevState,
+      {
+        key_id: nextKey,
+        answer: "",
+      },
+    ]);
+    setNextKey((currentId) => currentId + 1);
+  };
+
+  const removeBlankFromArray = (index) => {
+    let modCorrectOptionsArr = [...correctBlankAnswers];
+    modCorrectOptionsArr.splice(index, 1);
+    setCorrectBlankAnswers(modCorrectOptionsArr);
+  };
+
+  const removeAllBlanksFromArray = () => {
+    setCorrectBlankAnswers([]);
   };
 
   const keyPressed = (event) => {
@@ -134,14 +186,14 @@ function FIBTemplate(props) {
         className="add-blank-button"
         id={"add_blank_" + props.indexVal}
         onClick={addBlank}
-        style={{display:props.isDisabled ? "none": "inline-block"}}
+        style={{ display: props.isDisabled ? "none" : "inline-block" }}
       >
         Add a blank at the cursor
       </button>
       <br />
-      {Array.from({ length: blanksCount }).map((ele, index) => {
+      {correctBlankAnswers.map((ele, index) => {
         return (
-          <>
+          <React.Fragment key={ele.key_id}>
             <br />
             <label className="label-class">
               {props.isDisabled
@@ -157,7 +209,7 @@ function FIBTemplate(props) {
               defaultValue={props.correctFIBAnswers[index]}
               disabled={props.isDisabled}
             />
-          </>
+          </React.Fragment>
         );
       })}
     </FIB>

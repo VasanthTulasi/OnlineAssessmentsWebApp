@@ -56,50 +56,6 @@ function ViewSubmissions() {
       });
   }, []);
 
-  //   useEffect(() => {
-  //     setSubmissionsLoaded(false);
-  //     S([]);
-  //     axios2.post("/assessmentsForModule", { moduleCode }).then((res) => {
-  //       const assessments = res.data;
-  //       if (assessments.length === 0) {
-  //         setSubmissionsLoaded(true);
-  //       } else {
-  //         setSubmissionsLoaded(true);
-  //         S(assessments);
-  //       }
-  //     });
-  //   }, [moduleCode]);
-
-  //   const customStyles = {
-  //     valueContainer: (provided) => ({
-  //       ...provided,
-  //       width: "400px",
-  //       paddingLeft: "10px",
-  //       color: "black",
-  //       font: "17px",
-  //       fontFamily: '"Source Sans Pro", sans-serif',
-  //       fontSize: "17px",
-  //       fontWeight: 400,
-  //       color: "#282c34",
-  //     }),
-  //     option: (provided, state) => ({
-  //       ...provided,
-  //       color: "black",
-  //       font: "17px",
-  //       fontFamily: '"Source Sans Pro", sans-serif',
-  //       fontSize: "17px",
-  //       fontWeight: 400,
-  //       color: "#282c34",
-  //       backgroundColor: state.isSelected ? "#61dafb" : "white",
-  //       "&:hover": {
-  //         backgroundColor: "rgba(189,197,209,.3)",
-  //       },
-  //     }),
-  //     placeholder: (provided) => ({
-  //       ...provided,
-  //       fontSize: "17px",
-  //     }),
-  //   };
 
   const calculateMarksAwarded = (index) => {
     let marks = submissionsArray[index].marks_awarded;

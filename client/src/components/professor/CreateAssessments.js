@@ -141,9 +141,22 @@ function CreateAssessments() {
     setQuestions(modQuestionArr);
   };
 
-  const saveFIBAnswers = (index, answerIndex, correctAnswer) => {
+  // const saveFIBAnswers = (index, answerIndex, correctAnswer) => {
+  //   console.log("triggered save fib");
+  //   if (answerIndex == null && correctAnswer == null) {
+  //     let modQuestionArr = [...questions];
+  //     modQuestionArr[index].correctFIBAnswers.push("");
+  //     setQuestions(modQuestionArr);
+  //   } else {
+  //     let modQuestionArr = [...questions];
+  //     modQuestionArr[index].correctFIBAnswers[answerIndex] = correctAnswer;
+  //     setQuestions(modQuestionArr);
+  //   }
+  // };
+
+  const saveFIBAnswers = (index, answers) => {
     let modQuestionArr = [...questions];
-    modQuestionArr[index].correctFIBAnswers[answerIndex] = correctAnswer;
+    modQuestionArr[index].correctFIBAnswers = answers;
     setQuestions(modQuestionArr);
   };
 
@@ -265,6 +278,7 @@ function CreateAssessments() {
   const save = () => {
     // console.log("\n" + JSON.stringify(questions));
     // return;
+    // return;
     // console.log(assessmentTitle);
     // console.log(selectedDurationNumber);
     // console.log(selectedDurationMeasure);
@@ -334,9 +348,14 @@ function CreateAssessments() {
     }
   };
 
+  //Convert Time zone
+  //https://stackoverflow.com/questions/49330139/date-toisostring-but-local-time-instead-of-utc
   const getCurrentTime = () => {
-    console.log(new Date().toISOString().slice(0, 16));
-    return new Date().toISOString().slice(0, 16);
+    let date = new Date();
+    let finalDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+    return finalDate;
   };
 
   const validateQuestions = () => {
@@ -344,8 +363,8 @@ function CreateAssessments() {
     for (let i = 0; i < questions.length; i++) {
       marksSum += questions[i].questionMarks;
     }
-    console.log(marksSum);
-    console.log(totalMarks);
+    // console.log(marksSum);
+    // console.log(totalMarks);
     if (marksSum != totalMarks) {
       alert(
         "Total marks and the sum of the individual marks do not match. Please make sure they match."
@@ -378,8 +397,17 @@ function CreateAssessments() {
           return false;
         }
       } else if (questions[i].questionType === "fib") {
+        if (questions[i].correctFIBAnswers.length === 0) {
+          alert(
+            "Error in question number " +
+              (i + 1) +
+              ". There must at least be one blank in the question."
+          );
+          return false;
+        }
+
         for (let j = 0; j < questions[i].correctFIBAnswers.length; j++) {
-          if (questions[i].correctFIBAnswers[j].length === 0) {
+          if (questions[i].correctFIBAnswers[j] === "") {
             alert(
               "Error in question number " +
                 (i + 1) +
@@ -389,15 +417,6 @@ function CreateAssessments() {
             );
             return false;
           }
-        }
-
-        if (questions[i].correctFIBAnswers.length === 0) {
-          alert(
-            "Error in question number " +
-              (i + 1) +
-              ". There must at least be one blank and a non-empty correct answer."
-          );
-          return false;
         }
       } else if (questions[i].questionType === "coding") {
         if (questions[i].codingLanguage === "") {
@@ -567,9 +586,10 @@ function CreateAssessments() {
                       indexVal={index}
                       saveFIBQuestion={saveFIBQuestion}
                       saveFIBAnswers={saveFIBAnswers}
-                      questionText={ele.questionText}
-                      correctFIBAnswers={ele.correctFIBAnswers}
                       removeFIBAnswer={removeFIBAnswer}
+                      questionText={ele.questionText}
+                      // correctFIBAnswers={ele.correctFIBAnswers}
+                      correctFIBAnswers={[]}
                     />
                   )}
                   {ele.questionType === "essay" && (
@@ -589,13 +609,13 @@ function CreateAssessments() {
                   )}
                   <div style={{ marginTop: "5px" }}>
                     <label className="assessment-info-label">
-                      Marks Awarded
+                      Marks for Correct Answer
                     </label>
                     <br />
                     <input
                       id={"question_marks_" + index}
                       className="assessment-text-field"
-                      placeholder="Marks Awarded"
+                      placeholder="Marks for Correct Answer"
                       onBlur={saveMarks}
                     />
                   </div>

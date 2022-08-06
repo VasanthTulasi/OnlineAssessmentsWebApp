@@ -15,11 +15,14 @@ function FIBTemplate(props) {
   const [nextKey, setNextKey] = useState(null);
 
   useEffect(() => {
-    console.log("answers form prop: " + props.correctFIBAnswers);
-    const correctBlankAnswersWithKeys = props.correctFIBAnswers;
-    correctBlankAnswersWithKeys.map((ele, index) => {
-      return { key_id: index, answer: ele };
-    });
+    console.log("use effect 1");
+    // console.log("answers form prop: " + props.correctFIBAnswers);
+    let correctBlankAnswersWithKeys = props.correctFIBAnswers;
+    correctBlankAnswersWithKeys = correctBlankAnswersWithKeys.map(
+      (ele, index) => {
+        return { key_id: index, answer: ele };
+      }
+    );
     setCorrectBlankAnswers(correctBlankAnswersWithKeys);
     setNextKey(correctBlankAnswersWithKeys.length);
   }, []);
@@ -107,6 +110,9 @@ function FIBTemplate(props) {
   };
 
   useEffect(() => {
+    console.log(
+      "use effect 2. Answers: " + JSON.stringify(correctBlankAnswers)
+    );
     const questionId = textAreaComponent.current.id.split("_")[3];
     const correctBlankAnswersWithoutKeys = correctBlankAnswers.map(
       (ele, index) => {
@@ -114,6 +120,9 @@ function FIBTemplate(props) {
       }
     );
     // console.log(JSON.stringify(correctBlankAnswersWithoutKeys));
+    console.log(
+      "final Answers: " + JSON.stringify(correctBlankAnswersWithoutKeys)
+    );
     props.saveFIBAnswers(questionId, correctBlankAnswersWithoutKeys);
   }, [correctBlankAnswers]);
 
@@ -123,29 +132,56 @@ function FIBTemplate(props) {
     // console.log("continue");
     let curText = textAreaComponent.current.value;
     let curPosition = textAreaComponent.current.selectionStart;
-    let blankCount = curText.split("____________").length;
+    // let blankCount = curText.split("____________").length;
+    addNewBlankInArray(curPosition);
     let finalText =
       curText.substring(0, curPosition) +
       " ____________ " +
       curText.substring(curPosition);
     textAreaComponent.current.value = finalText;
     textAreaComponent.current.focus();
-    // setBlanksCount(blankCount);
-    addNewBlankInArray();
     const questionId = textAreaComponent.current.id.split("_")[3];
     props.saveFIBQuestion(questionId, textAreaComponent.current.value);
     // props.saveFIBAnswers(questionId, null, null);
   };
 
-  const addNewBlankInArray = () => {
-    console.log("called add blank");
-    setCorrectBlankAnswers((prevState) => [
-      ...prevState,
-      {
-        key_id: nextKey,
-        answer: "",
-      },
-    ]);
+  const addNewBlankInArray = (position) => {
+    const curText = textAreaComponent.current.value.substring(0, position);
+    let numOfBlanks = 0;
+    for (let i = 0; i < curText.length; i++) {
+      if (curText[i] == "_") {
+        let blankFound = true;
+        for (let j = i; j < i + 12; j++) {
+          if (curText[j] != "_") {
+            blankFound = false;
+            i = j;
+            break;
+          }
+        }
+        if (blankFound) {
+          numOfBlanks++;
+          i = i + 12;
+        }
+      }
+    }
+
+    // console.log("Number of blanks: " + numOfBlanks);
+    // return;
+    // console.log("called add blank");
+    let modCorrectOptionsArr = [...correctBlankAnswers];
+    modCorrectOptionsArr.splice(numOfBlanks, 0, {
+      key_id: nextKey,
+      answer: "",
+    });
+    setCorrectBlankAnswers([...modCorrectOptionsArr]);
+
+    // setCorrectBlankAnswers((prevState) => [
+    //   ...prevState,
+    // {
+    //   key_id: nextKey,
+    //   answer: "",
+    // },
+    // ]);
     setNextKey((currentId) => currentId + 1);
   };
 
@@ -202,11 +238,11 @@ function FIBTemplate(props) {
             </label>
             <br />
             <input
-              onBlur={(event) => setCorrectAnswers(event)}
+              onChange={(event) => setCorrectAnswers(event)}
               className="blanks-answer-field"
               id={"blank_answer_" + index}
               placeholder="Correct Answer"
-              defaultValue={props.correctFIBAnswers[index]}
+              value={props.correctFIBAnswers[index]}
               disabled={props.isDisabled}
             />
           </React.Fragment>

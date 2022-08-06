@@ -278,7 +278,6 @@ function CreateAssessments() {
   const save = () => {
     // console.log("\n" + JSON.stringify(questions));
     // return;
-    // return;
     // console.log(assessmentTitle);
     // console.log(selectedDurationNumber);
     // console.log(selectedDurationMeasure);

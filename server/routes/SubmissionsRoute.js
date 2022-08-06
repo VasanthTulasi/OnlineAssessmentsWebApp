@@ -270,7 +270,7 @@ router.post("/autoEvaluate", async (req, res) => {
             },
           }
         )
-          .then(() => console.log("done"))
+          .then(() => {})
           .catch((err) => console.log(err));
       }
     }

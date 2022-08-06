@@ -127,9 +127,23 @@ function EditAssessments() {
     setQuestions(modQuestionArr);
   };
 
-  const saveFIBAnswers = (index, answerIndex, correctAnswer) => {
+  // const saveFIBAnswers = (index, answerIndex, correctAnswer) => {
+  //   console.log("triggered save fib");
+  //   if (answerIndex == null && correctAnswer == null) {
+  //     let modQuestionArr = [...questions];
+  //     modQuestionArr[index].correctFIBAnswers.push("");
+  //     setQuestions(modQuestionArr);
+  //   } else {
+  //     let modQuestionArr = [...questions];
+  //     modQuestionArr[index].correctFIBAnswers[answerIndex] = correctAnswer;
+  //     setQuestions(modQuestionArr);
+  //   }
+  // };
+
+  const saveFIBAnswers = (index, answers) => {
+    console.log("save fib index "+index+ " answers " +answers);
     let modQuestionArr = [...questions];
-    modQuestionArr[index].correctFIBAnswers[answerIndex] = correctAnswer;
+    modQuestionArr[index].correctFIBAnswers = answers;
     setQuestions(modQuestionArr);
   };
 
@@ -344,7 +358,19 @@ function EditAssessments() {
 
   const goBack = () => navigate("../viewAssessments");
 
-  const getCurrentTime = () => new Date().toISOString().slice(0, 16);
+  const getCurrentTime = () => {
+    let date = new Date();
+    let finalDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+    return finalDate;
+  };
+  
+  
+  
+  
+  
+  
 
   const getDurationInSeconds = () => {
     return (
@@ -392,8 +418,17 @@ function EditAssessments() {
           return false;
         }
       } else if (questions[i].questionType === "fib") {
+        if (questions[i].correctFIBAnswers.length === 0) {
+          alert(
+            "Error in question number " +
+              (i + 1) +
+              ". There must at least be one blank in the question."
+          );
+          return false;
+        }
+
         for (let j = 0; j < questions[i].correctFIBAnswers.length; j++) {
-          if (questions[i].correctFIBAnswers[j].length === 0) {
+          if (questions[i].correctFIBAnswers[j] === "") {
             alert(
               "Error in question number " +
                 (i + 1) +
@@ -403,15 +438,6 @@ function EditAssessments() {
             );
             return false;
           }
-        }
-
-        if (questions[i].correctFIBAnswers.length === 0) {
-          alert(
-            "Error in question number " +
-              (i + 1) +
-              ". There must at least be one blank and a non-empty correct answer."
-          );
-          return false;
         }
       } else if (questions[i].questionType === "coding") {
         if (questions[i].codingLanguage === "") {

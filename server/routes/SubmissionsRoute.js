@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const SubmissionsModel = require("../Models/SubmissionsModel");
 const UsersModel = require("../Models/UsersModel");
+const AssessmentsModel = require("../models/AssessmentsModel");
 
 router.post("/saveAnswers", async (req, res) => {
   const { assessment_id, student_uni_id, index, answer } = req.body;
@@ -98,6 +99,8 @@ router.post("/getSubmissionsForAssessment", async (req, res) => {
       student_uni_id: true,
       marks_awarded: true,
       marks_released: true,
+      auto_evaluated: true,
+      manually_evaluated: true,
       _id: false,
     }
   );
@@ -118,6 +121,8 @@ router.post("/getSubmissionsForAssessment", async (req, res) => {
         uni_id: user.uni_id,
         marks_awarded: submissions[i].marks_awarded,
         marks_released: submissions[i].marks_released,
+        manually_evaluated: submissions[i].manually_evaluated,
+        auto_evaluated: submissions[i].auto_evaluated,
       };
 
       // console.log(finalUser);
@@ -154,6 +159,7 @@ router.post("/saveMarksAwarded", (req, res) => {
     marks_awarded,
     feedback,
     marks_released,
+    manually_evaluated,
   } = req.body;
   SubmissionsModel.findOneAndUpdate(
     { assessment_id: assessment_id, student_uni_id: student_uni_id },
@@ -162,6 +168,7 @@ router.post("/saveMarksAwarded", (req, res) => {
         marks_awarded: marks_awarded,
         feedback: feedback,
         marks_released: marks_released,
+        manually_evaluated: manually_evaluated,
       },
     },
     function (err) {
@@ -181,6 +188,93 @@ router.post("/updateMarksReleased", (req, res) => {
       res.json({ message: "success" });
     }
   );
+});
+
+router.post("/autoEvaluate", async (req, res) => {
+  const { assessment_id, uni_ids } = req.body;
+  let correctAnswers = [];
+  let marksForCorrectAnswers = [];
+  const marks = await AssessmentsModel.findOne(
+    { _id: assessment_id },
+    { questions: true, _id: false }
+  );
+
+  if (marks) {
+    for (let i = 0; i < marks.questions.length; i++) {
+      if (marks.questions[i].questionType === "mcq") {
+        correctAnswers.push(marks.questions[i].correctAnswer);
+        marksForCorrectAnswers.push(marks.questions[i].questionMarks);
+      } else if (marks.questions[i].questionType === "fib") {
+        correctAnswers.push(marks.questions[i].correctFIBAnswers);
+        marksForCorrectAnswers.push(marks.questions[i].questionMarks);
+      } else {
+        correctAnswers.push("");
+        marksForCorrectAnswers.push("");
+      }
+    }
+
+    console.log("Marks: " + JSON.stringify(marksForCorrectAnswers));
+    console.log("Correct Answers: " + JSON.stringify(correctAnswers));
+
+    for (let i = 0; i < uni_ids.length; i++) {
+      const submission = await SubmissionsModel.findOne(
+        { assessment_id: assessment_id, student_uni_id: uni_ids[i] },
+        { answers: true, _id: false }
+      );
+      if (submission) {
+        let marksAwarded = [];
+        console.log("Student ----------------- " + (i + 1));
+        for (let j = 0; j < submission.answers.length; j++) {
+          if (marks.questions[j].questionType === "mcq") {
+            // console.log("Student answer: " + submission.answers[j]);
+            if (correctAnswers[j] === submission.answers[j]) {
+              marksAwarded.push(String(marksForCorrectAnswers[j]));
+            } else {
+              marksAwarded.push("0");
+            }
+          } else if (marks.questions[j].questionType === "fib") {
+            const studentFIBAnswers = submission.answers[j];
+            let totalFIBCount = studentFIBAnswers.length;
+            let correctFIBCount = 0;
+            for (
+              let k = 0;
+              k < marks.questions[j].correctFIBAnswers.length;
+              k++
+            ) {
+              // console.log(
+              //   "correct ans: " + marks.questions[j].correctFIBAnswers[k]
+              // );
+              // console.log("student ans: " + studentFIBAnswers[k]);
+              if (
+                marks.questions[j].correctFIBAnswers[k] === studentFIBAnswers[k]
+              ) {
+                correctFIBCount++;
+              }
+            }
+            const finalMarks =
+              (correctFIBCount / totalFIBCount) * marksForCorrectAnswers[j];
+            marksAwarded.push(String(finalMarks));
+          } else {
+            marksAwarded.push("");
+          }
+        }
+
+        console.log("marks awarded: " + marksAwarded);
+        SubmissionsModel.findOneAndUpdate(
+          { assessment_id: assessment_id, student_uni_id: uni_ids[i] },
+          {
+            $set: {
+              marks_awarded: marksAwarded,
+              auto_evaluated: true,
+              marks_released: false,
+            },
+          }
+        )
+          .then(() => console.log("done"))
+          .catch((err) => console.log(err));
+      }
+    }
+  }
 });
 
 module.exports = router;

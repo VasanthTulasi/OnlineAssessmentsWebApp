@@ -19,17 +19,25 @@ const schema = new mongoose.Schema(
       required: true,
     },
     marks_awarded: {
-      type:Array,
-      required: false
+      type: Array,
+      required: false,
     },
-    feedback:{
+    feedback: {
       type: String,
-      required: false
+      required: false,
     },
-    marks_released:{
+    marks_released: {
       type: Boolean,
-      required:false
-    }
+      required: false,
+    },
+    manually_evaluated: {
+      type: Boolean,
+      required: false,
+    },
+    auto_evaluated: {
+      type: Boolean,
+      required: false,
+    },
   },
   { collection: "Submissions", versionKey: false }
 );

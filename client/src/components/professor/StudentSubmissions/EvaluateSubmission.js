@@ -75,7 +75,8 @@ function EvaluateSubmission() {
           student_uni_id: state.student_uni_id,
           marks_awarded: marksAwarded,
           feedback: feedback,
-          marks_released: false
+          marks_released: false,
+          manually_evaluated: true
         })
         .then((res) => {
           if (res.data.message === "success") {
@@ -322,32 +323,22 @@ function EvaluateSubmission() {
           />
         </div>
       </div>
-
-      {/* {moduleCode !== "" && ( */}
       <div
         style={{
           textAlign: "center",
           width: "100%",
           backgroundColor: "#282c34",
-          // bacgroundColor: "#f2cc8f",
           paddingTop: "10px",
           paddingBottom: "10px",
-          // position: "fixed",
-          // bottom: 0,
-          // borderTop: "1px solid #f2cc8f"
         }}
       >
         <button className="new-question-button" onClick={goBack}>
           Go Back
         </button>
-        {/* <button className="new-question-button" onClick={addNewQuestion}>
-          Add New Question
-        </button> */}
         <button className="new-question-button" onClick={save}>
           Save
         </button>
       </div>
-      {/* )} */}
     </EvalSubmission>
   );
 }

@@ -50,17 +50,19 @@ function ViewSubmissions() {
         else {
           setSubmissionsLoaded(true);
           setSubmissionsArray(res.data);
-          console.log(res.data[0].marks_released);
-          console.log(res.data[1].marks_released);
+          // console.log(res.data[0].marks_released);
+          // console.log(res.data[1].marks_released);
         }
       });
   }, []);
 
-
   const calculateMarksAwarded = (index) => {
     let marks = submissionsArray[index].marks_awarded;
     let sum = 0;
-    for (let i = 0; i < marks.length; i++) sum += parseInt(marks[i]);
+    for (let i = 0; i < marks.length; i++) {
+      if (marks[i] === "") continue;
+      sum += parseInt(marks[i]);
+    }
     return sum;
   };
 
@@ -77,9 +79,41 @@ function ViewSubmissions() {
           modSubmissionsArray[index].marks_released = true;
           setSubmissionsArray(modSubmissionsArray);
         } else {
-          alert("Error: "+ res.data.message);
+          alert("Error: " + res.data.message);
         }
       });
+  };
+
+  const goBack = () => {
+    navigate("../viewAssessments");
+  };
+
+  const autoEvaluteAll = () => {
+    let uniIds = [];
+    for (let i = 0; i < submissionsArray.length; i++) {
+      uniIds.push(submissionsArray[i].uni_id);
+    }
+    // console.log(submissionsArray[1].uni_id)
+    axios3.post("/autoEvaluate", {
+      assessment_id: state._id,
+      uni_ids: uniIds,
+    });
+  };
+
+  const getEvaluationStatus = (index) => {
+    const marksAwarded = submissionsArray[index].marks_awarded;
+    const autoEvaluated = submissionsArray[index].auto_evaluated;
+    const manuallyEvaluated = submissionsArray[index].manually_evaluated;
+    if (!autoEvaluated && !manuallyEvaluated) {
+      return "Not Yet Evaluated";
+    }
+    if (autoEvaluated && manuallyEvaluated) {
+      return "Evaluated (Auto & Manual)";
+    } else if (autoEvaluated) {
+      return "Auto Evaluated";
+    } else {
+      return "Evaluated Manually";
+    }
   };
 
   return (
@@ -101,10 +135,10 @@ function ViewSubmissions() {
                 <td className="module-data headers-color">
                   Student University ID
                 </td>
-                <td className="module-data end headers-color">Marks Awarded</td>
-                {/* <td className="module-data end headers-color">
+                <td className="module-data headers-color">Marks Awarded</td>
+                <td className="module-data end headers-color">
                   Evaluation Status
-                </td> */}
+                </td>
               </tr>
               {submissionsArray.map((ele, index) => {
                 return (
@@ -113,27 +147,23 @@ function ViewSubmissions() {
                     <td className="module-data mid">{ele.first_name}</td>
                     <td className="module-data mid">{ele.last_name}</td>
                     <td className="module-data mid">{ele.uni_id}</td>
-                    <td className="module-data end">
+                    <td className="module-data mid">
                       {ele.marks_awarded.length !== 0
                         ? calculateMarksAwarded(index) +
                           " out of " +
                           state.total_marks
                         : "Not Yet Available"}
                     </td>
+                    <td className="module-data end">
+                      {getEvaluationStatus(index)}
+                    </td>
+                    {/* {ele.auto_evaluated && (
+                      <td className="module-data end">Completed</td>
+                    )} */}
                     <td className="module-data mid" style={{ border: "none" }}>
                       <button
                         id={"evaluateSubmission_" + index}
                         onClick={evaluateSubmission}
-                        // disabled={
-                        //   new Date() < new Date(ele.window_start_time)
-                        //     ? true
-                        //     : false
-                        // }
-                        // className={
-                        //   new Date() < new Date(ele.window_start_time)
-                        //     ? "module-data-button button-disabled"
-                        //     : "module-data-button"
-                        // }
                         className="module-data-button"
                       >
                         {ele.marks_awarded.length !== 0
@@ -184,6 +214,25 @@ function ViewSubmissions() {
               )}
             </tbody>
           </table>
+          <div
+            style={{
+              textAlign: "center",
+              width: "100%",
+              backgroundColor: "#282c34",
+              paddingTop: "10px",
+              paddingBottom: "10px",
+            }}
+          >
+            <button className="new-question-button" onClick={goBack}>
+              Go Back
+            </button>
+            <button className="new-question-button" onClick={autoEvaluteAll}>
+              Auto-evalute All
+            </button>
+            <button className="new-question-button" onClick={null}>
+              Release All Marks
+            </button>
+          </div>
         </div>
       </ViewSubs>
     </>
@@ -315,6 +364,24 @@ const ViewSubs = styled.div`
 
   .headers-color {
     color: #61dafb;
+  }
+
+  .new-question-button {
+    margin: 20px 10px;
+    border: 1px solid black;
+    color: #282c34;
+    background-color: white;
+    font-family: "Sourse Sans Pro ", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    width: max-content;
+    border-radius: 25px;
+    padding: 7px 20px 7px 20px;
+    text-align: center;
+  }
+
+  .new-question-button {
+    cursor: pointer;
   }
 `;
 

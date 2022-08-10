@@ -21,10 +21,8 @@ function TakeAssessments() {
     useState(true);
   const [isAssessmentEndedModalVisible, setIsAssessmentEndedModalVisible] =
     useState(false);
-  const [
-    isAssessmentTimeElapsedModalVisible,
-    setIsAssessmentTimeElapsedModalVisible,
-  ] = useState(false);
+  const [assessmentElapsedMessage, setAssessmentElapsedMessage] =
+    useState(null);
   const [timeLeft, setTimeLeft] = useState("");
   const [isInternetLost, setIsInternetLost] = useState(false);
   const { state } = useLocation();
@@ -42,6 +40,7 @@ function TakeAssessments() {
   const [errorMessageWithOptions, setErrorMessageWithOptions] = useState("");
   const submitButton = useRef(null);
   const countdownTimer = useRef(null);
+  const attemptsLeft = useRef(null);
 
   const goBack = () => {
     setNavLinksStyle("menu");
@@ -145,7 +144,7 @@ function TakeAssessments() {
   };
 
   const updateLastAttemptedQuestionInDb = (quesIndex) => {
-    console.log("Updated last question: " + quesIndex);
+    // console.log("Updated last question: " + quesIndex);
     axios.post("/updateLastAttemptedQuestion", {
       assessment_id: state.assessment._id,
       student_uni_id: loggedInUserDetails.uni_id,
@@ -156,12 +155,16 @@ function TakeAssessments() {
   useEffect(() => {
     window.addEventListener("online", () => {
       console.log("Internet is active");
-      continueOnExitAssessment();
+      continueAssessment();
     });
     window.addEventListener("offline", () => {
       console.log("Internet is lost");
       clearInterval(countdownTimer.current);
-      setIsInternetLost(true);
+      if (attemptsLeft.current === 0) {
+        setAssessmentElapsedMessage(
+          "Internet connection is lost again. You have elapsed the maximum number of attempts for this assessment."
+        );
+      } else setIsInternetLost(true);
     });
     return () => {
       clearInterval(countdownTimer.current);
@@ -171,37 +174,39 @@ function TakeAssessments() {
     };
   }, []);
 
-  const continueOnExitAssessment = () => {
-    axios
-      .post("/getAssessmentAttemptsLeft", {
-        assessment_id: state.assessment._id,
-        student_uni_id: loggedInUserDetails.uni_id,
-      })
-      .then((res) => {
-        if (res.data.attempts_left === 0) {
-          alert("Max attempts elapsed.. go back now");
-        } else {
-          updateAttemptsLeft(res.data.attempts_left - 1);
-          continueAssessment();
-        }
-      });
+  const continueAssessment = () => {
+    // axios
+    //   .post("/getAssessmentAttemptsLeft", {
+    //     assessment_id: state.assessment._id,
+    //     student_uni_id: loggedInUserDetails.uni_id,
+    //   })
+    //   .then((res) => {
+    //     if (res.data.attempts_left === 0) {
+    //       alert("Max attempts elapsed.. go back now");
+    //     } else {
+    //       updateAttemptsLeft(res.data.attempts_left - 1);
+    //       continueAssessment();
+    //     }
+    //   });
+    updateAttemptsLeft(attemptsLeft.current - 1);
+    continueTimer();
   };
 
-  const continueAssessment = () => {
+  const continueTimer = () => {
     axios
       .post("/getAssessmentTimeLeft", {
         assessment_id: state.assessment._id,
         student_uni_id: loggedInUserDetails.uni_id,
       })
       .then((res) => {
-        console.log("Reached here");
+        // console.log("Reached here");
         startCountDownTimer(res.data.time_left);
         setIsInternetLost(false);
       });
   };
 
   useEffect(() => {
-    console.log("Question Index: " + questionIndex);
+    // console.log("Question Index: " + questionIndex);
     setErrorMessage("");
     setErrorMessageWithOptions("");
     if (questionIndex < questions.length) {
@@ -227,12 +232,12 @@ function TakeAssessments() {
   const saveFIBAnswers = (quesIndex, answerValue, changedIndex = null) => {
     setErrorMessageWithOptions("");
     if (changedIndex != null) {
-      console.log("modified array");
+      // console.log("modified array");
       let modArr = [...answers];
       modArr[quesIndex][changedIndex] = answerValue;
       setAnswers(modArr);
     } else {
-      console.log("Empty array set");
+      // console.log("Empty array set");
       let modArr = [...answers];
       modArr[quesIndex] = answerValue;
       setAnswers(modArr);
@@ -270,6 +275,7 @@ function TakeAssessments() {
     );
 
     if (state.submissionData == "") {
+      attemptsLeft.current = 2;
       axios
         .post("/createNewSubmission", {
           assessment_id: state.assessment._id,
@@ -282,7 +288,7 @@ function TakeAssessments() {
           numberOfQuestions: questions.length,
         })
         .then((res) => {
-          console.log(res.data.message);
+          // console.log(res.data.message);
           if (res.data.message === "success") {
             setIsInstuctionsModalVisible(false);
             setNavLinksStyle("menu disabled-menu");
@@ -290,6 +296,8 @@ function TakeAssessments() {
           } else alert("Error! Please try again later.");
         });
     } else {
+      attemptsLeft.current =
+        state.submissionData.session_details.attempts_left - 1;
       axios
         .post("/updateAttemptsLeft", {
           assessment_id: state.assessment._id,
@@ -320,37 +328,40 @@ function TakeAssessments() {
   };
 
   const startCountDownTimer = (durInMilliSec) => {
-    // durInMilliSec = 10000;
     let time = getTimeLeft(durInMilliSec);
     setTimeLeft(time);
     let timeChangedCounter = 0;
     countdownTimer.current = setInterval(() => {
-      console.log("running");
+      console.log("running timer");
       durInMilliSec -= 1000;
       time = getTimeLeft(durInMilliSec);
       setTimeLeft(time);
       timeChangedCounter++;
       if (timeChangedCounter == 5) {
-        updateTimeLeftInDb(durInMilliSec);
+        // updateTimeLeftInDb(durInMilliSec);
         timeChangedCounter = 0;
       }
       if (durInMilliSec === 0) {
         clearInterval(countdownTimer.current);
-        setIsAssessmentTimeElapsedModalVisible(true);
+        setAssessmentElapsedMessage(
+          "Assessment time has elapsed and it is ended."
+        );
         setNavLinksStyle("menu");
         updateAttemptsLeft(0);
       }
     }, 1000);
 
-    console.log("timer value is " + countdownTimer.current);
+    // console.log("timer value is " + countdownTimer.current);
   };
 
   const updateAttemptsLeft = (val) => {
+    if (val < 0) val = 0;
     axios.post("/updateAttemptsLeft", {
       assessment_id: state.assessment._id,
       student_uni_id: loggedInUserDetails.uni_id,
       attempts_left: val,
     });
+    attemptsLeft.current = val;
   };
 
   const getTimeLeft = (durInMilliSec) => {
@@ -395,10 +406,11 @@ function TakeAssessments() {
         />
       )}
       {isInternetLost && <InternetConnectionLostModal />}
-      {isAssessmentTimeElapsedModalVisible && (
+      {assessmentElapsedMessage && (
         <AssessmentTimeElapsedModal
+          userMessage={assessmentElapsedMessage}
           okayClicked={() => {
-            setIsAssessmentTimeElapsedModalVisible(false);
+            setAssessmentElapsedMessage(null);
             navigate("../viewAssessments");
           }}
         />

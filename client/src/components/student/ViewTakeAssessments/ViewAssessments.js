@@ -84,6 +84,26 @@ function ViewAssessments() {
     });
   }, [moduleCode]);
 
+  const getSubmissionStatus = (index) => {
+    if (submissionsDataArray[index] == "") {
+      if (new Date() < new Date(assessmentsArray[index].window_end_time))
+        return "Yet to Submit";
+      else return "Not Submitted";
+    } else {
+      if (submissionsDataArray[index].session_details.attempts_left <= 0) {
+        if (submissionsDataArray[index].answers.length === 0)
+          return "Not Submitted";
+        else return "Submitted";
+      } else if (
+        submissionsDataArray[index].session_details.attempts_left > 0
+      ) {
+        if (new Date() < new Date(assessmentsArray[index].window_end_time))
+          return "Yet to Submit";
+        else return "Not Submitted";
+      }
+    }
+  };
+
   const customStyles = {
     valueContainer: (provided) => ({
       ...provided,
@@ -145,7 +165,7 @@ function ViewAssessments() {
                 </td>
                 {/* <td className="module-data headers-color">Assesment Status</td> */}
                 <td className="module-data end headers-color">
-                  My Submission Status
+                  Your Submission Status
                 </td>
                 {/* <td className="module-data end headers-color">Attempts Left</td> */}
               </tr>
@@ -165,21 +185,22 @@ function ViewAssessments() {
                       <td className="module-data mid">
                         {new Date(ele.window_end_time).toString().slice(0, 21)}
                       </td>
-                      {/* <td className="module-data mid">
-                        {new Date() > new Date(ele.window_end_time)
-                          ? "Completed"
-                          : new Date() > new Date(ele.window_start_time)
-                          ? "Ongoing"
-                          : "Yet To Start"}
-                      </td> */}
                       <td className="module-data end">
+                        {getSubmissionStatus(index)}
+                        {/* {new Date() > new Date(ele.window_end_time)
+                          ? "Submitted"
+                          : new Date() > new Date(ele.window_start_time)
+                          ? "Not Submitted"
+                          : "Yet To Start"} */}
+                      </td>
+                      {/* <td className="module-data end">
                         {submissionsDataArray[index] !== ""
                           ? submissionsDataArray[index].session_details
                               .attempts_left === 0
                             ? "Submitted"
                             : "To Be Continued"
                           : "Yet to Attempt"}
-                      </td>
+                      </td> */}
                       {/* <td className="module-data end">
                         {submissionsDataArray[index] !== ""
                           ? submissionsDataArray[index].session_details

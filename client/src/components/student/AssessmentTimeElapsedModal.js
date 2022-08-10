@@ -5,7 +5,7 @@ function AssessmentTimeElapsedModal(props) {
   return (
     <Main>
       <ModalBox>
-        <div className="main-heading">Time Elapsed!</div>
+        <div className="main-heading">{props.userMessage}</div>
         <br/>
         <br/>
         <label className="modal-heading">

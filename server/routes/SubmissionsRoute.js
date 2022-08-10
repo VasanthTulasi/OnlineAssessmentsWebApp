@@ -10,7 +10,7 @@ router.post("/saveAnswers", async (req, res) => {
     { $set: { [`answers.${index}`]: answer } },
     function (err) {
       if (err) res.json({ message: err });
-      res.json({ message: "success" });
+      else res.json({ message: "success" });
     }
   );
 });
@@ -69,7 +69,7 @@ router.post("/updateTimeLeft", (req, res) => {
     { $set: { "session_details.time_left": time_left } },
     function (err) {
       if (err) res.json({ message: err });
-      res.json({ message: "success" });
+      else res.json({ message: "success" });
     }
   );
 });
@@ -85,7 +85,7 @@ router.post("/updateLastAttemptedQuestion", (req, res) => {
     },
     function (err) {
       if (err) res.json({ message: err });
-      res.json({ message: "success" });
+      else res.json({ message: "success" });
     }
   );
 });
@@ -190,6 +190,37 @@ router.post("/updateMarksReleased", (req, res) => {
   );
 });
 
+router.post("/getAssessmentTimeLeft", async (req, res) => {
+  const { assessment_id, student_uni_id } = req.body;
+  const submission = await SubmissionsModel.findOne(
+    {
+      assessment_id: assessment_id,
+      student_uni_id: student_uni_id,
+    },
+    { session_details: true, _id: false }
+  );
+  if (submission) {
+    res.json({ time_left: submission.session_details.time_left });
+  }
+});
+
+
+router.post("/getAssessmentAttemptsLeft", async (req, res) => {
+  const { assessment_id, student_uni_id } = req.body;
+  const submission = await SubmissionsModel.findOne(
+    {
+      assessment_id: assessment_id,
+      student_uni_id: student_uni_id,
+    },
+    { session_details: true, _id: false }
+  );
+  if (submission) {
+    res.json({ attempts_left: submission.session_details.attempts_left });
+  }
+});
+
+
+
 router.post("/autoEvaluate", async (req, res) => {
   const { assessment_id, uni_ids } = req.body;
   let correctAnswers = [];
@@ -274,6 +305,7 @@ router.post("/autoEvaluate", async (req, res) => {
           .catch((err) => console.log(err));
       }
     }
+    res.json({ message: "success" });
   }
 });
 

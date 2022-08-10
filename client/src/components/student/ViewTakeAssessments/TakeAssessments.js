@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import AssessmentInstructionsModal from "../AssessmentInstructionsModal";
 import AssessmentEndedModal from "../AssessmentEndedModal";
 import AssessmentTimeElapsedModal from "../AssessmentTimeElapsedModal";
+import InternetConnectionLostModal from "../InternetConnectionLostModal";
 import Axios from "axios";
 import MCQTemplate from "../AnswerTemplates/MCQTemplate";
 import FIBTemplate from "../AnswerTemplates/FIBTemplate";
@@ -25,6 +26,7 @@ function TakeAssessments() {
     setIsAssessmentTimeElapsedModalVisible,
   ] = useState(false);
   const [timeLeft, setTimeLeft] = useState("");
+  const [isInternetLost, setIsInternetLost] = useState(false);
   const { state } = useLocation();
   const navigate = useNavigate();
   const axios = Axios.create({
@@ -39,7 +41,7 @@ function TakeAssessments() {
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessageWithOptions, setErrorMessageWithOptions] = useState("");
   const submitButton = useRef(null);
-  let countdownTimer;
+  const countdownTimer = useRef(null);
 
   const goBack = () => {
     setNavLinksStyle("menu");
@@ -71,15 +73,21 @@ function TakeAssessments() {
       questions[questionIndex].questionType === "essay" &&
       answers[questionIndex] === ""
     ) {
-      setErrorMessageWithOptions("Are you sure you want to continue with an empty response for this question.");
+      setErrorMessageWithOptions(
+        "Are you sure you want to continue with an empty response for this question."
+      );
       return false;
     } else if (questions[questionIndex].questionType === "coding") {
       if (answers[questionIndex][1] === "") {
-        setErrorMessageWithOptions("Are you sure you want to continue with an empty response for this question.");
+        setErrorMessageWithOptions(
+          "Are you sure you want to continue with an empty response for this question."
+        );
         return false;
       } else {
         if (answers[questionIndex][0] === "") {
-          setErrorMessage("Please select the programming language before proceedind further!");
+          setErrorMessage(
+            "Please select the programming language before proceedind further!"
+          );
           return false;
         }
       }
@@ -95,6 +103,24 @@ function TakeAssessments() {
   };
 
   const saveAnswerInDB = () => {
+    // if (navigator.onLine) console.log("ok");
+    // else {
+    //   console.log("not ok");
+    //   return;
+    // }
+    // submitButton.current.textContent = "Saving...";
+
+    // axios({
+    //   method: "get",
+    //   url: "https://www.google.com/",
+    //   headers: {
+    //     "Access-Control-Allow-Origin": "*",
+    //     "Access-Control-Allow-Methods": "GET",
+    //   },
+    // }).then((res) => {
+    //   console.log("From google" + res);
+    // });
+
     axios
       .post("/saveAnswers", {
         assessment_id: state.assessment._id,
@@ -102,13 +128,18 @@ function TakeAssessments() {
         index: questionIndex,
         answer: answers[questionIndex],
       })
-      .then(() => {
-        if (questionIndex < questions.length - 1)
-          setQuestionIndex((prevVal) => prevVal + 1);
-        else {
-          setIsAssessmentEndedModalVisible(true);
-          updateAttemptsLeftToZero();
-          setNavLinksStyle("menu");
+      .then((res) => {
+        if (res.data.message === "success") {
+          // submitButton.current.textContent = "Save & Next";
+          if (questionIndex < questions.length - 1)
+            setQuestionIndex((prevVal) => prevVal + 1);
+          else {
+            setIsAssessmentEndedModalVisible(true);
+            updateAttemptsLeft(0);
+            setNavLinksStyle("menu");
+          }
+        } else {
+          alert("Error: " + JSON.stringify(res.data.message));
         }
       });
   };
@@ -123,11 +154,51 @@ function TakeAssessments() {
   };
 
   useEffect(() => {
+    window.addEventListener("online", () => {
+      console.log("Internet is active");
+      continueOnExitAssessment();
+    });
+    window.addEventListener("offline", () => {
+      console.log("Internet is lost");
+      clearInterval(countdownTimer.current);
+      setIsInternetLost(true);
+    });
     return () => {
-      clearInterval(countdownTimer);
+      clearInterval(countdownTimer.current);
+      window.removeEventListener("online", () => {});
+      window.removeEventListener("offline", () => {});
       setNavLinksStyle("menu");
     };
   }, []);
+
+  const continueOnExitAssessment = () => {
+    axios
+      .post("/getAssessmentAttemptsLeft", {
+        assessment_id: state.assessment._id,
+        student_uni_id: loggedInUserDetails.uni_id,
+      })
+      .then((res) => {
+        if (res.data.attempts_left === 0) {
+          alert("Max attempts elapsed.. go back now");
+        } else {
+          updateAttemptsLeft(res.data.attempts_left - 1);
+          continueAssessment();
+        }
+      });
+  };
+
+  const continueAssessment = () => {
+    axios
+      .post("/getAssessmentTimeLeft", {
+        assessment_id: state.assessment._id,
+        student_uni_id: loggedInUserDetails.uni_id,
+      })
+      .then((res) => {
+        console.log("Reached here");
+        startCountDownTimer(res.data.time_left);
+        setIsInternetLost(false);
+      });
+  };
 
   useEffect(() => {
     console.log("Question Index: " + questionIndex);
@@ -253,31 +324,32 @@ function TakeAssessments() {
     let time = getTimeLeft(durInMilliSec);
     setTimeLeft(time);
     let timeChangedCounter = 0;
-
-    countdownTimer = setInterval(() => {
+    countdownTimer.current = setInterval(() => {
       console.log("running");
       durInMilliSec -= 1000;
       time = getTimeLeft(durInMilliSec);
       setTimeLeft(time);
       timeChangedCounter++;
       if (timeChangedCounter == 5) {
-        // updateTimeLeftInDb(durInMilliSec);
+        updateTimeLeftInDb(durInMilliSec);
         timeChangedCounter = 0;
       }
       if (durInMilliSec === 0) {
-        clearInterval(countdownTimer);
+        clearInterval(countdownTimer.current);
         setIsAssessmentTimeElapsedModalVisible(true);
         setNavLinksStyle("menu");
-        updateAttemptsLeftToZero();
+        updateAttemptsLeft(0);
       }
     }, 1000);
+
+    console.log("timer value is " + countdownTimer.current);
   };
 
-  const updateAttemptsLeftToZero = () => {
+  const updateAttemptsLeft = (val) => {
     axios.post("/updateAttemptsLeft", {
       assessment_id: state.assessment._id,
       student_uni_id: loggedInUserDetails.uni_id,
-      attempts_left: 0,
+      attempts_left: val,
     });
   };
 
@@ -322,6 +394,7 @@ function TakeAssessments() {
           doNotProceed={goBack}
         />
       )}
+      {isInternetLost && <InternetConnectionLostModal />}
       {isAssessmentTimeElapsedModalVisible && (
         <AssessmentTimeElapsedModal
           okayClicked={() => {
@@ -330,7 +403,6 @@ function TakeAssessments() {
           }}
         />
       )}
-
       {isAssessmentEndedModalVisible && (
         <AssessmentEndedModal
           okayClicked={() => {
@@ -473,7 +545,7 @@ const TakeAssess = styled.div`
     margin: 40px;
   }
 
-  .error-message{
+  .error-message {
     color: red;
     font-family: "Source Sans Pro", sans-serif;
     font-weight: 400;
@@ -509,12 +581,11 @@ const TakeAssess = styled.div`
     padding: 7px 20px 7px 20px;
   }
 
-  .error-option-button:hover{
+  .error-option-button:hover {
     cursor: pointer;
     color: white;
     border: 1px solid white;
   }
-
 `;
 
 export default TakeAssessments;

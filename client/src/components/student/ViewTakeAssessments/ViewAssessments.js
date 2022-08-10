@@ -143,9 +143,11 @@ function ViewAssessments() {
                 <td className="module-data headers-color">
                   Assessment End Time
                 </td>
-                <td className="module-data headers-color">Assesment Status</td>
-                <td className="module-data headers-color">Your Submission Status</td>
-                <td className="module-data end headers-color">Attempts Left</td>
+                {/* <td className="module-data headers-color">Assesment Status</td> */}
+                <td className="module-data end headers-color">
+                  My Submission Status
+                </td>
+                {/* <td className="module-data end headers-color">Attempts Left</td> */}
               </tr>
               {submissionsDataArray.length !== 0 &&
                 assessmentsArray.map((ele, index) => {
@@ -163,14 +165,14 @@ function ViewAssessments() {
                       <td className="module-data mid">
                         {new Date(ele.window_end_time).toString().slice(0, 21)}
                       </td>
-                      <td className="module-data mid">
+                      {/* <td className="module-data mid">
                         {new Date() > new Date(ele.window_end_time)
                           ? "Completed"
                           : new Date() > new Date(ele.window_start_time)
                           ? "Ongoing"
                           : "Yet To Start"}
-                      </td>
-                      <td className="module-data mid">
+                      </td> */}
+                      <td className="module-data end">
                         {submissionsDataArray[index] !== ""
                           ? submissionsDataArray[index].session_details
                               .attempts_left === 0
@@ -178,12 +180,12 @@ function ViewAssessments() {
                             : "To Be Continued"
                           : "Yet to Attempt"}
                       </td>
-                      <td className="module-data end">
+                      {/* <td className="module-data end">
                         {submissionsDataArray[index] !== ""
                           ? submissionsDataArray[index].session_details
                               .attempts_left
                           : 3}
-                      </td>
+                      </td> */}
                       <td>
                         <button
                           id={"beginAssessment_" + index}

@@ -1,11 +1,14 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useContext } from "react";
 import styled from "styled-components";
 import SingleSelect from "react-select";
+import { LoginContext } from "../../../contexts/LoginContext";
 
 function CodingTemplate(props) {
   const { question, questionIndex, totalQuestions, assessment_id } = props;
   const textAreaComponent = useRef(null);
   const codingLanguageComponent = useRef(null);
+  const { loggedInUserDetails } = useContext(LoginContext);
+  const uniId = loggedInUserDetails.uni_id;
 
   const programmingLanguages =
     question.codingLanguage === "Any"
@@ -24,7 +27,11 @@ function CodingTemplate(props) {
   const saveCodingLanguage = (selOption) => {
     if (question.codingLanguage === "Any")
       localStorage.setItem(
-        assessment_id + "_coding_language_" + String(questionIndex),
+        assessment_id +
+          "_" +
+          uniId +
+          "_coding_language_" +
+          String(questionIndex),
         selOption.value
       );
     props.saveCodingLanguage(questionIndex, selOption.value);
@@ -35,17 +42,21 @@ function CodingTemplate(props) {
     const codingLanguage =
       question.codingLanguage === "Any"
         ? localStorage.getItem(
-            assessment_id + "_coding_language_" + String(questionIndex)
+            assessment_id +
+              "_" +
+              uniId +
+              "_coding_language_" +
+              String(questionIndex)
           )
         : question.codingLanguage;
     const codingAnswer = localStorage.getItem(
-      assessment_id + "_answer_" + String(questionIndex)
+      assessment_id + "_" + uniId + "_answer_" + String(questionIndex)
     );
     if (codingLanguage == null) initialArray.push("");
     else initialArray.push(codingLanguage);
 
     initialArray.push(codingAnswer);
-    console.log("init arry"+ initialArray);
+    console.log("init arry" + initialArray);
     props.saveInitialCodingArray(questionIndex, initialArray);
   }, []);
 
@@ -106,10 +117,18 @@ function CodingTemplate(props) {
             return question.codingLanguage === "Any"
               ? {
                   label: localStorage.getItem(
-                    assessment_id + "_coding_language_" + String(questionIndex)
+                    assessment_id +
+                      "_" +
+                      uniId +
+                      "_coding_language_" +
+                      String(questionIndex)
                   ),
                   value: localStorage.getItem(
-                    assessment_id + "_coding_language_" + String(questionIndex)
+                    assessment_id +
+                      "_" +
+                      uniId +
+                      "_coding_language_" +
+                      String(questionIndex)
                   ),
                 }
               : {
@@ -126,12 +145,12 @@ function CodingTemplate(props) {
         placeholder="Type your code here... It will be autosaved as you write."
         onChange={(event) =>
           localStorage.setItem(
-            assessment_id + "_answer_" + String(questionIndex),
+            assessment_id + "_" + uniId + "_answer_" + String(questionIndex),
             event.target.value
           )
         }
         defaultValue={localStorage.getItem(
-          assessment_id + "_answer_" + String(questionIndex)
+          assessment_id + "_" + uniId + "_answer_" + String(questionIndex)
         )}
       />
     </CodingAnswer>

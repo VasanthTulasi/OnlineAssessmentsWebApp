@@ -84,6 +84,31 @@ function ViewSubmissions() {
       });
   };
 
+  const releaseMarksByIndex = (index) => {
+    axios3
+      .post("/updateMarksReleased", {
+        assessment_id: state._id,
+        student_uni_id: submissionsArray[index].uni_id,
+      })
+      .then((res) => {
+        if (res.data.message === "success") {
+          let modSubmissionsArray = [...submissionsArray];
+          modSubmissionsArray[index].marks_released = true;
+          setSubmissionsArray(modSubmissionsArray);
+        } else {
+          alert("Error: " + res.data.message);
+        }
+      });
+  };
+
+  const releaseMarksForAll = () => {
+    submissionsArray.map((ele, index) => {
+      if (ele.marks_released == false) {
+        releaseMarksByIndex(index);
+      }
+    });
+  };
+
   const goBack = () => {
     navigate("../viewAssessments");
   };
@@ -229,7 +254,10 @@ function ViewSubmissions() {
             <button className="new-question-button" onClick={autoEvaluteAll}>
               Auto-evalute All
             </button>
-            <button className="new-question-button" onClick={null}>
+            <button
+              className="new-question-button"
+              onClick={releaseMarksForAll}
+            >
               Release All Marks
             </button>
           </div>

@@ -217,7 +217,11 @@ function TakeAssessments() {
 
     if (questions[questionIndex].questionType === "essay") {
       answers[questionIndex] = localStorage.getItem(
-        state.assessment._id + "_answer_" + String(questionIndex)
+        state.assessment._id +
+          "_" +
+          loggedInUserDetails.uni_id +
+          "_answer_" +
+          String(questionIndex)
       );
     }
   }, [questionIndex]);
@@ -232,12 +236,10 @@ function TakeAssessments() {
   const saveFIBAnswers = (quesIndex, answerValue, changedIndex = null) => {
     setErrorMessageWithOptions("");
     if (changedIndex != null) {
-      // console.log("modified array");
       let modArr = [...answers];
       modArr[quesIndex][changedIndex] = answerValue;
       setAnswers(modArr);
     } else {
-      // console.log("Empty array set");
       let modArr = [...answers];
       modArr[quesIndex] = answerValue;
       setAnswers(modArr);

@@ -290,7 +290,6 @@ function TakeAssessments() {
           numberOfQuestions: questions.length,
         })
         .then((res) => {
-          // console.log(res.data.message);
           if (res.data.message === "success") {
             setIsInstuctionsModalVisible(false);
             setNavLinksStyle("menu disabled-menu");

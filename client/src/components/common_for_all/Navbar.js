@@ -52,7 +52,10 @@ function NavBar(props) {
               </Link>
             </li>
             <li>
-              <Link to="/results" className={props.navLinksAccess}>
+              <Link
+                to="/viewCheckResults/viewAssessments"
+                className={props.navLinksAccess}
+              >
                 Results
               </Link>
             </li>

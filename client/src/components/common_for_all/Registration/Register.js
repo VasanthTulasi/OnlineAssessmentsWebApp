@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import styled from "styled-components";
 import LoginRightBGImage from "../../../svgs/right_background.svg";
-import { useState} from "react";
+import { useState } from "react";
 import Axios from "axios";
 import { LandingContext } from "../../../contexts/LandingContext";
 
@@ -22,6 +22,7 @@ function Register() {
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
   const [registerReenterPassword, setRegisterReenterPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const alreadyRegisterClicked = () => {
     setCurrentSection("login");
@@ -29,22 +30,41 @@ function Register() {
 
   //Registration Methods
   const registerClicked = () => {
+    let errorMessageString = "";
     if (
+      registerFirstName === "" ||
+      registerLastName === "" ||
       registerUniIDNumber === "" ||
       registerEmail === "" ||
       registerPassword === "" ||
       registerReenterPassword === ""
     ) {
-      alert("Fields cannot be empty. All the fields must be filled.");
-    } else if (isNaN(registerUniIDNumber)) {
-      alert("University ID Number cannot contain non-numeric characters.");
-    } else if (!registerEmail.includes("@")) {
-      alert("Invalid Email format entered.");
-    } else if (registerPassword.length < 8) {
-      alert("Password should contain atleast 8 characters.");
-    } else if (registerPassword !== registerReenterPassword) {
-      alert("Password and Re-enter password fields do not match.");
+      errorMessageString += "All the fields must be filled.\n\n";
+    }
+    if (isNaN(registerUniIDNumber)) {
+      errorMessageString +=
+        "University ID Number must contain only numeric characters.\n\n";
+    }
+
+    if (registerUniIDNumber.length !== 9) {
+      errorMessageString += "University ID Number must be of 9 digits.\n\n";
+    }
+
+    if (!registerEmail.includes("@")) {
+      errorMessageString += "Invalid Email format entered.\n\n";
+    }
+    if (registerPassword.length < 8) {
+      errorMessageString += "Password should contain atleast 8 characters.\n\n";
+    }
+    if (registerPassword !== registerReenterPassword) {
+      errorMessageString +=
+        "Password and Re-enter password fields must match.\n\n";
+    }
+
+    if (errorMessageString !== "") {
+      setErrorMessage("Error(s):\n\n" + errorMessageString);
     } else {
+      setErrorMessage("");
       axios
         .post("/", {
           first_name: registerFirstName,
@@ -143,6 +163,7 @@ function Register() {
             type="password"
             onChange={(event) => setRegisterReenterPassword(event.target.value)}
           />
+          {errorMessage && <div className="error-message">{errorMessage}</div>}
           <button className="register-button" onClick={registerClicked}>
             REGISTER
           </button>
@@ -400,6 +421,20 @@ const RegisterSection = styled.div`
 
   .already-registered:hover {
     cursor: pointer;
+  }
+
+  .error-message {
+    color: red;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 30px;
+    border: 1px solid red;
+    border-radius: 8px;
+    width: 100%;
+    padding: 10px;
+    /* border-radius: 10px; */
+    white-space: pre-line;
   }
 `;
 

@@ -1,65 +1,73 @@
-import React, {useContext} from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 import LoginRightBGImage from "../../svgs/right_background.svg";
 import { useState, useEffect } from "react";
 import Axios from "axios";
 import { LandingContext } from "../../contexts/LandingContext";
 
-
 function ForgotPassword() {
-  const {setCurrentSection} = useContext(LandingContext);
+  const { setCurrentSection } = useContext(LandingContext);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
-  
+  const [message, setMessage] = useState("");
+  const [buttonDisplay, setButtonDisplay] = useState(null);
+
   const axios = Axios.create({
     withCredentials: true,
     baseURL: "http://localhost:3001/users",
     crossDomain: true,
   });
-  
+
   const sendPasswordResetLink = async () => {
+    setMessage("Password reset email is sent to your mail id.");
+    setButtonDisplay({ display: "none" });
+    return;
     axios
-    .post("/forgotPassword", {
-      email: forgotPasswordEmail
-    })
-    .then((res) => {
-      if(res.data.message === "password reset email sent")
-        alert("Password reset email is sent to your mail id.");
-      else if (res.data.message === "user not found")
-        alert("User does not exist with this email! Please enter a valid email.");
-    })
+      .post("/forgotPassword", {
+        email: forgotPasswordEmail,
+      })
+      .then((res) => {
+        if (res.data.message === "password reset email sent")
+          setMessage("Password reset email is sent to your mail id.");
+        else if (res.data.message === "user not found")
+          setMessage(
+            "User does not exist with this email! Please enter a valid email."
+          );
+      });
   };
 
-const backToLoginPageClicked = async () => {
+  const backToLoginPageClicked = async () => {
     setCurrentSection("login");
-};
-
+  };
 
   return (
-      <ForgotPasswordSection>
-        <div className="forgot-password-heading">
-          <span>Forgot Password</span>
+    <ForgotPasswordSection>
+      <div className="forgot-password-heading">
+        <span>Forgot Password</span>
+      </div>
+      <div className="forgot-password-card">
+        <label className="forgot-password-email-label" style={buttonDisplay}>
+          Enter Your Registered Email
+        </label>
+        <input
+          className="forgot-password-email-text-field"
+          placeholder="Registered Email"
+          id="register_email"
+          onChange={(event) => setForgotPasswordEmail(event.target.value)}
+          style={buttonDisplay}
+        />
+        {message && <div className="error-message">{message}</div>}
+        <button
+          className="password-reset-button"
+          style={buttonDisplay}
+          onClick={sendPasswordResetLink}
+        >
+          SEND PASSWORD RESET LINK
+        </button>
+        <div className="back-to-login-page" onClick={backToLoginPageClicked}>
+          Back to Login Page
         </div>
-        <div className="forgot-password-card">
-          <label className="forgot-password-email-label">
-            Enter Your Registered Email
-          </label>
-          <input
-            className="forgot-password-email-text-field"
-            placeholder="Registered Email"
-            id="register_email"
-            onChange={(event) => setForgotPasswordEmail(event.target.value)}
-          />
-          <button
-            className="password-reset-button"
-            onClick={sendPasswordResetLink}
-          >
-            SEND PASSWORD RESET LINK
-          </button>
-          <div className="back-to-login-page" onClick={backToLoginPageClicked}>
-            Back to Login Page
-          </div>
-        </div>
-      </ForgotPasswordSection>
+      </div>
+    </ForgotPasswordSection>
   );
 }
 
@@ -147,6 +155,14 @@ const ForgotPasswordSection = styled.div`
 
   .back-to-login-page:hover {
     cursor: pointer;
+  }
+
+  .error-message {
+    color: red;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 10px;
   }
 `;
 

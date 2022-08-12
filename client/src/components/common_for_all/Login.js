@@ -14,6 +14,7 @@ function Login() {
   //Login variables
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const registerHereButtonClicked = () => {
     setCurrentSection("register");
@@ -30,7 +31,9 @@ function Login() {
   });
 
   const loginButtonClicked = async () => {
-    console.log("Login clicked");
+    // setErrorMessage("Invalid User ID or Password");
+    // return;
+
     if (loginEmail === "") alert("Email field cannot be blank!");
     else if (loginPassword === "") alert("Password field cannot be blank!");
     else {
@@ -67,7 +70,10 @@ function Login() {
           className="login-email-text-field"
           placeholder="Email"
           id="login_email"
-          onChange={(event) => setLoginEmail(event.target.value)}
+          onChange={(event) => {
+            setLoginEmail(event.target.value);
+            setErrorMessage("");
+          }}
         />
         <label className="login-password-label">Enter Your Password</label>
         <input
@@ -75,11 +81,15 @@ function Login() {
           placeholder="Password"
           id="login_password"
           type="password"
-          onChange={(event) => setLoginPassword(event.target.value)}
+          onChange={(event) => {
+            setLoginPassword(event.target.value);
+            setErrorMessage("");
+          }}
         />
         <div className="forgot-password" onClick={forgotPasswordButtonClicked}>
           Forgot Password?
         </div>
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
         <button className="login-button" onClick={loginButtonClicked}>
           LOGIN
         </button>
@@ -234,6 +244,14 @@ const LoginSection = styled.div`
 
   .new-user:hover {
     cursor: pointer;
+  }
+
+  .error-message {
+    color: red;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 10px;
   }
 `;
 

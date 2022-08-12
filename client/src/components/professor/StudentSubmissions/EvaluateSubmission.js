@@ -14,15 +14,14 @@ import { useNavigate, useLocation } from "react-router-dom";
 function EvaluateSubmission() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  // const { loggedInUserDetails } = useContext(LoginContext);
-  // const [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
-  // const [moduleCode, setModuleCode] = useState("");
   const [questions, setQuestions] = useState([]);
   const [studentAnswers, setStudentAnswers] = useState([]);
   const [totalMarks, setTotalMarks] = useState(null);
   const [feedback, setFeedback] = useState("");
   const [marksAwarded, setMarksAwarded] = useState([]);
   const [totalMarksAwarded, setTotalMarksAwarded] = useState(0);
+  const [isAutoEvaluated, setIsAutoEvaluated] = useState(false);
+  const [isManuallyEvaluated, setIsManuallyEvaluated] = useState(false);
 
   const axios = Axios.create({
     withCredentials: true,
@@ -42,22 +41,27 @@ function EvaluateSubmission() {
       setTotalMarks(assessment.total_marks);
       setQuestions(assessment.questions);
     });
+    getStudentSubmissionInfo();
+  }, []);
 
+  const getStudentSubmissionInfo = () => {
     axios2
       .post("/getStudentAnswersAndMarks", {
         assessment_id: state.assessment_id,
         student_uni_id: state.student_uni_id,
       })
       .then((res) => {
-        const studentAnswers = res.data;
-        setStudentAnswers(studentAnswers.answers);
-        if (studentAnswers.marks_awarded.length !== 0)
-          setMarksAwarded(studentAnswers.marks_awarded);
-        else setMarksAwarded(Array(studentAnswers.answers.length).fill(""));
-
-        setFeedback(studentAnswers.feedback);
+        const stuAnswers = res.data;
+        console.log("Student answers: " + JSON.stringify(stuAnswers.answers));
+        setStudentAnswers(stuAnswers.answers);
+        if (stuAnswers.marks_awarded.length !== 0)
+          setMarksAwarded(stuAnswers.marks_awarded);
+        else setMarksAwarded(Array(stuAnswers.answers.length).fill(""));
+        if (stuAnswers.auto_evaluated) setIsAutoEvaluated(true);
+        if (stuAnswers.manually_evaluated) setIsManuallyEvaluated(true);
+        setFeedback(stuAnswers.feedback);
       });
-  }, []);
+  };
 
   useEffect(() => {
     calculateTotalMarks();
@@ -66,8 +70,8 @@ function EvaluateSubmission() {
   const save = () => {
     if (validateQuestions()) {
       // console.log("All ok.. can save to server");
-      console.log(marksAwarded);
-      console.log(feedback);
+      // console.log(marksAwarded);
+      // console.log(feedback);
 
       axios2
         .post("/saveMarksAwarded", {
@@ -76,7 +80,7 @@ function EvaluateSubmission() {
           marks_awarded: marksAwarded,
           feedback: feedback,
           marks_released: false,
-          manually_evaluated: true
+          manually_evaluated: true,
         })
         .then((res) => {
           if (res.data.message === "success") {
@@ -93,16 +97,16 @@ function EvaluateSubmission() {
   };
 
   const validateQuestions = () => {
-    for (let i = 0; i < marksAwarded.length; i++) {
-      if (marksAwarded[i] == "") {
-        console.log(
-          "Error in question number " +
-            (i + 1) +
-            ". Marks awarded cannot be empty."
-        );
-        return false;
-      }
-    }
+    // for (let i = 0; i < marksAwarded.length; i++) {
+    //   if (marksAwarded[i] == "") {
+    //     console.log(
+    //       "Error in question number " +
+    //         (i + 1) +
+    //         ". Marks awarded cannot be empty."
+    //     );
+    //     return false;
+    //   }
+    // }
 
     for (let i = 0; i < marksAwarded.length; i++) {
       if (marksAwarded[i] > questions[i].questionMarks) {
@@ -209,100 +213,176 @@ function EvaluateSubmission() {
         <label className="submission-info-label" style={{ width: "80%" }}>
           Questions to be Evaluated:
         </label>
-        {questions.map((ele, index) => {
-          return (
-            <div key={ele.id} id={ele.id} className="new-question">
-              <div className="question-number">{index + 1}</div>
-              <div className="question-content">
-                <label className="submission-info-label">Question Type</label>
-                <QuestionTypeDropdown
-                  indexVal={index}
-                  changeQuestionType={() => {}}
-                  questionType={ele.questionType}
-                  isDisabled={true}
-                />
-                {ele.questionType === "mcq" && (
-                  <MCQTemplate
-                    indexVal={index}
-                    saveMCQQuestion={() => {}}
-                    saveMCQQuestionOptions={() => {}}
-                    saveMCQCorrectAnswer={() => {}}
-                    questionText={ele.questionText}
-                    options={ele.options}
-                    correctAnswer={ele.correctAnswer}
-                    isDisabled={true}
-                  />
-                )}
-                {ele.questionType === "fib" && (
-                  <FIBTemplate
-                    indexVal={index}
-                    saveFIBQuestion={() => {}}
-                    saveFIBAnswers={() => {}}
-                    questionText={ele.questionText}
-                    correctFIBAnswers={ele.correctFIBAnswers}
-                    removeFIBAnswer={() => {}}
-                    isDisabled={true}
-                  />
-                )}
-                {ele.questionType === "essay" && (
-                  <EssayTemplate
-                    indexVal={index}
-                    saveEssayQuestion={() => {}}
-                    questionText={ele.questionText}
-                    isDisabled={true}
-                  />
-                )}
-                {ele.questionType === "coding" && (
-                  <CodingTemplate
-                    indexVal={index}
-                    saveCodingQuestion={() => {}}
-                    saveCodingLanguage={() => {}}
-                    questionText={ele.questionText}
-                    codingLanguage={ele.codingLanguage}
-                    isDisabled={true}
-                  />
-                )}
-                <div style={{ marginTop: "5px" }}>
-                  <label className="submission-info-label">
-                    Marks for Correct Answer
+        {studentAnswers.length !== 0 &&
+          marksAwarded.length !== 0 &&
+          questions.map((ele, index) => {
+            return (
+              <div key={ele.id} id={ele.id} className="new-question">
+                <div className="question-number">{index + 1}</div>
+                <div className="question-content">
+                  <label className="answer-submission-info-label">
+                    Question Type
                   </label>
-                  <br />
-                  <input
-                    id={"question_marks_" + index}
-                    className="submission-text-field"
-                    defaultValue={ele.questionMarks}
-                    disabled="true"
+                  <QuestionTypeDropdown
+                    indexVal={index}
+                    changeQuestionType={() => {}}
+                    questionType={ele.questionType}
+                    isDisabled={true}
                   />
-                </div>
-                <div style={{ marginTop: "5px" }}>
-                  <label className="submission-info-label">
-                    Student's Answer
-                  </label>
-                  <br />
+                  {ele.questionType === "mcq" && (
+                    <MCQTemplate
+                      indexVal={index}
+                      saveMCQQuestion={() => {}}
+                      saveMCQQuestionOptions={() => {}}
+                      saveMCQCorrectAnswer={() => {}}
+                      questionText={ele.questionText}
+                      options={ele.options}
+                      correctAnswer={ele.correctAnswer}
+                      isDisabled={true}
+                    />
+                  )}
+                  {ele.questionType === "fib" && (
+                    <FIBTemplate
+                      indexVal={index}
+                      saveFIBQuestion={() => {}}
+                      saveFIBAnswers={() => {}}
+                      questionText={ele.questionText}
+                      correctFIBAnswers={ele.correctFIBAnswers}
+                      removeFIBAnswer={() => {}}
+                      isDisabled={true}
+                    />
+                  )}
+                  {ele.questionType === "essay" && (
+                    <EssayTemplate
+                      indexVal={index}
+                      saveEssayQuestion={() => {}}
+                      questionText={ele.questionText}
+                      isDisabled={true}
+                    />
+                  )}
+                  {ele.questionType === "coding" && (
+                    <CodingTemplate
+                      indexVal={index}
+                      saveCodingQuestion={() => {}}
+                      saveCodingLanguage={() => {}}
+                      questionText={ele.questionText}
+                      codingLanguage={ele.codingLanguage}
+                      isDisabled={true}
+                    />
+                  )}
+                  <div style={{ marginTop: "5px" }}>
+                    <label className="answer-submission-info-label">
+                      Marks for Correct Answer
+                    </label>
+                    <br />
+                    <input
+                      id={"question_marks_" + index}
+                      className="submission-text-field"
+                      defaultValue={ele.questionMarks}
+                      disabled="true"
+                    />
+                  </div>
                   <div
-                    id={"student_answer_" + index}
-                    className="student-answer"
-                    // defaultValue={ele.questionMarks}
-                    disabled="true"
+                    style={{
+                      marginTop: "20px",
+                      padding: "10px",
+                      paddingTop: "0",
+                      border: "1px dotted white",
+                      borderRadius: "10px",
+                    }}
                   >
-                    {studentAnswers[index]}
+                    {ele.questionType === "mcq" && (
+                      <>
+                        <label className="answer-submission-info-label">
+                          Student's Answer
+                        </label>
+                        <br />
+                        <input
+                          id={"student_answer_" + index}
+                          className="mcq-student-answer"
+                          disabled="true"
+                          value={studentAnswers[index]}
+                        />
+                      </>
+                    )}
+                    {ele.questionType === "fib" &&
+                      studentAnswers[index].map((val, ind) => {
+                        return (
+                          <>
+                            <label className="answer-submission-info-label">
+                              Student's Answer for Blank {ind + 1}
+                            </label>
+                            <br />
+                            <input
+                              id={"student_answer_" + ind}
+                              className="mcq-student-answer"
+                              disabled="true"
+                              value={val}
+                            />
+                            <br />
+                          </>
+                        );
+                      })}
+                    {ele.questionType === "essay" && (
+                      <>
+                        <label className="answer-submission-info-label">
+                          Student's Answer
+                        </label>
+                        <br />
+                        <div
+                          id={"student_answer_" + index}
+                          className="student-answer"
+                          disabled="true"
+                        >
+                          {studentAnswers[index]}
+                        </div>
+                      </>
+                    )}
+                    {ele.questionType === "coding" && (
+                      <>
+                        <label className="answer-submission-info-label">
+                          Student's Answer
+                        </label>
+                        <br />
+                        <div
+                          id={"student_answer_" + index}
+                          className="student-answer"
+                          disabled="true"
+                        >
+                          {studentAnswers[index]}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <div style={{ marginTop: "5px" }}>
+                    <label className="answer-submission-info-label">
+                      Marks Awarded{" "}
+                      {ele.questionType === "mcq" &&
+                        isAutoEvaluated &&
+                        " (Auto-evaluated)"}
+                      {ele.questionType === "fib" &&
+                        isAutoEvaluated &&
+                        " (Auto-evaluated)"}
+                      {ele.questionType === "essay" &&
+                        isManuallyEvaluated &&
+                        " (Manually-evaluated)"}
+                      {ele.questionType === "coding" &&
+                        isManuallyEvaluated &&
+                        " (Manually-evaluated)"}
+                    </label>
+                    <br />
+                    <input
+                      id={"marks_awarded_" + index}
+                      className="submission-text-field"
+                      onChange={saveAwardedMarks}
+                      // onKeyDown={validateEntry}
+                      value={marksAwarded[index]}
+                    />
                   </div>
                 </div>
-                <div style={{ marginTop: "5px" }}>
-                  <label className="submission-info-label">Marks Awarded</label>
-                  <br />
-                  <input
-                    id={"marks_awarded_" + index}
-                    className="submission-text-field"
-                    onChange={saveAwardedMarks}
-                    // onKeyDown={validateEntry}
-                    value={marksAwarded[index]}
-                  />
-                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
       <div className="total-marks-and-feedback">
         <div className="total-marks-awarded">
@@ -392,6 +472,17 @@ const EvalSubmission = styled.div`
     font-size: 17px;
     font-weight: 400;
     margin-top: 20px;
+    /* border:1px solid red; */
+  }
+
+  .answer-submission-info-label {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 7px;
+    /* border:1px solid red; */
+    display: inline-block;
   }
 
   .select-module-dropdown {
@@ -522,6 +613,21 @@ const EvalSubmission = styled.div`
 
   input:disabled {
     color: white;
+  }
+
+  .mcq-student-answer {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    /* background-color: rgba(239, 239, 239, 0.3); */
+    margin-top: 5px;
+    border-radius: 5px;
+    width: 400px;
+    /* height: 35px; */
+    padding: 5px;
+    padding-left: 10px;
+    border: none;
   }
 
   .student-answer {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import styled from "styled-components";
 import Axios from "axios";
 import ConfirmDeleteModal from "../ConfirmDeletionModal";
@@ -10,6 +10,7 @@ function ViewSubmissions() {
   let [submissionsArray, setSubmissionsArray] = useState([]);
   let [submissionsLoaded, setSubmissionsLoaded] = useState(false);
   // let [areMarksAwarded, setAreMarksAwarded] = useState([]);
+  const autoEvaluateButton = useRef(null);
   const { state } = useLocation();
   const navigate = useNavigate();
   const axios = Axios.create({
@@ -43,6 +44,10 @@ function ViewSubmissions() {
   };
 
   useEffect(() => {
+    getLatestSubmissionInfo();
+  }, []);
+
+  const getLatestSubmissionInfo = () => {
     axios3
       .post("/getSubmissionsForAssessment", { assessment_id: state._id })
       .then((res) => {
@@ -50,11 +55,9 @@ function ViewSubmissions() {
         else {
           setSubmissionsLoaded(true);
           setSubmissionsArray(res.data);
-          // console.log(res.data[0].marks_released);
-          // console.log(res.data[1].marks_released);
         }
       });
-  }, []);
+  };
 
   const calculateMarksAwarded = (index) => {
     let marks = submissionsArray[index].marks_awarded;
@@ -113,16 +116,42 @@ function ViewSubmissions() {
     navigate("../viewAssessments");
   };
 
+  const autoEvaluateByIndex = (ind) => {
+    axios3
+      .post("/autoEvaluate", {
+        assessment_id: state._id,
+        student_uni_id: submissionsArray[ind].uni_id,
+      })
+      .then((res) => {
+        if (res.data.message === "success") {
+          getLatestSubmissionInfo();
+        } else alert("Server Error! Please contact admin.");
+      });
+  };
+
   const autoEvaluteAll = () => {
     let uniIds = [];
     for (let i = 0; i < submissionsArray.length; i++) {
       uniIds.push(submissionsArray[i].uni_id);
     }
-    // console.log(submissionsArray[1].uni_id)
-    axios3.post("/autoEvaluate", {
-      assessment_id: state._id,
-      uni_ids: uniIds,
-    });
+    console.log("Clicked");
+    autoEvaluateButton.current.textContent = "Auto-evaluation in progress";
+    autoEvaluateButton.current.disabled = true;
+    autoEvaluateButton.current.style.backgroundColor = "gray";
+
+    axios3
+      .post("/autoEvaluateAll", {
+        assessment_id: state._id,
+        uni_ids: uniIds,
+      })
+      .then((res) => {
+        if (res.data.message === "success") getLatestSubmissionInfo();
+        else alert("Server Error! Please contact admin.");
+
+        autoEvaluateButton.current.textContent = "Auto-evaluate All";
+        autoEvaluateButton.current.disabled = false;
+        autoEvaluateButton.current.style.backgroundColor = "white";
+      });
   };
 
   const getEvaluationStatus = (index) => {
@@ -153,10 +182,8 @@ function ViewSubmissions() {
             <tbody>
               <tr>
                 <td className="module-data start headers-color">S. No</td>
-                <td className="module-data headers-color">
-                  Student First Name
-                </td>
-                <td className="module-data headers-color">Student Last Name</td>
+                <td className="module-data headers-color">Student Name</td>
+                {/* <td className="module-data headers-color">Student Last Name</td> */}
                 <td className="module-data headers-color">
                   Student University ID
                 </td>
@@ -169,8 +196,9 @@ function ViewSubmissions() {
                 return (
                   <tr>
                     <td className="module-data start">{index + 1}</td>
-                    <td className="module-data mid">{ele.first_name}</td>
-                    <td className="module-data mid">{ele.last_name}</td>
+                    <td className="module-data mid">
+                      {ele.first_name + " " + ele.last_name}
+                    </td>
                     <td className="module-data mid">{ele.uni_id}</td>
                     <td className="module-data mid">
                       {ele.marks_awarded.length !== 0
@@ -185,7 +213,16 @@ function ViewSubmissions() {
                     {/* {ele.auto_evaluated && (
                       <td className="module-data end">Completed</td>
                     )} */}
-                    <td className="module-data mid" style={{ border: "none" }}>
+                    <td className="module-data" style={{ border: "none" }}>
+                      <button
+                        id={"autoEvalute_" + index}
+                        onClick={() => autoEvaluateByIndex(index)}
+                        className="module-data-button"
+                      >
+                        Auto-evaluate
+                      </button>
+                    </td>
+                    <td className="module-data" style={{ border: "none" }}>
                       <button
                         id={"evaluateSubmission_" + index}
                         onClick={evaluateSubmission}
@@ -196,7 +233,7 @@ function ViewSubmissions() {
                           : "Evaluate"}
                       </button>
                     </td>
-                    <td>
+                    <td className="module-data" style={{ border: "none" }}>
                       <button
                         id={"releaseMarks_" + index}
                         onClick={releaseMarks}
@@ -251,7 +288,11 @@ function ViewSubmissions() {
             <button className="new-question-button" onClick={goBack}>
               Go Back
             </button>
-            <button className="new-question-button" onClick={autoEvaluteAll}>
+            <button
+              ref={autoEvaluateButton}
+              className="new-question-button"
+              onClick={autoEvaluteAll}
+            >
               Auto-evalute All
             </button>
             <button
@@ -298,7 +339,7 @@ const ViewSubs = styled.div`
     align-items: flex-start;
     flex-direction: column;
     /* border:1px solid red; */
-    width: 80%;
+    width: 90%;
   }
 
   .select-module-label {

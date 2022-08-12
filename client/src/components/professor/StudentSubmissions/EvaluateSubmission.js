@@ -428,18 +428,13 @@ const EvalSubmission = styled.div`
   width: 100%;
   min-height: 100vh;
   background-color: #282c34;
-  /* background-image: url("${BodyImage}");
-  background-repeat: repeat;
-  background-size: auto; */
   color: white;
   padding-top: 72px;
-  /* border: 1px solid red; */
   flex-direction: column;
   margin-top: 30px;
   display: flex;
   align-items: center;
   flex-direction: column;
-  /* background-color: #282c34; */
 
   .evaluate-heading {
     color: white;

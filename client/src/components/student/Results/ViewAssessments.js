@@ -105,9 +105,17 @@ function ViewAssessments() {
   };
 
   const viewResult = (event) => {
-    console.log("clicked view");
-    alert("Button clicked: " + event.target.id);
-    navigate("../checkResult");
+    const index = event.target.id.split("_")[1];
+    // console.log("clicked view");
+    // alert("Button clicked: " + event.target.id);
+    navigate("../checkResult", {
+      state: {
+        assessment_title: assessmentsArray[index].title,
+        total_marks: assessmentsArray[index].total_marks,
+        marks_awarded: submissionsDataArray[index].marks_awarded,
+        feedback: submissionsDataArray[index].feedback,
+      },
+    });
   };
 
   const customStyles = {

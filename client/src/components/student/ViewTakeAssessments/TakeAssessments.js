@@ -48,6 +48,8 @@ function TakeAssessments() {
   };
 
   const validateAnswer = (questionIndex) => {
+    console.log("Answer value is: " + answers[questionIndex]);
+
     if (
       questions[questionIndex].questionType === "mcq" &&
       answers[questionIndex] === ""
@@ -70,14 +72,17 @@ function TakeAssessments() {
       }
     } else if (
       questions[questionIndex].questionType === "essay" &&
-      answers[questionIndex] === ""
+      (answers[questionIndex] === "" || answers[questionIndex] === null)
     ) {
       setErrorMessageWithOptions(
         "Are you sure you want to continue with an empty response for this question."
       );
       return false;
     } else if (questions[questionIndex].questionType === "coding") {
-      if (answers[questionIndex][1] === "") {
+      if (
+        answers[questionIndex][1] === "" ||
+        answers[questionIndex][1] === null
+      ) {
         setErrorMessageWithOptions(
           "Are you sure you want to continue with an empty response for this question."
         );
@@ -338,8 +343,8 @@ function TakeAssessments() {
       time = getTimeLeft(durInMilliSec);
       setTimeLeft(time);
       timeChangedCounter++;
-      if (timeChangedCounter == 5) {
-        // updateTimeLeftInDb(durInMilliSec);
+      if (timeChangedCounter == 1) {
+        updateTimeLeftInDb(durInMilliSec);
         timeChangedCounter = 0;
       }
       if (durInMilliSec === 0) {

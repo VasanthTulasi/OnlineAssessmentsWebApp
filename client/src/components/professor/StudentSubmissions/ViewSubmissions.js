@@ -251,9 +251,9 @@ function ViewSubmissions() {
                             "module-data-button button-disabled")
                         }
                       >
-                        {ele.marks_released == undefined && "Release Marks"}
-                        {ele.marks_released == false && "Release Marks"}
-                        {ele.marks_released == true && "Marks Released"}
+                        {ele.marks_released == undefined && "Release Result"}
+                        {ele.marks_released == false && "Release Result"}
+                        {ele.marks_released == true && "Result Released"}
                       </button>
                     </td>
                   </tr>
@@ -299,7 +299,7 @@ function ViewSubmissions() {
               className="new-question-button"
               onClick={releaseMarksForAll}
             >
-              Release All Marks
+              Release Result for All
             </button>
           </div>
         </div>

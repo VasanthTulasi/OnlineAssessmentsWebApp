@@ -277,7 +277,8 @@ router.post("/autoEvaluate", async (req, res) => {
             k++
           ) {
             if (
-              marks.questions[j].correctFIBAnswers[k] === studentFIBAnswers[k]
+              marks.questions[j].correctFIBAnswers[k].toLowerCase() ===
+              studentFIBAnswers[k].toLowerCase()
             ) {
               correctFIBCount++;
             }

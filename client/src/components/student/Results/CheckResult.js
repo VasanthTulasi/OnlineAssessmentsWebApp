@@ -28,7 +28,7 @@ function CheckResult() {
 
   return (
     <Result>
-      <div className="result-heading">Result</div>
+      <div className="result-heading">My Result</div>
       <div className="result-content">
         <label className="result-label">Assessment Title</label>
         <input

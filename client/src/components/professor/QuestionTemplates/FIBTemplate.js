@@ -39,9 +39,8 @@ function FIBTemplate(props) {
 
     let quesTextArr = textAreaComponent.current.value.split("____________");
     const { finalQuesTextArr, removedIndex } =
-      removeUnwantedBlanks(quesTextArr);
+      removeBlank(quesTextArr);
     textAreaComponent.current.value = finalQuesTextArr.join("____________");
-    // setBlanksCount(quesTextArr.length - 1);
     if (removedIndex != null) removeBlankFromArray(removedIndex);
 
     props.saveFIBQuestion(questionId, textAreaComponent.current.value);
@@ -85,9 +84,7 @@ function FIBTemplate(props) {
     return false;
   };
 
-  const removeUnwantedBlanks = (quesTextArr) => {
-    // console.log("Question text array :" + JSON.stringify(quesTextArr));
-    // return;
+  const removeBlank = (quesTextArr) => {
     let removedIndex = null;
     for (let i = 0; i < quesTextArr.length; i++) {
       let textArr = quesTextArr[i];
@@ -95,7 +92,6 @@ function FIBTemplate(props) {
       if (textArr !== quesTextArr[i]) {
         removedIndex = i;
         const questionId = textAreaComponent.current.id.split("_")[3];
-        // props.removeFIBAnswer(questionId);
       }
     }
     const finalQuesTextArr = quesTextArr;
@@ -129,10 +125,8 @@ function FIBTemplate(props) {
   const addBlank = () => {
     setErrorMessageStyle({ display: "none" });
     if (checkIfAddingInBlank()) return;
-    // console.log("continue");
     let curText = textAreaComponent.current.value;
     let curPosition = textAreaComponent.current.selectionStart;
-    // let blankCount = curText.split("____________").length;
     addNewBlankInArray(curPosition);
     let finalText =
       curText.substring(0, curPosition) +
@@ -142,7 +136,6 @@ function FIBTemplate(props) {
     textAreaComponent.current.focus();
     const questionId = textAreaComponent.current.id.split("_")[3];
     props.saveFIBQuestion(questionId, textAreaComponent.current.value);
-    // props.saveFIBAnswers(questionId, null, null);
   };
 
   const addNewBlankInArray = (position) => {

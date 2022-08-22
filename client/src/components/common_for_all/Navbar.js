@@ -48,7 +48,7 @@ function NavBar(props) {
                 to="/viewTakeAssessments/viewAssessments"
                 className={props.navLinksAccess}
               >
-                Assessments
+                My Assessments
               </Link>
             </li>
             <li>
@@ -56,7 +56,7 @@ function NavBar(props) {
                 to="/viewCheckResults/viewAssessments"
                 className={props.navLinksAccess}
               >
-                Results
+                My Results
               </Link>
             </li>
             <li>
@@ -64,7 +64,7 @@ function NavBar(props) {
                 to="/myprofile/profilecontent"
                 className={props.navLinksAccess}
               >
-                Profile
+                My Profile
               </Link>
             </li>
           </ul>

@@ -336,17 +336,12 @@ function TakeAssessments() {
   const startCountDownTimer = (durInMilliSec) => {
     let time = getTimeLeft(durInMilliSec);
     setTimeLeft(time);
-    let timeChangedCounter = 0;
     countdownTimer.current = setInterval(() => {
       console.log("running timer");
       durInMilliSec -= 1000;
       time = getTimeLeft(durInMilliSec);
       setTimeLeft(time);
-      timeChangedCounter++;
-      if (timeChangedCounter == 1) {
-        updateTimeLeftInDb(durInMilliSec);
-        timeChangedCounter = 0;
-      }
+      updateTimeLeftInDb(durInMilliSec);
       if (durInMilliSec === 0) {
         clearInterval(countdownTimer.current);
         setAssessmentElapsedMessage(
@@ -356,8 +351,6 @@ function TakeAssessments() {
         updateAttemptsLeft(0);
       }
     }, 1000);
-
-    // console.log("timer value is " + countdownTimer.current);
   };
 
   const updateAttemptsLeft = (val) => {

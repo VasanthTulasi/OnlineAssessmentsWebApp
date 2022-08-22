@@ -128,7 +128,7 @@ function ViewUsersForModules() {
             />
           </div>
           <div className="heading" style={{ fontSize: "17px" }}>
-            Users for the selected module:
+            Users assigned for the selected module:
           </div>
           <table className="module-data-content">
             <tbody>

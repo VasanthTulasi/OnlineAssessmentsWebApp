@@ -22,6 +22,7 @@ function EvaluateSubmission() {
   const [totalMarksAwarded, setTotalMarksAwarded] = useState(0);
   const [isAutoEvaluated, setIsAutoEvaluated] = useState(false);
   const [isManuallyEvaluated, setIsManuallyEvaluated] = useState(false);
+  const [plagInfo, setPlagInfo] = useState([]);
 
   const axios = Axios.create({
     withCredentials: true,
@@ -32,6 +33,11 @@ function EvaluateSubmission() {
   const axios2 = Axios.create({
     withCredentials: true,
     baseURL: "http://localhost:3001/submissions",
+    crossDomain: true,
+  });
+
+  const axios3 = Axios.create({
+    withCredentials: false,
     crossDomain: true,
   });
 
@@ -54,13 +60,50 @@ function EvaluateSubmission() {
         const stuAnswers = res.data;
         console.log("Student answers: " + JSON.stringify(stuAnswers.answers));
         setStudentAnswers(stuAnswers.answers);
+
         if (stuAnswers.marks_awarded.length !== 0)
           setMarksAwarded(stuAnswers.marks_awarded);
         else setMarksAwarded(Array(stuAnswers.answers.length).fill(""));
+
         if (stuAnswers.auto_evaluated) setIsAutoEvaluated(true);
         if (stuAnswers.manually_evaluated) setIsManuallyEvaluated(true);
         setFeedback(stuAnswers.feedback);
       });
+  };
+
+  useEffect(() => {
+    checkPlagiarism();
+  }, [studentAnswers]);
+
+  const checkPlagiarism = () => {
+    let modPlagInfo = [...plagInfo];
+    for (let i = 0; i < questions.length; i++) {
+      modPlagInfo.push("Plagiarism Check In-progress...");
+    }
+    setPlagInfo(modPlagInfo);
+
+    for (let i = 0; i < questions.length; i++) {
+      if (questions[i].questionType === "essay") {
+        console.log("in essay");
+        var formData = new FormData();
+        formData.append("key", "b1ca0f2ed1dd83a645b1b3b19ceb755f");
+        formData.append("data", String(studentAnswers[i]));
+        axios3({
+          method: "post",
+          url: "https://www.check-plagiarism.com/apis/checkPlag",
+          data: formData,
+        }).then((res) => {
+          console.log("response is: " + JSON.stringify(res.data));
+          const plagPercent = res.data.plagPercent;
+          const source =
+            res.data.sources.length !== 0 ? res.data.sources[0].link : null;
+          modPlagInfo[i] = "Plagiarism Percentage: " + plagPercent + "%.";
+          if (source !== null)
+            modPlagInfo[i] += "\n\n Plagiarised from:\n" + source;
+          setPlagInfo([...modPlagInfo]);
+        });
+      }
+    }
   };
 
   useEffect(() => {
@@ -333,7 +376,7 @@ function EvaluateSubmission() {
                         <br />
                         <div
                           id={"student_answer_" + index}
-                          className="student-answer"
+                          className="essay-student-answer"
                           disabled="true"
                         >
                           {studentAnswers[index]}
@@ -356,6 +399,20 @@ function EvaluateSubmission() {
                       </>
                     )}
                   </div>
+                  {ele.questionType === "essay" && (
+                    <>
+                      <label className="answer-submission-info-label">
+                        Plagiarism Status
+                      </label>
+                      <br />
+                      <div
+                        className="essay-student-answer-plag"
+                        disabled="true"
+                      >
+                        {plagInfo[index]}
+                      </div>
+                    </>
+                  )}
                   <div style={{ marginTop: "5px" }}>
                     <label className="answer-submission-info-label">
                       Marks Awarded{" "}
@@ -639,6 +696,39 @@ const EvalSubmission = styled.div`
     /* height: 35px; */
     padding: 5px;
     padding-left: 10px;
+  }
+
+  .essay-student-answer {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    background-color: rgba(239, 239, 239, 0.3);
+    margin-top: 5px;
+    border-radius: 5px;
+    /* width: 400px; */
+    /* height: 35px; */
+    padding: 5px;
+    padding-left: 10px;
+
+    white-space: pre-line;
+    /* word-wrap: break-word; */
+    /* overflow-x: auto; */
+  }
+
+  .essay-student-answer-plag {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    background-color: rgba(239, 239, 239, 0.3);
+    margin-top: 5px;
+    border-radius: 5px;
+    width: 400px;
+    /* height: 35px; */
+    padding: 5px;
+    padding-left: 10px;
+    white-space: pre-line;
   }
 
   .total-marks-awarded {

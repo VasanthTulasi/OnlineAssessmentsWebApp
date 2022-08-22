@@ -242,6 +242,9 @@ router.post("/autoEvaluate", async (req, res) => {
       } else if (marks.questions[i].questionType === "fib") {
         correctAnswers.push(marks.questions[i].correctFIBAnswers);
         marksForCorrectAnswers.push(marks.questions[i].questionMarks);
+      } else if (marks.questions[i].questionType === "essay") {
+        correctAnswers.push(marks.questions[i].correctKeywords);
+        marksForCorrectAnswers.push(marks.questions[i].questionMarks);
       } else {
         correctAnswers.push("");
         marksForCorrectAnswers.push("");
@@ -286,6 +289,37 @@ router.post("/autoEvaluate", async (req, res) => {
           const finalMarks =
             (correctFIBCount / totalFIBCount) * marksForCorrectAnswers[j];
           marksToBeAwarded.push(String(finalMarks));
+        } else if (marks.questions[j].questionType === "essay") {
+          console.log("Triggered essay");
+          const studentEssayAnswer = submission.answers[j];
+
+          let totalCorrectKeywordsCount =
+            marks.questions[j].correctKeywords.length;
+
+          if (totalCorrectKeywordsCount === 0) {
+            if (submission.manually_evaluated === true)
+              marksToBeAwarded.push(submission.marks_awarded[j]);
+            else marksToBeAwarded.push("");
+          } else {
+            let studentCorrectKeywordsCount = 0;
+            for (
+              let k = 0;
+              k < marks.questions[j].correctKeywords.length;
+              k++
+            ) {
+              if (
+                studentEssayAnswer
+                  .toLowerCase()
+                  .includes(marks.questions[j].correctKeywords[k].toLowerCase())
+              ) {
+                studentCorrectKeywordsCount++;
+              }
+            }
+            const finalMarks =
+              (studentCorrectKeywordsCount / totalCorrectKeywordsCount) *
+              marksForCorrectAnswers[j];
+            marksToBeAwarded.push(String(finalMarks));
+          }
         } else {
           if (submission.manually_evaluated === true)
             marksToBeAwarded.push(submission.marks_awarded[j]);
@@ -327,6 +361,9 @@ router.post("/autoEvaluateAll", async (req, res) => {
         marksForCorrectAnswers.push(marks.questions[i].questionMarks);
       } else if (marks.questions[i].questionType === "fib") {
         correctAnswers.push(marks.questions[i].correctFIBAnswers);
+        marksForCorrectAnswers.push(marks.questions[i].questionMarks);
+      } else if (marks.questions[i].questionType === "essay") {
+        correctAnswers.push(marks.questions[i].correctKeywords);
         marksForCorrectAnswers.push(marks.questions[i].questionMarks);
       } else {
         correctAnswers.push("");
@@ -371,6 +408,38 @@ router.post("/autoEvaluateAll", async (req, res) => {
             const finalMarks =
               (correctFIBCount / totalFIBCount) * marksForCorrectAnswers[j];
             marksToBeAwarded.push(String(finalMarks));
+          } else if (marks.questions[j].questionType === "essay") {
+            const studentEssayAnswer = submission.answers[j];
+
+            let totalCorrectKeywordsCount =
+              marks.questions[j].correctKeywords.length;
+
+            if (totalCorrectKeywordsCount === 0) {
+              if (submission.manually_evaluated === true)
+                marksToBeAwarded.push(submission.marks_awarded[j]);
+              else marksToBeAwarded.push("");
+            } else {
+              let studentCorrectKeywordsCount = 0;
+              for (
+                let k = 0;
+                k < marks.questions[j].correctKeywords.length;
+                k++
+              ) {
+                if (
+                  studentEssayAnswer
+                    .toLowerCase()
+                    .includes(
+                      marks.questions[j].correctKeywords[k].toLowerCase()
+                    )
+                ) {
+                  studentCorrectKeywordsCount++;
+                }
+              }
+              const finalMarks =
+                (studentCorrectKeywordsCount / totalCorrectKeywordsCount) *
+                marksForCorrectAnswers[j];
+              marksToBeAwarded.push(String(finalMarks));
+            }
           } else {
             if (submission.manually_evaluated === true)
               marksToBeAwarded.push(submission.marks_awarded[j]);

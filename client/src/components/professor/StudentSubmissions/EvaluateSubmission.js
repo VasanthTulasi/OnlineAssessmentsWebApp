@@ -256,7 +256,9 @@ function EvaluateSubmission() {
                     <EssayTemplate
                       indexVal={index}
                       saveEssayQuestion={() => {}}
+                      saveEssayCorrectKeywords={() => {}}
                       questionText={ele.questionText}
+                      correctKeywords={ele.correctKeywords}
                       isDisabled={true}
                     />
                   )}
@@ -364,8 +366,8 @@ function EvaluateSubmission() {
                         isAutoEvaluated &&
                         " (Auto-evaluated)"}
                       {ele.questionType === "essay" &&
-                        isManuallyEvaluated &&
-                        " (Manually-evaluated)"}
+                        isAutoEvaluated &&
+                        " (Auto-evaluated)"}
                       {ele.questionType === "coding" &&
                         isManuallyEvaluated &&
                         " (Manually-evaluated)"}

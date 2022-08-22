@@ -1,14 +1,81 @@
 import styled from "styled-components";
 import React, { useState, useRef, useEffect } from "react";
 import CreatableSelect from "react-select/creatable";
-import SingleSelect from "react-select";
 
 function EssayTemplate(props) {
   const textAreaComponent = useRef(null);
+  const correctKeywordsComponent = useRef(null);
 
   const saveEssayQuestion = (event) => {
     const questionId = textAreaComponent.current.id.split("_")[3];
     props.saveEssayQuestion(questionId, event.target.value);
+  };
+
+  const saveEssayCorrectKeywords = (enteredKeywords) => {
+    let correctKeywordsArray = enteredKeywords;
+    correctKeywordsArray = correctKeywordsArray.map((ele) => ele.value);
+    const questionId = correctKeywordsComponent.current.props.id.split("_")[2];
+    props.saveEssayCorrectKeywords(questionId, correctKeywordsArray);
+  };
+
+  function formatCreateLabel(value) {
+    return 'Add Keyword "' + value + '"';
+  }
+
+  const customStyles = {
+    container: (provided) => ({
+      ...provided,
+      width: "400px",
+      color: "black",
+      font: "17px",
+      fontFamily: '"Source Sans Pro", sans-serif',
+      fontSize: "17px",
+      fontWeight: 400,
+      color: "#282c34",
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      fontFamily: '"Source Sans Pro", sans-serif',
+      fontSize: "17px",
+      fontWeight: 400,
+      color: "#282c34",
+      backgroundColor: state.isSelected ? "#61dafb" : "white",
+      "&:hover": {
+        backgroundColor: "rgba(189,197,209,.3)",
+      },
+    }),
+    placeholder: (provided) => ({
+      ...provided,
+      fontSize: "17px",
+    }),
+    singleValue: (provided, { isDisabled }) => ({
+      ...provided,
+      color: isDisabled ? "white" : "#282c34",
+    }),
+    multiValue: (provided, { isDisabled }) => ({
+      ...provided,
+      fontSize: "20px",
+      backgroundColor: isDisabled
+        ? "rgba(239, 239, 239,0.3)"
+        : provided.backgroundColor,
+    }),
+    multiValueLabel: (provided, { isDisabled }) => ({
+      ...provided,
+      color: isDisabled ? "white" : "#282c34",
+    }),
+    multiValueRemove: (provided, { isDisabled }) => ({
+      ...provided,
+      display: isDisabled ? "none" : provided.display,
+      "&:hover": {
+        backgroundColor: "#282c34",
+        color: "white",
+      },
+    }),
+    control: (provided, { isDisabled }) => ({
+      ...provided,
+      backgroundColor: isDisabled ? "rgba(239, 239, 239, 0.3)" : "white",
+      border: isDisabled ? "none" : "1px solid white",
+    }),
   };
 
   return (
@@ -26,6 +93,33 @@ function EssayTemplate(props) {
         defaultValue={props.questionText}
         disabled={props.isDisabled}
       />
+      <label className="label-class">
+        {props.isDisabled ? "Correct Answer Keywords" : "Enter Correct Answer Keywords"}
+      </label>
+      <div style={{ marginTop: "5px" }}>
+        <CreatableSelect
+          isDisabled={props.isDisabled}
+          ref={correctKeywordsComponent}
+          styles={customStyles}
+          placeholder="Please Type Here And Add Them"
+          id={"keywords_id_" + props.indexVal}
+          onChange={saveEssayCorrectKeywords}
+          isMulti
+          formatCreateLabel={formatCreateLabel}
+          noOptionsMessage={() => null}
+          components={{
+            DropdownIndicator: () => null,
+            IndicatorSeparator: () => null,
+          }}
+          defaultValue={() => {
+            let options = props.correctKeywords;
+            options = options.map((ele) => {
+              return { label: ele, value: ele };
+            });
+            return options;
+          }}
+        />
+      </div>
     </Essay>
   );
 }
@@ -51,7 +145,7 @@ const Essay = styled.div`
     padding: 5px;
     border-radius: 5px;
     margin-top: 5px;
-    resize:none;
+    resize: none;
   }
 
   textarea:disabled {

@@ -67,10 +67,17 @@ function EditAssessments() {
       modQuestionArr[index].correctFIBAnswers = [];
     } else if (val === "essay") {
       deletePropertiesExcept(
-        ["id", "questionType", "questionMarks","questionText"],
+        [
+          "id",
+          "questionType",
+          "questionMarks",
+          "questionText",
+          "correctKeywords",
+        ],
         modQuestionArr,
         index
       );
+      modQuestionArr[index].correctKeywords = [];
     } else {
       deletePropertiesExcept(
         ["id", "questionType","questionMarks", "questionText", "codingLanguage"],
@@ -117,6 +124,12 @@ function EditAssessments() {
   const saveEssayQuestion = (index, question) => {
     let modQuestionArr = [...questions];
     modQuestionArr[index].questionText = question;
+    setQuestions(modQuestionArr);
+  };
+
+  const saveEssayCorrectKeywords = (index, correctKeywords) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].correctKeywords = correctKeywords;
     setQuestions(modQuestionArr);
   };
 
@@ -346,6 +359,7 @@ function EditAssessments() {
             questionType: ele.questionType,
             questionText: ele.questionText,
             questionMarks: ele.questionMarks,
+            correctKeywords: ele.correctKeywords,
           };
       });
       assessment.questions = questionsWithoutIDs;
@@ -439,6 +453,8 @@ function EditAssessments() {
             return false;
           }
         }
+      } else if (questions[i].questionType === "essay") {
+        //Essay question validations here...
       } else if (questions[i].questionType === "coding") {
         if (questions[i].codingLanguage === "") {
           alert(
@@ -634,7 +650,9 @@ function EditAssessments() {
                   <EssayTemplate
                     indexVal={index}
                     saveEssayQuestion={saveEssayQuestion}
+                      saveEssayCorrectKeywords={saveEssayCorrectKeywords}
                     questionText={ele.questionText}
+                      correctKeywords={ele.correctKeywords}
                   />
                 )}
                 {ele.questionType === "coding" && (

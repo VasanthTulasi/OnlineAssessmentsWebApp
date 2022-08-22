@@ -334,9 +334,6 @@ router.post("/autoEvaluateAll", async (req, res) => {
       }
     }
 
-    console.log("Marks: " + JSON.stringify(marksForCorrectAnswers));
-    console.log("Correct Answers: " + JSON.stringify(correctAnswers));
-
     for (let i = 0; i < uni_ids.length; i++) {
       const submission = await SubmissionsModel.findOne(
         { assessment_id: assessment_id, student_uni_id: uni_ids[i] },
@@ -349,7 +346,6 @@ router.post("/autoEvaluateAll", async (req, res) => {
       );
       if (submission) {
         let marksToBeAwarded = [];
-        console.log("Student ----------------- " + (i + 1));
         for (let j = 0; j < submission.answers.length; j++) {
           if (marks.questions[j].questionType === "mcq") {
             if (correctAnswers[j] === submission.answers[j]) {
@@ -382,7 +378,6 @@ router.post("/autoEvaluateAll", async (req, res) => {
           }
         }
 
-        console.log("marks awarded: " + marksToBeAwarded);
         SubmissionsModel.findOneAndUpdate(
           { assessment_id: assessment_id, student_uni_id: uni_ids[i] },
           {

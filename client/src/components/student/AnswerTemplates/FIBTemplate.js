@@ -3,7 +3,8 @@ import styled from "styled-components";
 
 function FIBTemplate(props) {
   const { question, questionIndex, totalQuestions } = props;
-  
+  const [randomNumsGenerated, setRandomNumsGenerated] = useState([]);
+
   const setAnswers = (event) => {
     const changedIndex = event.target.id.split("_")[2];
     const answer = event.target.value;
@@ -32,12 +33,52 @@ function FIBTemplate(props) {
   };
 
   useEffect(() => {
+    if (randomNumsGenerated.length === 0) return;
+
+    const finalQuestion = question.questionText;
+    let finalCorrectAnswers = [];
+    for (let i = 0; i < question.correctFIBAnswerTypes.length; i++) {
+      if (question.correctFIBAnswerTypes[i] === "value")
+        finalCorrectAnswers.push(question.correctFIBAnswers[i]);
+      else {
+        let formula = question.correctFIBAnswers[i].split(" ");
+        formula = formula.map((ele) => {
+          if (ele.includes("rand_")) {
+            let index = ele.substring(5) - 1;
+            return "randomNumsGenerated[" + index + "]";
+          } else return ele;
+        });
+        formula = formula.join(" ");
+        let x = eval(formula);
+        finalCorrectAnswers.push(x);
+      }
+    }
+    console.log("question: " + finalQuestion);
+    console.log("final correct answers: " + finalCorrectAnswers);
+  }, [randomNumsGenerated]);
+
+  useEffect(() => {
+    // console.log("correct answers " + question.correctFIBAnswers);
+    // setRandomNumsGenerated([]);
+    console.log("use effect in fib template");
+    let quesTextArr = question.questionText.split(" ");
+    let randNums = [];
+    quesTextArr = quesTextArr.map((ele) => {
+      if (ele.trim() === "*RandNum*") {
+        let randomNum = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
+        randNums.push(randomNum);
+        return String(randomNum).trim();
+      } else return ele.trim();
+    });
+    question.questionText = quesTextArr.join(" ");
+    setRandomNumsGenerated([...randNums]);
+
     const numberOfBlanks =
       question.questionText.split("____________").length - 1;
     const emptyAnswersArray = [];
     for (let i = 0; i < numberOfBlanks; i++) emptyAnswersArray.push("");
-    props.saveFIBAnswers(questionIndex,emptyAnswersArray);
-  }, []);
+    props.saveFIBAnswers(questionIndex, emptyAnswersArray);
+  }, [questionIndex]);
 
   return (
     <FIBAnswer>

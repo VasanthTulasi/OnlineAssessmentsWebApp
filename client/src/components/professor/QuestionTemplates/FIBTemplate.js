@@ -31,6 +31,7 @@ function FIBTemplate(props) {
     );
     setCorrectBlankAnswerTypes(correctBlankAnswerTypesWithKeys);
     setNextKeyForType(correctBlankAnswerTypesWithKeys.length);
+    updateRandomNumberReferences();
   }, []);
 
   const saveFIBQuestion = () => {
@@ -355,7 +356,7 @@ function FIBTemplate(props) {
       console.log(answer);
     } catch (e) {
       if (
-        !e.message.includes("is not defined") && 
+        !e.message.includes("is not defined") &&
         !e.message.includes("Invalid reference")
       )
         alert(e.message);
@@ -406,37 +407,39 @@ function FIBTemplate(props) {
       <br />
       {/* <div style={{border: correctBlankAnswers.length != 0 ? "1px solid white" : "none", borderRadius: "5px", marginTop:"10px",padding: "10px"}}> */}
       {correctBlankAnswers.map((ele, index) => {
-        return (
-          <React.Fragment key={ele.key_id}>
-            <label className="label-class">
-              {props.isDisabled
-                ? "Correct Answer for Blank " + (index + 1) + " -"
-                : "Enter Correct Answer for Blank " + (index + 1) + " - "}
-            </label>
-            &nbsp;
-            <select
-              id={"correct_answer_type_" + index}
-              className="answer-type-dropdown"
-              defaultValue={props.correctFIBAnswerTypes[index]}
-              onChange={(event) => setCorrectAnswerType(event)}
-            >
-              <option value="value">Value</option>
-              <option value="formula">Formula</option>
-            </select>
-            <br />
-            <input
-              onChange={(event) => setCorrectAnswers(event)}
-              onBlur={(event) => checkExpression(event)}
-              className="blanks-answer-field"
-              id={"blank_answer_" + index}
-              placeholder="Correct Answer"
-              value={props.correctFIBAnswers[index]}
-              disabled={props.isDisabled}
-            />
-            <br />
-          </React.Fragment>
-        );
-      })}
+          return (
+            <React.Fragment key={ele.key_id}>
+              <label className="label-class">
+                {props.isDisabled
+                  ? "Correct Answer for Blank " + (index + 1) + " -"
+                  : "Enter Correct Answer for Blank " + (index + 1) + " - "}
+              </label>
+              &nbsp;
+              <select
+                id={"correct_answer_type_" + index}
+                className="answer-type-dropdown"
+                value={props.correctFIBAnswerTypes[index]}
+                // defaultValue={correctBlankAnswerTypes[index]}
+                onChange={(event) => setCorrectAnswerType(event)}
+              >
+                <option value="value">Value</option>
+                <option value="formula">Formula</option>
+              </select>
+              <br />
+              <input
+                onChange={(event) => setCorrectAnswers(event)}
+                // onBlur={(event) => checkExpression(event)}
+                className="blanks-answer-field"
+                id={"blank_answer_" + index}
+                placeholder="Correct Answer"
+                value={props.correctFIBAnswers[index]}
+                // value={ele.answer}
+                disabled={props.isDisabled}
+              />
+              <br />
+            </React.Fragment>
+          );
+        })}
       {/* </div> */}
     </FIB>
   );

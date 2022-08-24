@@ -43,7 +43,7 @@ function EditAssessments() {
     crossDomain: true,
   });
 
-  //Question Type Methods
+  //Question Type Method
   const changeQuestionType = (index, val) => {
     let modQuestionArr = [...questions];
     modQuestionArr[index].questionType = val;
@@ -52,7 +52,14 @@ function EditAssessments() {
 
     if (val === "mcq") {
       deletePropertiesExcept(
-        ["id", "questionType", "questionMarks", "questionText", "options", "correctAnswer"],
+        [
+          "id",
+          "questionType",
+          "questionText",
+          "questionMarks",
+          "options",
+          "correctAnswer",
+        ],
         modQuestionArr,
         index
       );
@@ -60,7 +67,14 @@ function EditAssessments() {
       modQuestionArr[index].correctAnswer = "";
     } else if (val === "fib") {
       deletePropertiesExcept(
-        ["id", "questionType","questionMarks", "questionText", "correctFIBAnswers","correctFIBAnswerTypes"],
+        [
+          "id",
+          "questionType",
+          "questionText",
+          "questionMarks",
+          "correctFIBAnswers",
+          "correctFIBAnswerTypes",
+        ],
         modQuestionArr,
         index
       );
@@ -82,7 +96,13 @@ function EditAssessments() {
       modQuestionArr[index].correctKeywords = [];
     } else {
       deletePropertiesExcept(
-        ["id", "questionType","questionMarks", "questionText", "codingLanguage"],
+        [
+          "id",
+          "questionType",
+          "questionText",
+          "questionMarks",
+          "codingLanguage",
+        ],
         modQuestionArr,
         index
       );
@@ -465,6 +485,66 @@ function EditAssessments() {
             );
             return false;
           }
+
+          if (questions[i].correctFIBAnswerTypes[j] === "formula") {
+            const curText = questions[i].questionText;
+            let randNumIndices = [];
+            for (let k = 0; k < curText.length; k++) {
+              let indexFound = curText.indexOf("*RandNum*", k);
+              if (!randNumIndices.includes(indexFound))
+                randNumIndices.push(indexFound);
+            }
+            randNumIndices.pop();
+            let randNumReferences = "";
+            for (let k = 0; k < randNumIndices.length; k++) {
+              if (k === randNumIndices.length - 1)
+                randNumReferences += "rand_" + (k + 1);
+              else randNumReferences += "rand_" + (k + 1) + ", ";
+            }
+            let randNumReferencesArray = randNumReferences.split(", ");
+            const enteredFormula = questions[i].correctFIBAnswers[j];
+            const formulaArray = enteredFormula.split(" ");
+            for (let k = 0; k < formulaArray.length; k++) {
+              if (
+                !isNaN(formulaArray[k]) ||
+                formulaArray[k] === "+" ||
+                formulaArray[k] === "-" ||
+                formulaArray[k] === "*" ||
+                formulaArray[k] === "/" ||
+                formulaArray[k] === "%"
+              )
+                continue;
+
+              if (!randNumReferencesArray.includes(formulaArray[k])) {
+                alert(
+                  formulaArray[k] +
+                    " is an invalid reference in the formula in question number " +
+                    (i + 1) +
+                    " - blank " +
+                    (j + 1)
+                );
+                return false;
+              }
+            }
+
+            try {
+              eval(enteredFormula);
+            } catch (e) {
+              if (
+                !e.message.includes("is not defined") &&
+                !e.message.includes("Invalid reference")
+              ) {
+                alert(
+                  e.message +
+                    " in question number " +
+                    (i + 1) +
+                    " - blank " +
+                    (j + 1)
+                );
+                return false;
+              }
+            }
+          }
         }
       } else if (questions[i].questionType === "essay") {
         //Essay question validations here...
@@ -654,10 +734,11 @@ function EditAssessments() {
                     indexVal={index}
                     saveFIBQuestion={saveFIBQuestion}
                     saveFIBAnswers={saveFIBAnswers}
+                      saveFIBAnswerTypes={saveFIBAnswerTypes}
+                      removeFIBAnswer={removeFIBAnswer}
                     questionText={ele.questionText}
                     correctFIBAnswers={ele.correctFIBAnswers}
                     correctFIBAnswerTypes={ele.correctFIBAnswerTypes}
-                    removeFIBAnswer={removeFIBAnswer}
                   />
                 )}
                 {ele.questionType === "essay" && (
@@ -680,13 +761,13 @@ function EditAssessments() {
                 )}
                 <div style={{ marginTop: "5px" }}>
                   <label className="assessment-info-label">
-                      Marks Awarded
+                      Marks for Correct Answer
                   </label>
                   <br />
                   <input
                     id={"question_marks_" + index}
                     className="assessment-text-field"
-                    placeholder="Marks Awarded for Correct Answer"
+                      placeholder="Marks for Correct Answer"
                     onBlur={saveMarks}
                     defaultValue={ele.questionMarks}
                   />

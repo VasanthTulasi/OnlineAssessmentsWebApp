@@ -300,8 +300,8 @@ function CreateAssessments() {
   };
 
   const save = () => {
-    console.log("\n" + JSON.stringify(questions));
-    return;
+    // console.log("\n" + JSON.stringify(questions));
+    // return;
     // console.log(assessmentTitle);
     // console.log(selectedDurationNumber);
     // console.log(selectedDurationMeasure);
@@ -366,9 +366,9 @@ function CreateAssessments() {
           };
       });
       assessment.questions = questionsWithoutIDs;
-      // console.log("final object: " + JSON.stringify(assessment));
+      console.log("final object: " + JSON.stringify(assessment));
       axios2.post("/saveNewAssessment", assessment).then((res) => {
-        alert(JSON.stringify(res.data.message));
+      alert(JSON.stringify(res.data.message));
       });
     }
   };
@@ -441,6 +441,66 @@ function CreateAssessments() {
                 " cannot be empty."
             );
             return false;
+          }
+
+          if (questions[i].correctFIBAnswerTypes[j] === "formula") {
+            const curText = questions[i].questionText;
+            let randNumIndices = [];
+            for (let k = 0; k < curText.length; k++) {
+              let indexFound = curText.indexOf("*RandNum*", k);
+              if (!randNumIndices.includes(indexFound))
+                randNumIndices.push(indexFound);
+            }
+            randNumIndices.pop();
+            let randNumReferences = "";
+            for (let k = 0; k < randNumIndices.length; k++) {
+              if (k === randNumIndices.length - 1)
+                randNumReferences += "rand_" + (k + 1);
+              else randNumReferences += "rand_" + (k + 1) + ", ";
+            }
+            let randNumReferencesArray = randNumReferences.split(", ");
+            const enteredFormula = questions[i].correctFIBAnswers[j];
+            const formulaArray = enteredFormula.split(" ");
+            for (let k = 0; k < formulaArray.length; k++) {
+              if (
+                !isNaN(formulaArray[k]) ||
+                formulaArray[k] === "+" ||
+                formulaArray[k] === "-" ||
+                formulaArray[k] === "*" ||
+                formulaArray[k] === "/" ||
+                formulaArray[k] === "%"
+              )
+                continue;
+
+              if (!randNumReferencesArray.includes(formulaArray[k])) {
+                alert(
+                  formulaArray[k] +
+                    " is an invalid reference in the formula in question number " +
+                    (i + 1) +
+                    " - blank " +
+                    (j + 1)
+                );
+                return false;
+              }
+            }
+
+            try {
+              eval(enteredFormula);
+            } catch (e) {
+              if (
+                !e.message.includes("is not defined") &&
+                !e.message.includes("Invalid reference")
+              ) {
+                alert(
+                  e.message +
+                    " in question number " +
+                    (i + 1) +
+                    " - blank " +
+                    (j + 1)
+                );
+                return false;
+              }
+            }
           }
         }
       } else if (questions[i].questionType === "essay") {

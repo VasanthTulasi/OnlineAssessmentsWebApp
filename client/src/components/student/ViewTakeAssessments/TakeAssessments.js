@@ -10,6 +10,7 @@ import MCQTemplate from "../AnswerTemplates/MCQTemplate";
 import FIBTemplate from "../AnswerTemplates/FIBTemplate";
 import EssayTemplate from "../AnswerTemplates/EssayTemplate";
 import CodingTemplate from "../AnswerTemplates/CodingTemplate";
+import Timer from "./Timer";
 import { LoginContext } from "../../../contexts/LoginContext";
 import { AssessmentContext } from "../../../contexts/AssessmentContext";
 
@@ -41,6 +42,7 @@ function TakeAssessments() {
   const submitButton = useRef(null);
   const countdownTimer = useRef(null);
   const attemptsLeft = useRef(null);
+  // const remTime = useRef(null);
 
   const goBack = () => {
     setNavLinksStyle("menu");
@@ -336,12 +338,14 @@ function TakeAssessments() {
   const startCountDownTimer = (durInMilliSec) => {
     let time = getTimeLeft(durInMilliSec);
     setTimeLeft(time);
+    // remTime.current = time;
     countdownTimer.current = setInterval(() => {
       console.log("running timer");
       durInMilliSec -= 1000;
       time = getTimeLeft(durInMilliSec);
       setTimeLeft(time);
-      updateTimeLeftInDb(durInMilliSec);
+      // remTime.current = time;
+      // updateTimeLeftInDb(durInMilliSec);
       if (durInMilliSec === 0) {
         clearInterval(countdownTimer.current);
         setAssessmentElapsedMessage(

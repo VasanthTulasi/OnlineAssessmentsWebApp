@@ -60,11 +60,13 @@ function EditAssessments() {
       modQuestionArr[index].correctAnswer = "";
     } else if (val === "fib") {
       deletePropertiesExcept(
-        ["id", "questionType","questionMarks", "questionText", "correctFIBAnswers"],
+        ["id", "questionType","questionMarks", "questionText", "correctFIBAnswers","correctFIBAnswerTypes"],
         modQuestionArr,
         index
       );
       modQuestionArr[index].correctFIBAnswers = [];
+      modQuestionArr[index].correctFIBAnswerTypes = [];
+
     } else if (val === "essay") {
       deletePropertiesExcept(
         [
@@ -159,6 +161,16 @@ function EditAssessments() {
     modQuestionArr[index].correctFIBAnswers = answers;
     setQuestions(modQuestionArr);
   };
+
+  const saveFIBAnswerTypes = (index, answerTypes) => {
+    // console.log("save fib index "+index+ " answers " +answers);
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].correctFIBAnswerTypes = answerTypes;
+    setQuestions(modQuestionArr);
+  };
+
+
+
 
   const removeFIBAnswer = (index) => {
     let modQuestionArr = [...questions];
@@ -345,6 +357,7 @@ function EditAssessments() {
             questionType: ele.questionType,
             questionText: ele.questionText,
             correctFIBAnswers: ele.correctFIBAnswers,
+            correctFIBAnswerTypes: ele.correctFIBAnswerTypes,
             questionMarks: ele.questionMarks,
           };
         else if (ele.questionType === "coding")
@@ -643,6 +656,7 @@ function EditAssessments() {
                     saveFIBAnswers={saveFIBAnswers}
                     questionText={ele.questionText}
                     correctFIBAnswers={ele.correctFIBAnswers}
+                    correctFIBAnswerTypes={ele.correctFIBAnswerTypes}
                     removeFIBAnswer={removeFIBAnswer}
                   />
                 )}

@@ -70,11 +70,13 @@ function CreateAssessments() {
           "questionText",
           "questionMarks",
           "correctFIBAnswers",
+          "correctFIBAnswerTypes",
         ],
         modQuestionArr,
         index
       );
       modQuestionArr[index].correctFIBAnswers = [];
+      modQuestionArr[index].correctFIBAnswerTypes = [];
     } else if (val === "essay") {
       deletePropertiesExcept(
         [
@@ -168,8 +170,17 @@ function CreateAssessments() {
   // };
 
   const saveFIBAnswers = (index, answers) => {
+    // console.log("this is save fib answers");
     let modQuestionArr = [...questions];
     modQuestionArr[index].correctFIBAnswers = answers;
+    setQuestions(modQuestionArr);
+  };
+
+  const saveFIBAnswerTypes = (index, answerTypes) => {
+    // console.log("save fib index "+index+ " answers " +answers);
+    // console.log("this is save fib answer types");
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].correctFIBAnswerTypes = answerTypes;
     setQuestions(modQuestionArr);
   };
 
@@ -289,8 +300,8 @@ function CreateAssessments() {
   };
 
   const save = () => {
-    // console.log("\n" + JSON.stringify(questions));
-    // return;
+    console.log("\n" + JSON.stringify(questions));
+    return;
     // console.log(assessmentTitle);
     // console.log(selectedDurationNumber);
     // console.log(selectedDurationMeasure);
@@ -336,6 +347,7 @@ function CreateAssessments() {
             questionType: ele.questionType,
             questionText: ele.questionText,
             correctFIBAnswers: ele.correctFIBAnswers,
+            correctFIBAnswerTypes: ele.correctFIBAnswerTypes,
             questionMarks: ele.questionMarks,
           };
         else if (ele.questionType === "coding")
@@ -601,10 +613,12 @@ function CreateAssessments() {
                       indexVal={index}
                       saveFIBQuestion={saveFIBQuestion}
                       saveFIBAnswers={saveFIBAnswers}
+                      saveFIBAnswerTypes={saveFIBAnswerTypes}
                       removeFIBAnswer={removeFIBAnswer}
                       questionText={ele.questionText}
                       // correctFIBAnswers={ele.correctFIBAnswers}
                       correctFIBAnswers={[]}
+                      correctFIBAnswerTypes={[]}
                     />
                   )}
                   {ele.questionType === "essay" && (

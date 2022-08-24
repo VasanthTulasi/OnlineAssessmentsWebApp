@@ -5,14 +5,14 @@ function QuestionTypeDropdown(props) {
   const questionTypeComponent = useRef(null);
   const questionTypesDropdown = [
     { label: "Multiple Choice Question", value: "mcq" },
-    { label: "Fill in the Blank", value: "fib" },
+    { label: "Fill-in-the-blank", value: "fib" },
     { label: "Essay", value: "essay" },
     { label: "Coding", value: "coding" },
   ];
 
   const questionTypePairs = {
     mcq: "Multiple Choice Question",
-    fib: "Fill in the Blank",
+    fib: "Fill-in-the-blank",
     essay: "Essay",
     coding: "Coding",
   };

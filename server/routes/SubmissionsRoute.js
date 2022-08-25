@@ -240,7 +240,8 @@ router.post("/autoEvaluate", async (req, res) => {
         correctAnswers.push(marks.questions[i].correctAnswer);
         marksForCorrectAnswers.push(marks.questions[i].questionMarks);
       } else if (marks.questions[i].questionType === "fib") {
-        correctAnswers.push(marks.questions[i].correctFIBAnswers);
+        // correctAnswers.push(marks.questions[i].correctFIBAnswers);
+        correctAnswers.push("");
         marksForCorrectAnswers.push(marks.questions[i].questionMarks);
       } else if (marks.questions[i].questionType === "essay") {
         correctAnswers.push(marks.questions[i].correctKeywords);
@@ -272,16 +273,15 @@ router.post("/autoEvaluate", async (req, res) => {
           }
         } else if (marks.questions[j].questionType === "fib") {
           const studentFIBAnswers = submission.answers[j];
-          let totalFIBCount = studentFIBAnswers.length;
+          const finalCorrectFIBAnswers =
+            submission.answers[j][submission.answers[j].length - 1]
+              .final_correct_answers;
+          let totalFIBCount = studentFIBAnswers.length - 1;
           let correctFIBCount = 0;
-          for (
-            let k = 0;
-            k < marks.questions[j].correctFIBAnswers.length;
-            k++
-          ) {
+          for (let k = 0; k < finalCorrectFIBAnswers.length; k++) {
             if (
-              marks.questions[j].correctFIBAnswers[k].toLowerCase() ===
-              studentFIBAnswers[k].toLowerCase()
+              String(finalCorrectFIBAnswers[k]).toLowerCase() ===
+              String(studentFIBAnswers[k]).toLowerCase()
             ) {
               correctFIBCount++;
             }
@@ -360,7 +360,8 @@ router.post("/autoEvaluateAll", async (req, res) => {
         correctAnswers.push(marks.questions[i].correctAnswer);
         marksForCorrectAnswers.push(marks.questions[i].questionMarks);
       } else if (marks.questions[i].questionType === "fib") {
-        correctAnswers.push(marks.questions[i].correctFIBAnswers);
+        // correctAnswers.push(marks.questions[i].correctFIBAnswers);
+        correctAnswers.push("");
         marksForCorrectAnswers.push(marks.questions[i].questionMarks);
       } else if (marks.questions[i].questionType === "essay") {
         correctAnswers.push(marks.questions[i].correctKeywords);
@@ -392,15 +393,15 @@ router.post("/autoEvaluateAll", async (req, res) => {
             }
           } else if (marks.questions[j].questionType === "fib") {
             const studentFIBAnswers = submission.answers[j];
-            let totalFIBCount = studentFIBAnswers.length;
+            const finalCorrectFIBAnswers =
+              submission.answers[j][submission.answers[j].length - 1]
+                .final_correct_answers;
+            let totalFIBCount = studentFIBAnswers.length - 1;
             let correctFIBCount = 0;
-            for (
-              let k = 0;
-              k < marks.questions[j].correctFIBAnswers.length;
-              k++
-            ) {
+            for (let k = 0; k < finalCorrectFIBAnswers.length; k++) {
               if (
-                marks.questions[j].correctFIBAnswers[k] === studentFIBAnswers[k]
+                String(finalCorrectFIBAnswers[k]).toLowerCase() ===
+                String(studentFIBAnswers[k]).toLowerCase()
               ) {
                 correctFIBCount++;
               }

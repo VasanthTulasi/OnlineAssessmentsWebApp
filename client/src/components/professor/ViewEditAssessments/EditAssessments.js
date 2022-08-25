@@ -734,8 +734,8 @@ function EditAssessments() {
                     indexVal={index}
                     saveFIBQuestion={saveFIBQuestion}
                     saveFIBAnswers={saveFIBAnswers}
-                      saveFIBAnswerTypes={saveFIBAnswerTypes}
-                      removeFIBAnswer={removeFIBAnswer}
+                    saveFIBAnswerTypes={saveFIBAnswerTypes}
+                    removeFIBAnswer={removeFIBAnswer}
                     questionText={ele.questionText}
                     correctFIBAnswers={ele.correctFIBAnswers}
                     correctFIBAnswerTypes={ele.correctFIBAnswerTypes}

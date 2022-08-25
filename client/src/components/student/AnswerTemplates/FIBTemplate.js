@@ -33,9 +33,7 @@ function FIBTemplate(props) {
   };
 
   useEffect(() => {
-    if (randomNumsGenerated.length === 0) return;
-
-    const finalQuestion = question.questionText;
+    let finalQuestion = question.questionText;
     let finalCorrectAnswers = [];
     for (let i = 0; i < question.correctFIBAnswerTypes.length; i++) {
       if (question.correctFIBAnswerTypes[i] === "value")
@@ -49,12 +47,22 @@ function FIBTemplate(props) {
           } else return ele;
         });
         formula = formula.join(" ");
-        let x = eval(formula);
-        finalCorrectAnswers.push(x);
+        let result = eval(formula);
+        finalCorrectAnswers.push(result);
       }
     }
     console.log("question: " + finalQuestion);
     console.log("final correct answers: " + finalCorrectAnswers);
+
+    const numberOfBlanks =
+      question.questionText.split("____________").length - 1;
+    const initialAnswersArray = [];
+    for (let i = 0; i < numberOfBlanks; i++) initialAnswersArray.push("");
+    initialAnswersArray.push({
+      final_question: finalQuestion,
+      final_correct_answers: finalCorrectAnswers,
+    });
+    props.saveFIBAnswers(questionIndex, initialAnswersArray);
   }, [randomNumsGenerated]);
 
   useEffect(() => {
@@ -72,12 +80,6 @@ function FIBTemplate(props) {
     });
     question.questionText = quesTextArr.join(" ");
     setRandomNumsGenerated([...randNums]);
-
-    const numberOfBlanks =
-      question.questionText.split("____________").length - 1;
-    const emptyAnswersArray = [];
-    for (let i = 0; i < numberOfBlanks; i++) emptyAnswersArray.push("");
-    props.saveFIBAnswers(questionIndex, emptyAnswersArray);
   }, [questionIndex]);
 
   return (

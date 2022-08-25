@@ -112,10 +112,6 @@ function EvaluateSubmission() {
 
   const save = () => {
     if (validateQuestions()) {
-      // console.log("All ok.. can save to server");
-      // console.log(marksAwarded);
-      // console.log(feedback);
-
       axios2
         .post("/saveMarksAwarded", {
           assessment_id: state.assessment_id,
@@ -285,13 +281,29 @@ function EvaluateSubmission() {
                     />
                   )}
                   {ele.questionType === "fib" && (
+                    // console.log(
+                    //   "Question is: " +
+                    //     JSON.stringify(
+                    //       studentAnswers[index][0]
+                    //     )
+                    // ) &&
                     <FIBTemplate
                       indexVal={index}
                       saveFIBQuestion={() => {}}
                       saveFIBAnswers={() => {}}
-                      questionText={ele.questionText}
-                      correctFIBAnswers={ele.correctFIBAnswers}
+                      saveFIBAnswerTypes={() => {}}
                       removeFIBAnswer={() => {}}
+                      // questionText={ele.questionText}
+                      questionText={
+                        studentAnswers[index][studentAnswers[index].length - 1]
+                          .final_question
+                      }
+                      // correctFIBAnswers={ele.correctFIBAnswers}
+                      correctFIBAnswers={
+                        studentAnswers[index][studentAnswers[index].length - 1]
+                          .final_correct_answers
+                      }
+                      correctFIBAnswerTypes={ele.correctFIBAnswerTypes}
                       isDisabled={true}
                     />
                   )}
@@ -351,7 +363,9 @@ function EvaluateSubmission() {
                       </>
                     )}
                     {ele.questionType === "fib" &&
-                      studentAnswers[index].map((val, ind) => {
+                      studentAnswers[index].map((val, ind, arr) => {
+                        // console.log("val is: " + val.final_question);
+                        if (ind === arr.length - 1) return;
                         return (
                           <>
                             <label className="answer-submission-info-label">

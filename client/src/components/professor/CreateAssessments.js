@@ -98,11 +98,16 @@ function CreateAssessments() {
           "questionText",
           "questionMarks",
           "codingLanguage",
+          "codingTemplate",
+          "testCases",
         ],
         modQuestionArr,
         index
       );
       modQuestionArr[index].codingLanguage = "";
+      modQuestionArr[index].codingTemplate = "";
+      // modQuestionArr[index].testCases = [{sample_input: "hello",expected_output:"hey"}];
+      modQuestionArr[index].testCases = [];
     }
 
     // console.log("Final arr " + JSON.stringify(modQuestionArr[index]));
@@ -203,6 +208,18 @@ function CreateAssessments() {
   const saveCodingLanguage = (index, codingLanguage) => {
     let modQuestionArr = [...questions];
     modQuestionArr[index].codingLanguage = codingLanguage;
+    setQuestions(modQuestionArr);
+  };
+
+  const saveCodingTemplate = (index, template) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].codingTemplate = template;
+    setQuestions(modQuestionArr);
+  };
+
+  const saveCodingTestCases = (index, testCases) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].testCases = testCases;
     setQuestions(modQuestionArr);
   };
 
@@ -355,20 +372,22 @@ function CreateAssessments() {
             questionType: ele.questionType,
             questionText: ele.questionText,
             codingLanguage: ele.codingLanguage,
+            codingTemplate: ele.codingTemplate,
+            testCases: ele.testCases,
             questionMarks: ele.questionMarks,
           };
         else
           return {
             questionType: ele.questionType,
             questionText: ele.questionText,
-            questionMarks: ele.questionMarks,
             correctKeywords: ele.correctKeywords,
+            questionMarks: ele.questionMarks,
           };
       });
       assessment.questions = questionsWithoutIDs;
       console.log("final object: " + JSON.stringify(assessment));
       axios2.post("/saveNewAssessment", assessment).then((res) => {
-      alert(JSON.stringify(res.data.message));
+        alert(JSON.stringify(res.data.message));
       });
     }
   };
@@ -695,7 +714,11 @@ function CreateAssessments() {
                       indexVal={index}
                       saveCodingQuestion={saveCodingQuestion}
                       saveCodingLanguage={saveCodingLanguage}
+                      saveCodingTemplate={saveCodingTemplate}
+                      saveCodingTestCases={saveCodingTestCases}
                       questionText={ele.questionText}
+                      codingTemplate={null}
+                      testCases={[]}
                     />
                   )}
                   <div style={{ marginTop: "5px" }}>

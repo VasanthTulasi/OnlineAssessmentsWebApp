@@ -11,6 +11,7 @@ router.post("/saveAnswers", async (req, res) => {
     function (err) {
       if (err) res.json({ message: err });
       else res.json({ message: "success" });
+      console.log("continuing..");
     }
   );
 });

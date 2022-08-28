@@ -329,39 +329,39 @@ function FIBTemplate(props) {
       saveFIBQuestion();
   };
 
-  const checkExpression = (event) => {
-    const index = event.target.id.split("_")[2];
-    if (correctBlankAnswerTypes[index].answerType === "value") return;
-    let randNumRefsArray = randomNumberReferences.split(", ");
-    const enteredFormula = correctBlankAnswers[index].answer;
-    const formulaArray = enteredFormula.split(" ");
+  // const checkExpression = (event) => {
+  //   const index = event.target.id.split("_")[2];
+  //   if (correctBlankAnswerTypes[index].answerType === "value") return;
+  //   let randNumRefsArray = randomNumberReferences.split(", ");
+  //   const enteredFormula = correctBlankAnswers[index].answer;
+  //   const formulaArray = enteredFormula.split(" ");
 
-    for (let i = 0; i < formulaArray.length; i++) {
-      if (
-        !isNaN(formulaArray[i]) ||
-        formulaArray[i] === "+" ||
-        formulaArray[i] === "-" ||
-        formulaArray[i] === "*" ||
-        formulaArray[i] === "/" ||
-        formulaArray[i] === "%"
-      )
-        continue;
+  //   for (let i = 0; i < formulaArray.length; i++) {
+  //     if (
+  //       !isNaN(formulaArray[i]) ||
+  //       formulaArray[i] === "+" ||
+  //       formulaArray[i] === "-" ||
+  //       formulaArray[i] === "*" ||
+  //       formulaArray[i] === "/" ||
+  //       formulaArray[i] === "%"
+  //     )
+  //       continue;
 
-      if (!randNumRefsArray.includes(formulaArray[i]))
-        alert(formulaArray[i] + " is an invalid usage in the formula.");
-    }
+  //     if (!randNumRefsArray.includes(formulaArray[i]))
+  //       alert(formulaArray[i] + " is an invalid usage in the formula.");
+  //   }
 
-    try {
-      let answer = eval(enteredFormula);
-      console.log(answer);
-    } catch (e) {
-      if (
-        !e.message.includes("is not defined") &&
-        !e.message.includes("Invalid reference")
-      )
-        alert(e.message);
-    }
-  };
+  //   try {
+  //     let answer = eval(enteredFormula);
+  //     console.log(answer);
+  //   } catch (e) {
+  //     if (
+  //       !e.message.includes("is not defined") &&
+  //       !e.message.includes("Invalid reference")
+  //     )
+  //       alert(e.message);
+  //   }
+  // };
 
   return (
     <FIB>

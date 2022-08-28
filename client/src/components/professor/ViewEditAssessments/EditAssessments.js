@@ -29,7 +29,7 @@ function EditAssessments() {
   const [windowEndTime, setWindowEndTime] = useState("");
   const [totalMarks, setTotalMarks] = useState(null);
   const selectedDurationNumberDiv = useRef(null);
-  const [changedMeasure,setChangedMeasure] = useState(0);
+  const [changedMeasure, setChangedMeasure] = useState(0);
 
   const axios = Axios.create({
     withCredentials: true,
@@ -80,7 +80,6 @@ function EditAssessments() {
       );
       modQuestionArr[index].correctFIBAnswers = [];
       modQuestionArr[index].correctFIBAnswerTypes = [];
-
     } else if (val === "essay") {
       deletePropertiesExcept(
         [
@@ -102,14 +101,17 @@ function EditAssessments() {
           "questionText",
           "questionMarks",
           "codingLanguage",
+          "codingTemplate",
+          "testCases",
         ],
         modQuestionArr,
         index
       );
       modQuestionArr[index].codingLanguage = "";
+      modQuestionArr[index].codingTemplate = "";
+      modQuestionArr[index].testCases = [];
     }
 
-    // console.log("Final arr " + JSON.stringify(modQuestionArr[index]));
     setQuestions(modQuestionArr);
   };
 
@@ -136,7 +138,7 @@ function EditAssessments() {
   };
 
   const saveMCQCorrectAnswer = (index, correctAnswer) => {
-    console.log("setting correct answer: " + correctAnswer);
+    // console.log("setting correct answer: " + correctAnswer);
     let modQuestionArr = [...questions];
     modQuestionArr[index].correctAnswer = correctAnswer;
     setQuestions(modQuestionArr);
@@ -176,7 +178,7 @@ function EditAssessments() {
   // };
 
   const saveFIBAnswers = (index, answers) => {
-    console.log("save fib index "+index+ " answers " +answers);
+    console.log("save fib index " + index + " answers " + answers);
     let modQuestionArr = [...questions];
     modQuestionArr[index].correctFIBAnswers = answers;
     setQuestions(modQuestionArr);
@@ -188,9 +190,6 @@ function EditAssessments() {
     modQuestionArr[index].correctFIBAnswerTypes = answerTypes;
     setQuestions(modQuestionArr);
   };
-
-
-
 
   const removeFIBAnswer = (index) => {
     let modQuestionArr = [...questions];
@@ -211,6 +210,18 @@ function EditAssessments() {
   const saveCodingLanguage = (index, codingLanguage) => {
     let modQuestionArr = [...questions];
     modQuestionArr[index].codingLanguage = codingLanguage;
+    setQuestions(modQuestionArr);
+  };
+
+  const saveCodingTemplate = (index, template) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].codingTemplate = template;
+    setQuestions(modQuestionArr);
+  };
+
+  const saveCodingTestCases = (index, testCases) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].testCases = testCases;
     setQuestions(modQuestionArr);
   };
 
@@ -270,12 +281,12 @@ function EditAssessments() {
       let newNumbers = [];
       for (let i = 10; i <= 59; i = i + 10) newNumbers.push(i);
       setAssessmentDurationNumberOptions(newNumbers);
-      setChangedMeasure(prevCount => prevCount +1);
+      setChangedMeasure((prevCount) => prevCount + 1);
     } else {
       let newNumbers = [];
       for (let i = 1; i <= 3; i = i + 0.5) newNumbers.push(i);
       setAssessmentDurationNumberOptions(newNumbers);
-      setChangedMeasure(prevCount => prevCount +1);
+      setChangedMeasure((prevCount) => prevCount + 1);
     }
   };
 
@@ -385,14 +396,16 @@ function EditAssessments() {
             questionType: ele.questionType,
             questionText: ele.questionText,
             codingLanguage: ele.codingLanguage,
+            codingTemplate: ele.codingTemplate,
+            testCases: ele.testCases,
             questionMarks: ele.questionMarks,
           };
         else
           return {
             questionType: ele.questionType,
             questionText: ele.questionText,
-            questionMarks: ele.questionMarks,
             correctKeywords: ele.correctKeywords,
+            questionMarks: ele.questionMarks,
           };
       });
       assessment.questions = questionsWithoutIDs;
@@ -412,12 +425,6 @@ function EditAssessments() {
       .slice(0, 16);
     return finalDate;
   };
-  
-  
-  
-  
-  
-  
 
   const getDurationInSeconds = () => {
     return (
@@ -745,9 +752,9 @@ function EditAssessments() {
                   <EssayTemplate
                     indexVal={index}
                     saveEssayQuestion={saveEssayQuestion}
-                      saveEssayCorrectKeywords={saveEssayCorrectKeywords}
+                    saveEssayCorrectKeywords={saveEssayCorrectKeywords}
                     questionText={ele.questionText}
-                      correctKeywords={ele.correctKeywords}
+                    correctKeywords={ele.correctKeywords}
                   />
                 )}
                 {ele.questionType === "coding" && (
@@ -755,19 +762,23 @@ function EditAssessments() {
                     indexVal={index}
                     saveCodingQuestion={saveCodingQuestion}
                     saveCodingLanguage={saveCodingLanguage}
+                    saveCodingTemplate={saveCodingTemplate}
+                    saveCodingTestCases={saveCodingTestCases}
                     questionText={ele.questionText}
                     codingLanguage={ele.codingLanguage}
+                    testCases={ele.testCases}
+                    codingTemplate={ele.codingTemplate}
                   />
                 )}
                 <div style={{ marginTop: "5px" }}>
                   <label className="assessment-info-label">
-                      Marks for Correct Answer
+                    Marks for Correct Answer
                   </label>
                   <br />
                   <input
                     id={"question_marks_" + index}
                     className="assessment-text-field"
-                      placeholder="Marks for Correct Answer"
+                    placeholder="Marks for Correct Answer"
                     onBlur={saveMarks}
                     defaultValue={ele.questionMarks}
                   />

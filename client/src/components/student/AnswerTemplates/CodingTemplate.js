@@ -7,6 +7,7 @@ function CodingTemplate(props) {
   const { question, questionIndex, totalQuestions, assessment_id } = props;
   const textAreaComponent = useRef(null);
   const codingLanguageComponent = useRef(null);
+  const codeArea = useRef(null);
   const { loggedInUserDetails } = useContext(LoginContext);
   const uniId = loggedInUserDetails.uni_id;
 
@@ -19,6 +20,11 @@ function CodingTemplate(props) {
           { label: "C Language", value: "C Language" },
         ]
       : [{ label: question.codingLanguage, value: question.codingLanguage }];
+
+  // const programmingLanguages = {
+  //   label: question.codingLanguage,
+  //   value: question.codingLanguage,
+  // };
 
   const saveCodingAnswer = (event) => {
     props.saveCodingAnswer(questionIndex, event.target.value);
@@ -38,6 +44,8 @@ function CodingTemplate(props) {
   };
 
   useEffect(() => {
+    console.log("Question: " + JSON.stringify(question));
+    // console.log("Coding language is: " + question.codingLanguage);
     const initialArray = [];
     const codingLanguage =
       question.codingLanguage === "Any"
@@ -49,16 +57,29 @@ function CodingTemplate(props) {
               String(questionIndex)
           )
         : question.codingLanguage;
-    const codingAnswer = localStorage.getItem(
-      assessment_id + "_" + uniId + "_answer_" + String(questionIndex)
-    );
+
+    const codingAnswer =
+      localStorage.getItem(
+        assessment_id + "_" + uniId + "_answer_" + String(questionIndex)
+      ) != undefined
+        ? localStorage.getItem(
+            assessment_id + "_" + uniId + "_answer_" + String(questionIndex)
+          )
+        : question.codingTemplate;
+
     if (codingLanguage == null) initialArray.push("");
     else initialArray.push(codingLanguage);
 
     initialArray.push(codingAnswer);
     console.log("init arry" + initialArray);
     props.saveInitialCodingArray(questionIndex, initialArray);
-  }, []);
+    codeArea.current.value = question.codingTemplate;
+    // codingLanguageComponent.current.value = {
+    //   label: question.codingLanguage,
+    //   value: question.codingLanguage,
+    // };
+    codingLanguageComponent.current.value = question.codingLanguage;
+  }, [question]);
 
   const customStyles = {
     container: (provided) => ({
@@ -97,14 +118,40 @@ function CodingTemplate(props) {
     }),
   };
 
+  const checkTabPressed = (event) => {
+    if (event.code === "Tab") {
+      event.preventDefault();
+
+      codeArea.current.setRangeText(
+        "\t",
+        codeArea.current.selectionStart,
+        codeArea.current.selectionStart,
+        "end"
+      );
+    }
+  };
+
   return (
     <CodingAnswer>
       <div className="question-number">
         Question {questionIndex + 1} / {totalQuestions}
       </div>
       <div className="question-text">{question.questionText}</div>
+      <label className="label-class">Coding Language: </label>
       <div>
-        <SingleSelect
+        <input
+          ref={codingLanguageComponent}
+          id={"coding_language_" + props.indexVal}
+          // options={programmingLanguages}
+          // styles={customStyles}
+          // placeholder="Select or Search the Programming Language"
+          // onChange={saveCodingLanguage}
+          // noOptionsMessage={() => "This programming language is not available"}
+          // isDisabled={question.codingLanguage !== "Any" ? true : false}
+          className="coding-language"
+          disabled={true}
+        />
+        {/* <SingleSelect
           ref={codingLanguageComponent}
           id={"coding_language_" + props.indexVal}
           options={programmingLanguages}
@@ -136,11 +183,13 @@ function CodingTemplate(props) {
                   value: question.codingLanguage,
                 };
           }}
-        />
+        /> */}
       </div>
       <textarea
+        ref={codeArea}
         className="text-area"
         onBlur={saveCodingAnswer}
+        onKeyDown={checkTabPressed}
         rows="10"
         placeholder="Type your code here... It will be autosaved as you write."
         onChange={(event) =>
@@ -149,9 +198,15 @@ function CodingTemplate(props) {
             event.target.value
           )
         }
-        defaultValue={localStorage.getItem(
-          assessment_id + "_" + uniId + "_answer_" + String(questionIndex)
-        )}
+        // defaultValue={
+        //   localStorage.getItem(
+        //     assessment_id + "_" + uniId + "_answer_" + String(questionIndex)
+        //   ) != undefined
+        //     ? localStorage.getItem(
+        //         assessment_id + "_" + uniId + "_answer_" + String(questionIndex)
+        //       )
+        //     : question.codingTemplate
+        // }
       />
     </CodingAnswer>
   );
@@ -163,6 +218,17 @@ const CodingAnswer = styled.div`
   border-radius: 10px;
   background: #61dafb;
   margin: 10px 40px 0 40px;
+
+  .label-class {
+    display: inline-block;
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    margin-top: 20px;
+    margin-left: 20px;
+    color: black;
+  }
 
   .question-number {
     color: white;
@@ -197,11 +263,21 @@ const CodingAnswer = styled.div`
     font-weight: 400;
     padding: 10px;
     border-radius: 10px;
+    margin: 0px 20px 20px 20px;
+    resize: none;
+    border: 1px solid #282c34;
+    white-space: pre-line;
+  }
+  .coding-language {
+    color: black;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    padding: 10px;
+    border-radius: 10px;
     margin: 20px 20px 20px 20px;
     resize: none;
     border: 1px solid #282c34;
-    /* background-color: #282c34; */
-    /* color: white; */
   }
 `;
 

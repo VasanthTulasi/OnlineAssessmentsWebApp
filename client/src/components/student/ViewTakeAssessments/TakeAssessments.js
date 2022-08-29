@@ -127,12 +127,20 @@ function TakeAssessments() {
     //   console.log("From google" + res);
     // });
 
+    let answerData = {
+      assessment_id: state.assessment._id,
+      student_uni_id: loggedInUserDetails.uni_id,
+      index: questionIndex,
+      answer: answers[questionIndex],
+      question_type: questions[questionIndex].questionType,
+    };
+
+    if (questions[questionIndex].questionType === "coding")
+      answerData.test_cases = questions[questionIndex].testCases;
+
     axios
       .post("/saveAnswers", {
-        assessment_id: state.assessment._id,
-        student_uni_id: loggedInUserDetails.uni_id,
-        index: questionIndex,
-        answer: answers[questionIndex],
+        ...answerData,
       })
       .then((res) => {
         if (res.data.message === "success") {

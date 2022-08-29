@@ -229,7 +229,7 @@ function ViewSubmissions() {
                         className="module-data-button"
                       >
                         {ele.marks_awarded.length !== 0
-                          ? "View / Edit Evalution"
+                          ? "View / Edit Evaluation"
                           : "Evaluate"}
                       </button>
                     </td>
@@ -339,7 +339,7 @@ const ViewSubs = styled.div`
     align-items: flex-start;
     flex-direction: column;
     /* border:1px solid red; */
-    width: 90%;
+    width: 93%;
   }
 
   .select-module-label {

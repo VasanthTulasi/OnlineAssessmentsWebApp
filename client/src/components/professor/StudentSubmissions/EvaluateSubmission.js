@@ -322,8 +322,12 @@ function EvaluateSubmission() {
                       indexVal={index}
                       saveCodingQuestion={() => {}}
                       saveCodingLanguage={() => {}}
+                      saveCodingTemplate={() => {}}
+                      saveCodingTestCases={() => {}}
                       questionText={ele.questionText}
                       codingLanguage={ele.codingLanguage}
+                      testCases={ele.testCases}
+                      codingTemplate={ele.codingTemplate}
                       isDisabled={true}
                     />
                   )}
@@ -342,7 +346,7 @@ function EvaluateSubmission() {
                   <div
                     style={{
                       marginTop: "20px",
-                      padding: "10px",
+                      padding: "15px",
                       paddingTop: "0",
                       border: "1px dotted white",
                       borderRadius: "10px",
@@ -408,8 +412,82 @@ function EvaluateSubmission() {
                           className="student-answer"
                           disabled="true"
                         >
-                          {studentAnswers[index]}
+                          {studentAnswers[index][1]}
                         </div>
+                        {ele.testCases.length != 0 && (
+                          <label
+                            className="label-class"
+                            style={{ marginTop: "15px" }}
+                          >
+                            Test Cases
+                          </label>
+                        )}
+                        <table className="test-cases-table">
+                          <tbody>
+                            {ele.testCases.length != 0 && (
+                              <tr>
+                                <td>
+                                  <label className="label-class">
+                                    Sample Input
+                                  </label>
+                                </td>
+                                <td>
+                                  <label
+                                    className="label-class"
+                                    style={{ marginLeft: "10px" }}
+                                  >
+                                    Expected Output
+                                  </label>
+                                </td>
+                                <td>
+                                  <label
+                                    className="label-class"
+                                    style={{ marginLeft: "20px" }}
+                                  >
+                                    Student's Code Output
+                                  </label>
+                                </td>
+                              </tr>
+                            )}
+                            {ele.testCases.map((ele, ind) => {
+                              return (
+                                <React.Fragment>
+                                  <tr>
+                                    <td>
+                                      <textarea
+                                        className="text-area"
+                                        id={"sample_input_" + ind}
+                                        value={ele.sample_input}
+                                        disabled="true"
+                                        rows="2"
+                                      />
+                                    </td>
+                                    <td>
+                                      <textarea
+                                        className="text-area"
+                                        id={"expected_output_" + ind}
+                                        value={ele.expected_output}
+                                        disabled="true"
+                                        rows="2"
+                                        style={{ marginLeft: "10px" }}
+                                      />
+                                    </td>
+                                    <td>
+                                      <textarea
+                                        className="text-area"
+                                        id={"student_code_output_" + ind}
+                                        value={studentAnswers[index][2][ind]}
+                                        disabled="true"
+                                        rows="2"
+                                        style={{ marginLeft: "20px" }}
+                                      />
+                                    </td>
+                                  </tr>
+                                </React.Fragment>
+                              );
+                            })}
+                          </tbody>
+                        </table>
                       </>
                     )}
                   </div>
@@ -440,8 +518,8 @@ function EvaluateSubmission() {
                         isAutoEvaluated &&
                         " (Auto-evaluated)"}
                       {ele.questionType === "coding" &&
-                        isManuallyEvaluated &&
-                        " (Manually-evaluated)"}
+                        isAutoEvaluated &&
+                        " (Auto-evaluated)"}
                     </label>
                     <br />
                     <input
@@ -519,6 +597,40 @@ const EvalSubmission = styled.div`
     /* text-decoration: underline; */
     /* margin-top: 0px; */
     text-align: center;
+  }
+
+  .label-class {
+    display: inline-block;
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 5px;
+  }
+
+  .test-cases-table {
+    /* border: 1px dotted white; */
+    /* margin-top: 5px; */
+    /* padding: 10px; */
+    /* padding-top: 0px; */
+    padding-right: 20px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .text-area {
+    width: 100%;
+    color: black;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    padding: 5px;
+    border-radius: 5px;
+    margin-top: 5px;
+    resize: none;
+  }
+  textarea:disabled {
+    color: white;
   }
 
   .submission-info {
@@ -707,9 +819,11 @@ const EvalSubmission = styled.div`
     margin-top: 5px;
     border-radius: 5px;
     /* width: 400px; */
-    /* height: 35px; */
+    height: 350px;
     padding: 5px;
     padding-left: 10px;
+    white-space: pre-wrap;
+    overflow-y: auto;
   }
 
   .essay-student-answer {

@@ -2,19 +2,78 @@ const router = require("express").Router();
 const SubmissionsModel = require("../Models/SubmissionsModel");
 const UsersModel = require("../Models/UsersModel");
 const AssessmentsModel = require("../models/AssessmentsModel");
+const axios = require("axios");
 
 router.post("/saveAnswers", async (req, res) => {
-  const { assessment_id, student_uni_id, index, answer } = req.body;
+  const { assessment_id, student_uni_id, index, answer, question_type } =
+    req.body;
+
   SubmissionsModel.findOneAndUpdate(
     { assessment_id: assessment_id, student_uni_id: student_uni_id },
     { $set: { [`answers.${index}`]: answer } },
     function (err) {
       if (err) res.json({ message: err });
       else res.json({ message: "success" });
-      console.log("continuing..");
     }
   );
+
+  if (question_type === "coding") {
+    const finalAnswer = await executeCode(answer, index, req.body.test_cases);
+    // console.log("Fin answer reached: " + JSON.stringify(finalAnswer));
+    SubmissionsModel.findOneAndUpdate(
+      { assessment_id: assessment_id, student_uni_id: student_uni_id },
+      { $set: { [`answers.${index}`]: finalAnswer } },
+      function (err) {
+        if (err) console.log({ message: err });
+        else console.log({ message: "success" });
+      }
+    );
+  }
 });
+
+const executeCode = async (answer, index, testCases) => {
+  const languages = {
+    Java: "java",
+    Python: "python3",
+    "C++": "cpp",
+    "C Language": "c",
+  };
+
+  let executionResults = [];
+
+  // console.log(
+  //   "test cases " +
+  //     testCases[0].sample_input +
+  //     " and " +
+  //     testCases[1].sample_input
+  // );
+  // return;
+  for (let i = 0; i < testCases.length; i++) {
+    const codeData = {
+      script: answer[1],
+      stdin: testCases[i].sample_input,
+      language: languages[answer[0]],
+      versionIndex: "0",
+      clientId: "f5f596e9d23c787b9310a2b7ca2b3c16",
+      clientSecret:
+        "fa13f1033f262922f661ed2427911926ce21d69cf0b410002bba08b747564ce5",
+    };
+
+    let res = await axios.post(
+      "https://api.jdoodle.com/v1/execute",
+      {
+        ...codeData,
+      },
+      { headers: { "Content-Type": "application/json" } }
+    );
+    executionResults.push(res.data.output);
+  }
+
+  let finalAnswer = answer;
+  finalAnswer.push(executionResults);
+  // console.log("Final answer inside method: " + JSON.stringify(finalAnswer));
+  return finalAnswer;
+};
 
 router.post("/createNewSubmission", async (req, res) => {
   const { assessment_id, student_uni_id, session_details, numberOfQuestions } =
@@ -27,6 +86,7 @@ router.post("/createNewSubmission", async (req, res) => {
     session_details: session_details,
     answers: answerArr,
   });
+
   submission
     .save()
     .then(() => res.json({ message: "success" }))
@@ -239,18 +299,15 @@ router.post("/autoEvaluate", async (req, res) => {
     for (let i = 0; i < marks.questions.length; i++) {
       if (marks.questions[i].questionType === "mcq") {
         correctAnswers.push(marks.questions[i].correctAnswer);
-        marksForCorrectAnswers.push(marks.questions[i].questionMarks);
       } else if (marks.questions[i].questionType === "fib") {
-        // correctAnswers.push(marks.questions[i].correctFIBAnswers);
         correctAnswers.push("");
-        marksForCorrectAnswers.push(marks.questions[i].questionMarks);
       } else if (marks.questions[i].questionType === "essay") {
         correctAnswers.push(marks.questions[i].correctKeywords);
-        marksForCorrectAnswers.push(marks.questions[i].questionMarks);
-      } else {
-        correctAnswers.push("");
-        marksForCorrectAnswers.push("");
+      } else if (marks.questions[i].questionType === "coding") {
+        correctAnswers.push(marks.questions[i].testCases);
       }
+
+      marksForCorrectAnswers.push(marks.questions[i].questionMarks);
     }
 
     const submission = await SubmissionsModel.findOne(
@@ -321,10 +378,28 @@ router.post("/autoEvaluate", async (req, res) => {
               marksForCorrectAnswers[j];
             marksToBeAwarded.push(String(finalMarks));
           }
-        } else {
-          if (submission.manually_evaluated === true)
-            marksToBeAwarded.push(submission.marks_awarded[j]);
-          else marksToBeAwarded.push("");
+        } else if (marks.questions[j].questionType === "coding") {
+          const studentCodeOutput = submission.answers[j][2];
+          const expectedOutput = [];
+          for (let k = 0; k < correctAnswers.length; k++) {
+            expectedOutput.push(correctAnswers[j][k].expected_output);
+          }
+          // console.log("Student Code Results: " + studentCodeOutput);
+          // console.log("Expected Results: " + expectedOutput);
+          let correctOutputCount = 0;
+
+          for (let k = 0; k < studentCodeOutput.length; k++) {
+            studentCodeOutput[k].replace("\n", "");
+            if (studentCodeOutput[k].trim() == expectedOutput[k].trim())
+              correctOutputCount++;
+          }
+
+          const finalMarks =
+            (correctOutputCount / expectedOutput.length) *
+            marksForCorrectAnswers[j];
+          marksToBeAwarded.push(String(finalMarks));
+
+          console.log("Final Marks: " + finalMarks);
         }
       }
 
@@ -359,18 +434,15 @@ router.post("/autoEvaluateAll", async (req, res) => {
     for (let i = 0; i < marks.questions.length; i++) {
       if (marks.questions[i].questionType === "mcq") {
         correctAnswers.push(marks.questions[i].correctAnswer);
-        marksForCorrectAnswers.push(marks.questions[i].questionMarks);
       } else if (marks.questions[i].questionType === "fib") {
-        // correctAnswers.push(marks.questions[i].correctFIBAnswers);
         correctAnswers.push("");
-        marksForCorrectAnswers.push(marks.questions[i].questionMarks);
       } else if (marks.questions[i].questionType === "essay") {
         correctAnswers.push(marks.questions[i].correctKeywords);
-        marksForCorrectAnswers.push(marks.questions[i].questionMarks);
-      } else {
-        correctAnswers.push("");
-        marksForCorrectAnswers.push("");
+      } else if (marks.questions[i].questionType === "coding") {
+        correctAnswers.push(marks.questions[i].testCases);
       }
+
+      marksForCorrectAnswers.push(marks.questions[i].questionMarks);
     }
 
     for (let i = 0; i < uni_ids.length; i++) {
@@ -442,10 +514,28 @@ router.post("/autoEvaluateAll", async (req, res) => {
                 marksForCorrectAnswers[j];
               marksToBeAwarded.push(String(finalMarks));
             }
-          } else {
-            if (submission.manually_evaluated === true)
-              marksToBeAwarded.push(submission.marks_awarded[j]);
-            else marksToBeAwarded.push("");
+          } else if (marks.questions[j].questionType === "coding") {
+            const studentCodeOutput = submission.answers[j][2];
+            const expectedOutput = [];
+            for (let k = 0; k < correctAnswers.length; k++) {
+              expectedOutput.push(correctAnswers[j][k].expected_output);
+            }
+            // console.log("Student Code Results: " + studentCodeOutput);
+            // console.log("Expected Results: " + expectedOutput);
+            let correctOutputCount = 0;
+
+            for (let k = 0; k < studentCodeOutput.length; k++) {
+              studentCodeOutput[k].replace("\n", "");
+              if (studentCodeOutput[k].trim() == expectedOutput[k].trim())
+                correctOutputCount++;
+            }
+
+            const finalMarks =
+              (correctOutputCount / expectedOutput.length) *
+              marksForCorrectAnswers[j];
+            marksToBeAwarded.push(String(finalMarks));
+
+            console.log("Final Marks: " + finalMarks);
           }
         }
 

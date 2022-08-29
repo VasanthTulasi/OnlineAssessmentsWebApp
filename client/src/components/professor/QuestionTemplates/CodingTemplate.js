@@ -215,99 +215,107 @@ function CodingTemplate(props) {
           }
         />
       </div>
-      <label className="label-class" style={{ marginTop: "10px" }}>
-        {props.isDisabled ? "Code Template" : "Enter Code Template"}
-      </label>
-      <br />
-      <textarea
-        ref={codingTemplateComponent}
-        id={"coding_template_" + props.indexVal}
-        className="template-text-area"
-        onBlur={saveCodingTemplate}
-        rows="10"
-        disabled={props.isDisabled}
-        onKeyDown={checkTabPressInTemplate}
-        placeholder="Code Template for Students"
-        defaultValue={props.codingTemplate}
-      />
-      <label className="label-class">Test Cases</label>
-      <table className="test-cases-table">
-        <tbody>
-          {testCases.length != 0 && (
+      {!props.isDisabled && (
+        <>
+          <label className="label-class" style={{ marginTop: "10px" }}>
+            Enter Code Template"
+          </label>
+          <br />
+        </>
+      )}
+      {!props.isDisabled && (
+        <textarea
+          ref={codingTemplateComponent}
+          id={"coding_template_" + props.indexVal}
+          className="template-text-area"
+          onBlur={saveCodingTemplate}
+          rows="10"
+          disabled={props.isDisabled}
+          onKeyDown={checkTabPressInTemplate}
+          placeholder="Code Template for Students"
+          defaultValue={props.codingTemplate}
+        />
+      )}
+      {!props.isDisabled && <label className="label-class">Test Cases</label>}
+      {!props.isDisabled && (
+        <table className="test-cases-table">
+          <tbody>
+            {testCases.length != 0 && (
+              <tr>
+                <td>
+                  <label className="label-class">Sample Input</label>
+                </td>
+                <td>
+                  <label className="label-class" style={{ marginLeft: "10px" }}>
+                    Expected Output
+                  </label>
+                </td>
+              </tr>
+            )}
+            {testCases.map((ele, index) => {
+              return (
+                <React.Fragment key={ele.key_id}>
+                  <tr>
+                    <td>
+                      <textarea
+                        onBlur={(event) => saveTestCases(event)}
+                        className="text-area"
+                        id={"sample_input_" + index}
+                        placeholder={"Enter Sample Input " + (index + 1)}
+                        defaultValue={
+                          props.testCases[index] !== undefined
+                            ? props.testCases[index].sample_input
+                            : null
+                        }
+                        disabled={props.isDisabled}
+                        rows="2"
+                      />
+                    </td>
+                    <td>
+                      <textarea
+                        onBlur={(event) => saveTestCases(event)}
+                        className="text-area"
+                        id={"expected_output_" + index}
+                        placeholder={"Enter Expected Output " + (index + 1)}
+                        defaultValue={
+                          props.testCases[index] != undefined
+                            ? props.testCases[index].expected_output
+                            : null
+                        }
+                        disabled={props.isDisabled}
+                        rows="2"
+                        style={{ marginLeft: "10px" }}
+                      />
+                    </td>
+                    <td>
+                      <button
+                        id={"remove_test_case_" + index}
+                        className="module-data-button"
+                        onClick={removeTestCase}
+                      >
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                </React.Fragment>
+              );
+            })}
             <tr>
-              <td>
-                <label className="label-class">Sample Input</label>
-              </td>
-              <td>
-                <label className="label-class" style={{ marginLeft: "10px" }}>
-                  Expected Output
-                </label>
+              <td colSpan="2">
+                <div style={{ textAlign: "center" }}>
+                  <button
+                    className="module-data-button"
+                    onClick={addTestCase}
+                    style={{ marginLeft: "0px" }}
+                  >
+                    Add a Test Case
+                  </button>
+                </div>
               </td>
             </tr>
-          )}
-          {testCases.map((ele, index) => {
-            return (
-              <React.Fragment key={ele.key_id}>
-                <tr>
-                  <td>
-                    <textarea
-                      onBlur={(event) => saveTestCases(event)}
-                      className="text-area"
-                      id={"sample_input_" + index}
-                      placeholder={"Enter Sample Input " + (index + 1)}
-                      defaultValue={
-                        props.testCases[index] !== undefined
-                          ? props.testCases[index].sample_input
-                          : null
-                      }
-                      disabled={props.isDisabled}
-                      rows="2"
-                    />
-                  </td>
-                  <td>
-                    <textarea
-                      onBlur={(event) => saveTestCases(event)}
-                      className="text-area"
-                      id={"expected_output_" + index}
-                      placeholder={"Enter Expected Output " + (index + 1)}
-                      defaultValue={
-                        props.testCases[index] != undefined
-                          ? props.testCases[index].expected_output
-                          : null
-                      }
-                      disabled={props.isDisabled}
-                      rows="2"
-                      style={{ marginLeft: "10px" }}
-                    />
-                  </td>
-                  <td>
-                    <button
-                      id={"remove_test_case_" + index}
-                      className="module-data-button"
-                      onClick={removeTestCase}
-                    >
-                      Remove
-                    </button>
-                  </td>
-                </tr>
-              </React.Fragment>
-            );
-          })}
-          <tr>
-            <td colSpan="2">
-              <div style={{ textAlign: "center" }}>
-                <button
-                  className="module-data-button"
-                  onClick={addTestCase}
-                  style={{ marginLeft: "0px" }}
-                >
-                  Add a Test Case
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      )}
     </Coding>
   );
 }

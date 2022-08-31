@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Axios from "axios";
 import SingleSelect from "react-select";
 import { LoginContext } from "../../../contexts/LoginContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function ViewAssessments() {
   const { loggedInUserDetails } = useContext(LoginContext);
@@ -14,6 +14,7 @@ function ViewAssessments() {
   let [submissionDataLoaded, setSubmissionDataLoaded] = useState(false);
   let [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
   const navigate = useNavigate();
+  const { state } = useLocation();
   const axios = Axios.create({
     withCredentials: true,
     baseURL: "http://localhost:3001/users",
@@ -53,6 +54,12 @@ function ViewAssessments() {
         setModuleCodesFromDB(moduleCodes);
       });
   }, []);
+
+  useEffect(() => {
+    // if(state)
+    // setModuleCode(state.)
+    if (state != null) setModuleCode(state.module_code);
+  }, [moduleCodesFromDB]);
 
   useEffect(() => {
     setAssessmentsLoaded(false);
@@ -161,6 +168,11 @@ function ViewAssessments() {
               styles={customStyles}
               placeholder="Select or Enter Module Code"
               onChange={(selOption) => setModuleCode(selOption.value)}
+              defaultValue={() => {
+                return state != null
+                  ? { label: state.module_code, value: state.module_code }
+                  : null;
+              }}
             />
           </div>
           <div className="heading" style={{ fontSize: "17px" }}>

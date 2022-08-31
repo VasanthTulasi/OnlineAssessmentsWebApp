@@ -14,6 +14,7 @@ import {
 import { useEffect } from "react";
 import Axios from "axios";
 import { LoginContext } from "../../../contexts/LoginContext";
+import { useNavigate } from "react-router-dom";
 
 function ViewDashboard() {
   const [assignedCoursesInfo, setAssignedCoursesInfo] = useState([]);
@@ -22,6 +23,7 @@ function ViewDashboard() {
   const [overallPercentange, setOverallPercentage] = useState([]);
   const [barData, setBarData] = useState([]);
   const { loggedInUserDetails } = useContext(LoginContext);
+  const navigate = useNavigate();
   const axios = Axios.create({
     withCredentials: true,
     baseURL: "http://localhost:3001/users",
@@ -88,6 +90,15 @@ function ViewDashboard() {
       };
     });
     setBarData(barInfo);
+  };
+
+  const goToResultsPage = (index) => {
+    // console.log("Result of: " + index);
+    navigate("../viewAssessments", {
+      state: {
+        module_code: assignedCoursesInfo[index].module_code,
+      },
+    });
   };
 
   return (
@@ -168,7 +179,7 @@ function ViewDashboard() {
                 <td className="module-data mid">
                   {overallPercentange[index] === null
                     ? "NA"
-                    : overallPercentange[index]}
+                    : overallPercentange[index] + "%"}
                 </td>
                 <td className="module-data end">
                   {overallPercentange[index] === null
@@ -182,7 +193,13 @@ function ViewDashboard() {
                 <td style={{ paddingLeft: "15px" }}>
                   <button
                     id={"viewSubmissionsButton_" + index}
-                    className="module-data-button"
+                    disabled={overallPercentange[index] === null ? true : false}
+                    className={
+                      overallPercentange[index] === null
+                        ? "module-data-button button-disabled"
+                        : "module-data-button"
+                    }
+                    onClick={() => goToResultsPage(index)}
                   >
                     View Details
                   </button>
@@ -292,6 +309,17 @@ const Dashboard = styled.div`
   }
   .headers-color {
     color: #61dafb;
+  }
+
+  .module-data-button:hover {
+    cursor: pointer;
+  }
+
+  .button-disabled {
+    background-color: gray;
+  }
+  .button-disabled:hover {
+    cursor: default;
   }
 `;
 

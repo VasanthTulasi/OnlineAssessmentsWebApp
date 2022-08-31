@@ -61,6 +61,14 @@ function NavBar(props) {
             </li>
             <li>
               <Link
+                to="/viewCheckResults/viewDashboard"
+                className={props.navLinksAccess}
+              >
+                My Dashboard
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/myprofile/profilecontent"
                 className={props.navLinksAccess}
               >

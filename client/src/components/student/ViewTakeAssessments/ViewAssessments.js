@@ -85,6 +85,9 @@ function ViewAssessments() {
   }, [moduleCode]);
 
   const getSubmissionStatus = (index) => {
+    console.log(
+      "Submittion data is " + JSON.stringify(submissionsDataArray[index])
+    );
     if (submissionsDataArray[index] == "") {
       if (new Date() < new Date(assessmentsArray[index].window_end_time))
         return "Yet to Submit";

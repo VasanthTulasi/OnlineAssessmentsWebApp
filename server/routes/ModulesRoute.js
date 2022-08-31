@@ -71,6 +71,22 @@ router.get("/moduleCodes", async (req, res) => {
   }
 });
 
+router.post("/getModulesInfo", async (req, res) => {
+  let { module_codes } = req.body;
+  let modulesInfo = [];
+  for (let i = 0; i < module_codes.length; i++) {
+    const modules = await ModulesModel.findOne(
+      {
+        module_code: module_codes[i],
+      },
+      { module_code: true, module_title: true, _id: false }
+    );
+    if (modules) modulesInfo.push(modules);
+  }
+  console.log(modulesInfo);
+  res.send(modulesInfo);
+});
+
 router.post("/assignUsers", async (req, res) => {
   const { moduleCode, newUsers } = req.body;
   let validUsers = [],
@@ -85,12 +101,11 @@ router.post("/assignUsers", async (req, res) => {
 
   for (let i = 0; i < validUsers.length; i++) {
     await UsersModel.updateOne(
-      { uni_id: validUsers[i]},
+      { uni_id: validUsers[i] },
       { $addToSet: { assigned_modules: { $each: [moduleCode] } } }
     );
   }
   res.json({ message: "success", invalidUsers: invalidUsers });
- 
 });
 
 router.post("/deleteUserFromModule", async (req, res) => {
@@ -99,8 +114,8 @@ router.post("/deleteUserFromModule", async (req, res) => {
     { uni_id: uni_id },
     { $pull: { assigned_modules: module_code } }
   )
-  .then(() => res.json({ message: "success" }))
-  .catch((err) => res.json({ message: err }));
+    .then(() => res.json({ message: "success" }))
+    .catch((err) => res.json({ message: err }));
 });
 
 module.exports = router;

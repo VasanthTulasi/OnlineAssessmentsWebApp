@@ -557,4 +557,43 @@ router.post("/autoEvaluateAll", async (req, res) => {
   }
 });
 
+router.post("/getOverallPercentages", async (req, res) => {
+  const { module_codes, uni_id } = req.body;
+  let finalMarks = [];
+  for (let i = 0; i < module_codes.length; i++) {
+    let assessments = await AssessmentsModel.find(
+      { module_code: module_codes[i] },
+      { _id: true, total_marks: true }
+    );
+    if (assessments) {
+      let combinedAwardedMarks = 0;
+      let combinedTotalMarks = 0;
+      for (let j = 0; j < assessments.length; j++) {
+        let marks = await SubmissionsModel.findOne(
+          { assessment_id: assessments[j]._id, student_uni_id: uni_id },
+          { marks_awarded: true }
+        );
+        if (marks) {
+          console.log(marks.marks_awarded);
+          let marksAssigned = marks.marks_awarded;
+          if (marksAssigned.length != 0) {
+            let awardedMarks = 0;
+            for (let k = 0; k < marksAssigned.length; k++) {
+              awardedMarks += parseInt(marks.marks_awarded[k]);
+            }
+            combinedAwardedMarks += awardedMarks;
+            console.log("Com marks" + combinedAwardedMarks);
+            combinedTotalMarks += assessments[j].total_marks;
+          }
+        }
+      }
+      // console.log("Tot marks" + combinedTotalMarks);
+      const percentage = (combinedAwardedMarks / combinedTotalMarks) * 100;
+      finalMarks.push(Math.ceil(percentage));
+    }
+  }
+  res.json(finalMarks);
+  // console.log(finalMarks);
+});
+
 module.exports = router;

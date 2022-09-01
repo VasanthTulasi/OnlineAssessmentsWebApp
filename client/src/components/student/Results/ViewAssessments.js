@@ -9,6 +9,8 @@ function ViewAssessments() {
   const { loggedInUserDetails } = useContext(LoginContext);
   let [assessmentsArray, setAssessmentsArray] = useState([]);
   let [submissionsDataArray, setSubmissionsDataArray] = useState([]);
+  let [submissionsStatusArray, setSubmissionsStatusArray] = useState([]);
+  let [marksReleaseArray, setMarksReleaseArray] = useState([]);
   let [moduleCode, setModuleCode] = useState("");
   let [assessmentsLoaded, setAssessmentsLoaded] = useState(false);
   let [submissionDataLoaded, setSubmissionDataLoaded] = useState(false);
@@ -63,7 +65,7 @@ function ViewAssessments() {
 
   useEffect(() => {
     setAssessmentsLoaded(false);
-    // setAssessmentsArray([]);
+    setAssessmentsArray([]);
     axios2.post("/assessmentsForModule", { moduleCode }).then((res) => {
       const assessments = res.data;
       if (assessments.length === 0) {
@@ -91,24 +93,41 @@ function ViewAssessments() {
     });
   }, [moduleCode]);
 
-  const getSubmissionStatus = (index) => {
-    if (submissionsDataArray[index] == "") {
-      if (new Date() < new Date(assessmentsArray[index].window_end_time))
-        return "Yet to Submit";
-      else return "Not Submitted";
-    } else {
-      if (submissionsDataArray[index].session_details.attempts_left <= 0) {
-        if (submissionsDataArray[index].answers.length === 0)
-          return "Not Submitted";
-        else return "Submitted";
-      } else if (
-        submissionsDataArray[index].session_details.attempts_left > 0
-      ) {
-        if (new Date() < new Date(assessmentsArray[index].window_end_time))
-          return "Yet to Submit";
-        else return "Not Submitted";
+  useEffect(() => {
+    setSubmissionStatusForAll();
+    setMarksReleaseStatusForAll();
+  }, [submissionsDataArray]);
+
+  const setSubmissionStatusForAll = () => {
+    let subStatus = [];
+    for (let i = 0; i < submissionsDataArray.length; i++) {
+      if (submissionsDataArray[i] == "") {
+        if (new Date() < new Date(assessmentsArray[i].window_end_time))
+          subStatus.push("Yet to Submit");
+        else subStatus.push("Not Submitted");
+      } else {
+        if (submissionsDataArray[i].session_details.attempts_left <= 0) {
+          if (submissionsDataArray[i].answers.length === 0)
+            subStatus.push("Not Submitted");
+          else subStatus.push("Submitted");
+        } else if (submissionsDataArray[i].session_details.attempts_left > 0) {
+          if (new Date() < new Date(assessmentsArray[i].window_end_time))
+            subStatus.push("Yet to Submit");
+          else subStatus.push("Not Submitted");
+        }
       }
     }
+
+    setSubmissionsStatusArray([...subStatus]);
+  };
+
+  const setMarksReleaseStatusForAll = () => {
+    let marksStatus = [];
+    for (let i = 0; i < submissionsDataArray.length; i++) {
+      if (submissionsDataArray[i].marks_released) marksStatus.push(true);
+      else marksStatus.push(false);
+    }
+    setMarksReleaseArray([...marksStatus]);
   };
 
   const viewResult = (event) => {
@@ -191,6 +210,8 @@ function ViewAssessments() {
                 </td>
               </tr>
               {submissionsDataArray.length !== 0 &&
+                submissionsStatusArray.length !== 0 &&
+                marksReleaseArray &&
                 assessmentsArray.map((ele, index) => {
                   // console.log("Suv "+JSON.stringify(submissionsDataArray[index]));
                   // return;
@@ -199,12 +220,10 @@ function ViewAssessments() {
                       <td className="module-data start">{index + 1}</td>
                       <td className="module-data mid">{ele.title}</td>
                       <td className="module-data">
-                        {getSubmissionStatus(index)}
+                        {submissionsStatusArray[index]}
                       </td>
                       <td className="module-data end">
-                        {submissionsDataArray[index].marks_released
-                          ? "Released"
-                          : "Not Released"}
+                        {marksReleaseArray[index] ? "Released" : "Not Released"}
                       </td>
                       <td>
                         <button
@@ -212,13 +231,9 @@ function ViewAssessments() {
                           onClick={(event) => {
                             viewResult(event);
                           }}
-                          disabled={
-                            submissionsDataArray[index].marks_released
-                              ? false
-                              : true
-                          }
+                          disabled={marksReleaseArray[index] ? false : true}
                           className={
-                            submissionsDataArray[index].marks_released
+                            marksReleaseArray[index]
                               ? "module-data-button"
                               : "module-data-button button-disabled"
                           }

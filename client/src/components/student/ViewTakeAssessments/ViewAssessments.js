@@ -9,6 +9,9 @@ function ViewAssessments() {
   const { loggedInUserDetails } = useContext(LoginContext);
   let [assessmentsArray, setAssessmentsArray] = useState([]);
   let [submissionsDataArray, setSubmissionsDataArray] = useState([]);
+  let [submissionsStatusArray, setSubmissionsStatusArray] = useState([]);
+  let [buttonsStatusArray, setButtonsStatusArray] = useState([]);
+  let [buttonsTextArray, setButtonsTextArray] = useState([]);
   let [moduleCode, setModuleCode] = useState("");
   let [assessmentsLoaded, setAssessmentsLoaded] = useState(false);
   let [submissionDataLoaded, setSubmissionDataLoaded] = useState(false);
@@ -55,8 +58,9 @@ function ViewAssessments() {
   }, []);
 
   useEffect(() => {
+    console.log("use effect triged");
     setAssessmentsLoaded(false);
-    // setAssessmentsArray([]);
+    setAssessmentsArray([]);
     axios2.post("/assessmentsForModule", { moduleCode }).then((res) => {
       const assessments = res.data;
       if (assessments.length === 0) {
@@ -84,27 +88,63 @@ function ViewAssessments() {
     });
   }, [moduleCode]);
 
-  const getSubmissionStatus = (index) => {
-    console.log(
-      "Submittion data is " + JSON.stringify(submissionsDataArray[index])
-    );
-    if (submissionsDataArray[index] == "") {
-      if (new Date() < new Date(assessmentsArray[index].window_end_time))
-        return "Yet to Submit";
-      else return "Not Submitted";
-    } else {
-      if (submissionsDataArray[index].session_details.attempts_left <= 0) {
-        if (submissionsDataArray[index].answers.length === 0)
-          return "Not Submitted";
-        else return "Submitted";
-      } else if (
-        submissionsDataArray[index].session_details.attempts_left > 0
-      ) {
-        if (new Date() < new Date(assessmentsArray[index].window_end_time))
-          return "Yet to Submit";
-        else return "Not Submitted";
+  useEffect(() => {
+    setSubmissionStatusForAll();
+    setButtonsStatusForAll();
+    setButtonsTextForAll();
+  }, [submissionsDataArray]);
+
+  const setSubmissionStatusForAll = () => {
+    let subStatus = [];
+    for (let i = 0; i < submissionsDataArray.length; i++) {
+      if (submissionsDataArray[i] == "") {
+        if (new Date() < new Date(assessmentsArray[i].window_end_time))
+          subStatus.push("Yet to Submit");
+        else subStatus.push("Not Submitted");
+      } else {
+        if (submissionsDataArray[i].session_details.attempts_left <= 0) {
+          if (submissionsDataArray[i].answers.length === 0)
+            subStatus.push("Not Submitted");
+          else subStatus.push("Submitted");
+        } else if (submissionsDataArray[i].session_details.attempts_left > 0) {
+          if (new Date() < new Date(assessmentsArray[i].window_end_time))
+            subStatus.push("Yet to Submit");
+          else subStatus.push("Not Submitted");
+        }
       }
     }
+
+    setSubmissionsStatusArray([...subStatus]);
+  };
+
+  const setButtonsStatusForAll = () => {
+    let buttonStatus = [];
+    for (let i = 0; i < submissionsDataArray.length; i++) {
+      if (new Date() >= new Date(assessmentsArray[i].window_start_time)) {
+        if (new Date() < new Date(assessmentsArray[i].window_end_time)) {
+          if (submissionsDataArray[i] !== "") {
+            if (submissionsDataArray[i].session_details.attempts_left === 0) {
+              buttonStatus.push(true);
+            } else buttonStatus.push(false);
+          } else buttonStatus.push(false);
+        } else buttonStatus.push(true);
+      } else buttonStatus.push(true);
+    }
+
+    setButtonsStatusArray([...buttonStatus]);
+  };
+
+  const setButtonsTextForAll = () => {
+    let buttonText = [];
+    for (let i = 0; i < submissionsDataArray.length; i++) {
+      if (submissionsDataArray[i] !== "") {
+        if (submissionsDataArray[i].session_details.attempts_left === 0)
+          buttonText.push("Begin Assessment");
+        else buttonText.push("Continue Assessment");
+      } else buttonText.push("Begin Assessment");
+    }
+
+    setButtonsTextArray([...buttonText]);
   };
 
   const customStyles = {
@@ -173,6 +213,9 @@ function ViewAssessments() {
                 {/* <td className="module-data end headers-color">Attempts Left</td> */}
               </tr>
               {submissionsDataArray.length !== 0 &&
+                submissionsStatusArray.length !== 0 &&
+                buttonsStatusArray.length !== 0 &&
+                buttonsTextArray.length !== 0 &&
                 assessmentsArray.map((ele, index) => {
                   // console.log("Suv "+JSON.stringify(submissionsDataArray[index]));
                   // return;
@@ -189,7 +232,7 @@ function ViewAssessments() {
                         {new Date(ele.window_end_time).toString().slice(0, 21)}
                       </td>
                       <td className="module-data end">
-                        {getSubmissionStatus(index)}
+                        {submissionsStatusArray[index]}
                         {/* {new Date() > new Date(ele.window_end_time)
                           ? "Submitted"
                           : new Date() > new Date(ele.window_start_time)
@@ -214,37 +257,32 @@ function ViewAssessments() {
                         <button
                           id={"beginAssessment_" + index}
                           onClick={beginAssessment}
-                          disabled={
-                            new Date() >= new Date(ele.window_start_time)
-                              ? new Date() <= new Date(ele.window_end_time)
-                                ? submissionsDataArray[index] !== ""
-                                  ? submissionsDataArray[index].session_details
-                                      .attempts_left === 0
-                                    ? true
-                                    : false
-                                  : false
-                                : true
-                              : true
-                          }
+                          // disabled={
+                          //   new Date() >= new Date(ele.window_start_time)
+                          //     ? new Date() < new Date(ele.window_end_time)
+                          //       ? submissionsDataArray[index] !== ""
+                          //         ? submissionsDataArray[index].session_details
+                          //             .attempts_left === 0
+                          //           ? true
+                          //           : false
+                          //         : false
+                          //       : true
+                          //     : true
+                          // }
+                          disabled={buttonsStatusArray[index]}
                           className={
-                            new Date() >= new Date(ele.window_start_time)
-                              ? new Date() <= new Date(ele.window_end_time)
-                                ? submissionsDataArray[index] !== ""
-                                  ? submissionsDataArray[index].session_details
-                                      .attempts_left === 0
-                                    ? "module-data-button button-disabled"
-                                    : "module-data-button"
-                                  : "module-data-button"
-                                : "module-data-button button-disabled"
-                              : "module-data-button button-disabled"
+                            buttonsStatusArray[index]
+                              ? "module-data-button button-disabled"
+                              : "module-data-button"
                           }
                         >
-                          {submissionsDataArray[index] !== ""
+                          {/* {submissionsDataArray[index] !== ""
                             ? submissionsDataArray[index].session_details
                                 .attempts_left === 0
                               ? "Begin Assessment"
                               : "Continue Assessment"
-                            : "Begin Assessment"}
+                            : "Begin Assessment"} */}
+                          {buttonsTextArray[index]}
                         </button>
                       </td>
                     </tr>

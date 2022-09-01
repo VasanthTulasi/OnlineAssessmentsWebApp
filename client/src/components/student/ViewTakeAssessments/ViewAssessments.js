@@ -60,6 +60,7 @@ function ViewAssessments() {
   useEffect(() => {
     console.log("use effect triged");
     setAssessmentsLoaded(false);
+    setSubmissionDataLoaded(false);
     setAssessmentsArray([]);
     axios2.post("/assessmentsForModule", { moduleCode }).then((res) => {
       const assessments = res.data;
@@ -138,9 +139,14 @@ function ViewAssessments() {
     let buttonText = [];
     for (let i = 0; i < submissionsDataArray.length; i++) {
       if (submissionsDataArray[i] !== "") {
-        if (submissionsDataArray[i].session_details.attempts_left === 0)
-          buttonText.push("Begin Assessment");
-        else buttonText.push("Continue Assessment");
+        if (
+          new Date() >= new Date(assessmentsArray[i].window_start_time) &&
+          new Date() <= new Date(assessmentsArray[i].window_end_time)
+        ) {
+          if (submissionsDataArray[i].session_details.attempts_left === 0)
+            buttonText.push("Begin Assessment");
+          else buttonText.push("Continue Assessment");
+        } else buttonText.push("Begin Assessment");
       } else buttonText.push("Begin Assessment");
     }
 

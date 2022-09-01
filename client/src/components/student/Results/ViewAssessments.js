@@ -58,8 +58,6 @@ function ViewAssessments() {
   }, []);
 
   useEffect(() => {
-    // if(state)
-    // setModuleCode(state.)
     if (state != null) setModuleCode(state.module_code);
   }, [moduleCodesFromDB]);
 

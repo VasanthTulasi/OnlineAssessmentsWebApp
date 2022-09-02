@@ -187,7 +187,7 @@ const MCQ = styled.div`
     font-family: "Source Sans Pro", sans-serif;
     font-size: 17px;
     font-weight: 400;
-    margin-top: 5px;
+    margin-top: 10px;
   }
 
   .text-area {

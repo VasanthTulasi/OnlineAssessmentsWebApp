@@ -96,6 +96,11 @@ function NavBar(props) {
               </Link>
             </li>
             <li>
+              <Link to="/discussions/viewAssessments" className="menu">
+                Discussions
+              </Link>
+            </li>
+            <li>
               <Link to="/myprofile/profilecontent" className="menu">
                 My Profile
               </Link>

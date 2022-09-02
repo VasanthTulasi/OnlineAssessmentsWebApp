@@ -69,7 +69,6 @@ function ViewAssessments() {
       } else {
         setAssessmentsArray(assessments);
         setAssessmentsLoaded(true);
-        //get submission data for each assessment
         let assessmentIds = [];
         for (let i = 0; i < assessments.length; i++)
           assessmentIds.push(assessments[i]._id);

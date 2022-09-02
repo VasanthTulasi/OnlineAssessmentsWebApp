@@ -487,7 +487,9 @@ function CreateAssessments() {
                 formulaArray[k] === "-" ||
                 formulaArray[k] === "*" ||
                 formulaArray[k] === "/" ||
-                formulaArray[k] === "%"
+                formulaArray[k] === "%" ||
+                formulaArray[k] === ")" ||
+                formulaArray[k] === "("
               )
                 continue;
 

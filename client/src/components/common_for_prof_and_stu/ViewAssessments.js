@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useContext } from "react";
 import styled from "styled-components";
 import Axios from "axios";
-import ConfirmDeleteModal from "../ConfirmDeletionModal";
+// import ConfirmDeleteModal from "../ConfirmDeletionModal";
 import SingleSelect from "react-select";
-import { LoginContext } from "../../../contexts/LoginContext";
+import { LoginContext } from "../../contexts/LoginContext";
 import { useNavigate } from "react-router-dom";
 
 function ViewAssessments() {
@@ -11,8 +11,8 @@ function ViewAssessments() {
   let [assessmentsArray, setAssessmentsArray] = useState([]);
   let [moduleCode, setModuleCode] = useState("");
   let [assessmentsLoaded, setAssessmentsLoaded] = useState(false);
-  const [isModalVisible, setisModalVisible] = useState(false);
-  const [deletionIndex, setDeletionIndex] = useState();
+  //   const [isModalVisible, setisModalVisible] = useState(false);
+  //   const [deletionIndex, setDeletionIndex] = useState();
   let [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
   const navigate = useNavigate();
   const axios = Axios.create({
@@ -27,16 +27,10 @@ function ViewAssessments() {
     crossDomain: true,
   });
 
-  const deleteAssessment = (event) => {
-    setDeletionIndex(event.currentTarget.id.split("_")[1]);
-    setisModalVisible(true);  
-  };
-
-  const editModule = (event) => {
+  const viewDiscussions = (event) => {
     const itemIndex = event.currentTarget.id.split("_")[1];
-    // console.log(assessmentsArray[itemIndex]);
-    navigate("../editAssessments", {
-      state: { _id: assessmentsArray[itemIndex]._id },
+    navigate("../viewQuestions", {
+      state: { assessment: assessmentsArray[itemIndex] },
     });
   };
 
@@ -97,34 +91,10 @@ function ViewAssessments() {
     }),
   };
 
-  const confirmedUserDeletion = () => {
-    setisModalVisible(false);
-    const itemIndex = deletionIndex;
-    axios2
-      .post("/deleteAssessmentFromModule", {
-        _id: assessmentsArray[itemIndex]._id,
-      })
-      .then((res) => {
-        if (res.data.message === "success") {
-          alert("Assessment deleted succesfully!");
-          const modAssessmentsArray = assessmentsArray;
-          modAssessmentsArray.splice(itemIndex, 1);
-          setAssessmentsArray([...modAssessmentsArray]);
-        } else alert("Error: " + res.data.message);
-      });
-  };
-
   return (
     <>
-      {isModalVisible && (
-        <ConfirmDeleteModal
-          setModalVisibility={() => setisModalVisible(false)}
-          assessmentInfo={assessmentsArray[deletionIndex].title}
-          confirmedDeletion={confirmedUserDeletion}
-        />
-      )}
       <ViewEditMod>
-        <div className="heading">View Existing Assessments</div>
+        <div className="heading">View Assessments for Discussions</div>
         <div className="whole-content">
           <label className="select-module-label">Select Module Code</label>
           <div className="select-module-dropdown">
@@ -132,8 +102,7 @@ function ViewAssessments() {
               options={moduleCodesFromDB}
               styles={customStyles}
               placeholder="Select or Enter Module Code"
-              onChange={(selOption)=>setModuleCode(selOption.value)}
-              
+              onChange={(selOption) => setModuleCode(selOption.value)}
             />
           </div>
           <div className="heading" style={{ fontSize: "17px" }}>
@@ -174,36 +143,20 @@ function ViewAssessments() {
                     </td>
                     <td>
                       <button
-                        id={"editButton_" + index}
-                        onClick={editModule}
+                        id={"viewDiscussions_" + index}
+                        onClick={viewDiscussions}
                         disabled={
-                          new Date() > new Date(ele.window_start_time)
-                            ? true
-                            : false
+                          new Date() > new Date(ele.window_end_time)
+                            ? false
+                            : true
                         }
                         className={
-                          new Date() > new Date(ele.window_start_time)
-                            ? "module-data-button button-disabled"
-                            : "module-data-button"
+                          new Date() > new Date(ele.window_end_time)
+                            ? "module-data-button"
+                            : "module-data-button button-disabled"
                         }
                       >
-                        Edit
-                      </button>
-                      <button
-                        id={"deleteButton_" + index}
-                        onClick={deleteAssessment}
-                        disabled={
-                          new Date() > new Date(ele.window_start_time)
-                            ? true
-                            : false
-                        }
-                        className={
-                          new Date() > new Date(ele.window_start_time)
-                            ? "module-data-button button-disabled"
-                            : "module-data-button"
-                        }
-                      >
-                        Delete
+                        View Discussions
                       </button>
                     </td>
                   </tr>
@@ -367,8 +320,6 @@ const ViewEditMod = styled.div`
   .headers-color {
     color: #61dafb;
   }
-
-  
 `;
 
 export default ViewAssessments;

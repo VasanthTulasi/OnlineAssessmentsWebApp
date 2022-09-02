@@ -3,10 +3,8 @@ import styled from "styled-components";
 import {
   BarChart,
   Bar,
-  Cell,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
@@ -86,7 +84,7 @@ function ViewDashboard() {
     barInfo = assignedCoursesInfo.map((val, ind) => {
       return {
         courseId: val.module_code,
-        "Course Progress": data[ind] === null ? 0 : parseInt(data[ind]),
+        "Course Progress Percentage": data[ind] === null ? "NA" : parseInt(data[ind]),
       };
     });
     setBarData(barInfo);
@@ -144,7 +142,7 @@ function ViewDashboard() {
               itemStyle={{ color: "#282c34" }}
             />
             <Legend />
-            <Bar dataKey="Course Progress" fill="#61dafb" />
+            <Bar dataKey="Course Progress Percentage" fill="#61dafb" />
           </BarChart>
         </ResponsiveContainer>
       </div>

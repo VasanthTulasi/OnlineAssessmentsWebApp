@@ -1,16 +1,23 @@
-import React,{useState} from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
 import Axios from "axios";
-
 
 function EditModule() {
   const { state } = useLocation();
   const [moduleCode, setModuleCode] = useState(state.module_code);
   const [moduleTitle, setModuleTitle] = useState(state.module_title);
-  const [moduleStartYear, setModuleStartYear] = useState(state.module_year.substring(0,4));
-  const [moduleEndYear, setModuleEndYear] = useState("20" + state.module_year.substring(5,7));
-  const [moduleSemesterNumber, setModuleSemesterNumber] = useState(state.module_semester.substring(4,5));
+  const [moduleStartYear, setModuleStartYear] = useState(
+    state.module_year.substring(0, 4)
+  );
+  const [moduleEndYear, setModuleEndYear] = useState(
+    "20" + state.module_year.substring(5, 7)
+  );
+  const [moduleSemesterNumber, setModuleSemesterNumber] = useState(
+    state.module_semester.substring(4, 5)
+  );
+  const [message, setMessage] = useState("");
+  // const saveButton = useRef(null);
 
   const navigate = useNavigate();
 
@@ -21,6 +28,7 @@ function EditModule() {
   });
 
   const saveNewModule = () => {
+    let errorMessageString = "";
     if (
       moduleCode === "" ||
       moduleTitle === "" ||
@@ -28,38 +36,54 @@ function EditModule() {
       moduleEndYear === "" ||
       moduleSemesterNumber === ""
     ) {
-      alert("Fields cannot be empty. All the fields must be filled.");
-    } else if (moduleCode.length !== 6 || moduleCode.substring(0, 2) !== "CO") {
-      alert("Invalid Module Code");
+      // alert("Fields cannot be empty. All the fields must be filled.");
+      errorMessageString +=
+        "Fields cannot be empty. All the fields must be filled.\n\n";
     }
-    else if (isNaN(moduleStartYear) || isNaN(moduleEndYear)) {
-      alert("Module Year must be a numeric value.");
-    }  
-    else if (isNaN(moduleSemesterNumber)) {
-      alert("Semester Number must be a numeric value.");
+    if (moduleCode.length !== 6 || moduleCode.substring(0, 2) !== "CO") {
+      // alert("Invalid Module Code Entered.");
+      errorMessageString += "Invalid Module Code Entered.\n\n";
+    }
+    console.log(isNaN(moduleStartYear));
+    if (isNaN(moduleStartYear) || isNaN(moduleEndYear)) {
+      // alert("Module Year must be a numeric value.");
+      errorMessageString += "Module Year must be a numeric value.\n\n";
+    }
+    if (isNaN(moduleSemesterNumber)) {
+      // alert("Semester Number must be a numeric value.");
+      errorMessageString += "Semester Number must be a numeric value.\n\n";
+    }
+
+    if (errorMessageString !== "") {
+      setMessage("Error(s):\n\n" + errorMessageString);
+      return;
     } else {
-      const moduleYear = moduleStartYear +"-"+moduleEndYear.substring(2,4);
-      const moduleSem = "SEM "+moduleSemesterNumber;
-      axios
-        .post("/editModule", {
-          moduleCode,
-          moduleTitle,
-          moduleYear,
-          moduleSem,
-        })
-        .then((res) => {
-          if (res.data.message === "success") {
-            alert("Module Edited successfully!");
-            navigate("../viewmodules");
-          } else alert("Error: " + res.data.message);
-        });
+      setMessage("");
     }
+
+    const moduleYear = moduleStartYear + "-" + moduleEndYear.substring(2, 4);
+    const moduleSem = "SEM " + moduleSemesterNumber;
+    axios
+      .post("/editModule", {
+        moduleCode,
+        moduleTitle,
+        moduleYear,
+        moduleSem,
+      })
+      .then((res) => {
+        if (res.data.message === "success") {
+          setMessage("Module Edited successfully!");
+          // saveButton.current.disabled = true;
+          // saveButton.current.style.backgroundColor = "gray";
+          // navigate("../viewmodules");
+        } else setMessage("Server Error! Please try again later");
+      });
   };
 
   const goBackOperation = () => {
     navigate("../viewmodules");
   };
-  
+
   return (
     <EditMod>
       <div className="add-new-module-heading">New Module</div>
@@ -100,8 +124,13 @@ function EditModule() {
           onChange={(event) => setModuleSemesterNumber(event.target.value)}
           value={moduleSemesterNumber}
         />
+        {message && <div className="error-message">{message}</div>}
         <div className="add-new-module-buttons">
-          <button className="button" onClick={saveNewModule}>
+          <button
+            // ref={saveButton}
+            className="button"
+            onClick={saveNewModule}
+          >
             SAVE
           </button>
           <button className="button" onClick={goBackOperation}>
@@ -202,6 +231,18 @@ const EditMod = styled.div`
 
   .back-to-login-page:hover {
     cursor: pointer;
+  }
+  .error-message {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 20px;
+    border: 1px solid white;
+    border-radius: 8px;
+    width: 100%;
+    padding: 10px;
+    white-space: pre-line;
   }
 `;
 

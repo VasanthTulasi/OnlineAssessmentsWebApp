@@ -60,7 +60,7 @@ router.post("/login", (req, res) => {
               else {
                 res.cookie("token", token, { httpOnly: true });
                 res.json({
-                  message: "Success",
+                  message: "success",
                   user_data: info,
                   token: "Bearer " + token,
                 });
@@ -104,7 +104,7 @@ router.post("/forgotPassword", async (req, res) => {
               }
             )
           )
-          .then(res.json({ message: "password reset email sent" }))
+          .then(res.json({ message: "success" }))
           .catch((err) => console.log(err));
       }
     );
@@ -198,7 +198,7 @@ router.post("/usersForModule", async (req, res) => {
 });
 
 router.post("/assignedModuleCodes", async (req, res) => {
-  const user = await UsersModel.findOne({ uni_id: req.body.uni_id});
+  const user = await UsersModel.findOne({ uni_id: req.body.uni_id });
   if (user) {
     res.send(user.assigned_modules);
   }

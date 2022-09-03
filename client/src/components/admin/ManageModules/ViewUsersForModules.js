@@ -11,6 +11,7 @@ function ViewUsersForModules() {
   const [isModalVisible, setisModalVisible] = useState(false);
   const [deletionIndex, setDeletionIndex] = useState();
   let [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
+  const [message, setMessage] = useState("");
 
   const axios = Axios.create({
     withCredentials: true,
@@ -69,7 +70,7 @@ function ViewUsersForModules() {
       fontWeight: 400,
       color: "#282c34",
     }),
-    option: (provided,state) => ({
+    option: (provided, state) => ({
       ...provided,
       color: "black",
       font: "17px",
@@ -78,9 +79,9 @@ function ViewUsersForModules() {
       fontWeight: 400,
       color: "#282c34",
       backgroundColor: state.isSelected ? "#61dafb" : "white",
-      "&:hover": {  
-        backgroundColor: "rgba(189,197,209,.3)"
-      }
+      "&:hover": {
+        backgroundColor: "rgba(189,197,209,.3)",
+      },
     }),
     placeholder: (provided) => ({
       ...provided,
@@ -94,15 +95,20 @@ function ViewUsersForModules() {
     axios
       .post("/deleteUserFromModule", {
         uni_id: moduleUsersArray[itemIndex].uni_id,
-        module_code: moduleCode 
+        module_code: moduleCode,
       })
       .then((res) => {
         if (res.data.message === "success") {
-          alert("User deleted succesfully!");
+          setMessage(
+            "User " +
+              moduleUsersArray[itemIndex].uni_id +
+              " removed succesfully from this module!"
+          );
+          // alert("User deleted succesfully!");
           const modUsersArray = moduleUsersArray;
           modUsersArray.splice(itemIndex, 1);
           setModuleUsersArray([...modUsersArray]);
-        } else alert("Error: " + res.data.message);
+        } else setMessage("Server Error! Please try again later.");
       });
   };
 
@@ -190,6 +196,7 @@ function ViewUsersForModules() {
               )}
             </tbody>
           </table>
+          {message && <div className="error-message">{message}</div>}
         </div>
       </ViewEditMod>
     </>
@@ -313,6 +320,17 @@ const ViewEditMod = styled.div`
 
   .headers-color {
     color: #61dafb;
+  }
+
+  .error-message {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 30px;
+    border: 1px solid white;
+    border-radius: 8px;
+    padding: 10px;
   }
 `;
 

@@ -9,7 +9,7 @@ function AddModules() {
   const [moduleStartYear, setModuleStartYear] = useState("");
   const [moduleEndYear, setModuleEndYear] = useState("");
   const [moduleSemesterNumber, setModuleSemesterNumber] = useState("");
-
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const axios = Axios.create({
@@ -19,6 +19,7 @@ function AddModules() {
   });
 
   const saveNewModule = () => {
+    let errorMessageString = "";
     if (
       moduleCode === "" ||
       moduleTitle === "" ||
@@ -26,36 +27,58 @@ function AddModules() {
       moduleEndYear === "" ||
       moduleSemesterNumber === ""
     ) {
-      alert("Fields cannot be empty. All the fields must be filled.");
-    } else if (moduleCode.length !== 6 || moduleCode.substring(0, 2) !== "CO") {
-      alert("Invalid Module Code");
+      // alert("Fields cannot be empty. All the fields must be filled.");
+      errorMessageString +=
+        "Fields cannot be empty. All the fields must be filled.\n\n";
     }
-    else if (isNaN(moduleStartYear) || isNaN(moduleEndYear)) {
-      alert("Module Year must be a numeric value.");
-    }  
-    else if (isNaN(moduleSemesterNumber)) {
-      alert("Semester Number must be a numeric value.");
+    if (
+      moduleCode !== "" &&
+      (moduleCode.length !== 6 || moduleCode.substring(0, 2) !== "CO")
+    ) {
+      // alert("Invalid Module Code Entered.");
+      errorMessageString += "Invalid Module Code Entered.\n\n";
+    }
+    // console.log(isNaN(moduleStartYear));
+    if (isNaN(moduleStartYear) || isNaN(moduleEndYear)) {
+      // alert("Module Year must be a numeric value.");
+      errorMessageString += "Module Year must be a numeric value.\n\n";
+    }
+    if (isNaN(moduleSemesterNumber)) {
+      // alert("Semester Number must be a numeric value.");
+      errorMessageString += "Semester Number must be a numeric value.\n\n";
+    }
+
+    if (moduleSemesterNumber < 1 || moduleSemesterNumber > 8) {
+      // alert("Semester Number must be a numeric value.");
+      errorMessageString += "Semester Number must be between 1 and 8.\n\n";
+    }
+
+    if (errorMessageString !== "") {
+      setMessage("Error(s):\n\n" + errorMessageString);
+      return;
     } else {
-      const moduleYear = moduleStartYear +"-"+moduleEndYear.substring(2,4);
-      const moduleSem = "SEM "+moduleSemesterNumber;
-      axios
-        .post("/addNewModule", {
-          moduleCode,
-          moduleTitle,
-          moduleYear,
-          moduleSem,
-        })
-        .then((res) => {
-          if (res.data.message === "success") {
-            alert("Module Added successfully!");
-            setModuleCode("");
-            setModuleTitle("");
-            setModuleStartYear("");
-            setModuleEndYear("");
-            setModuleSemesterNumber("");
-          } else alert("Error: " + res.data.message);
-        });
+      setMessage("");
     }
+
+    const moduleYear = moduleStartYear + "-" + moduleEndYear.substring(2, 4);
+    const moduleSem = "SEM " + moduleSemesterNumber;
+    axios
+      .post("/addNewModule", {
+        moduleCode,
+        moduleTitle,
+        moduleYear,
+        moduleSem,
+      })
+      .then((res) => {
+        if (res.data.message === "success") {
+          setMessage("Module Added successfully!");
+          setModuleCode("");
+          setModuleTitle("");
+          setModuleStartYear("");
+          setModuleEndYear("");
+          setModuleSemesterNumber("");
+        } else setMessage("ServerError! Please try again later.");
+      });
   };
 
   const goBackOperation = () => {
@@ -101,6 +124,7 @@ function AddModules() {
           onChange={(event) => setModuleSemesterNumber(event.target.value)}
           value={moduleSemesterNumber}
         />
+        {message && <div className="error-message">{message}</div>}
         <div className="add-new-module-buttons">
           <button className="button" onClick={saveNewModule}>
             SAVE
@@ -170,7 +194,7 @@ const Main = styled.div`
     align-items: center;
     /* border: 1px solid red; */
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
   }
 
   .button {
@@ -203,6 +227,19 @@ const Main = styled.div`
 
   .back-to-login-page:hover {
     cursor: pointer;
+  }
+
+  .error-message {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 20px;
+    border: 1px solid white;
+    border-radius: 8px;
+    width: 100%;
+    padding: 10px;
+    white-space: pre-line;
   }
 `;
 

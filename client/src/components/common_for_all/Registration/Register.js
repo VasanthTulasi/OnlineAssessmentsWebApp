@@ -50,7 +50,7 @@ function Register() {
       errorMessageString += "University ID Number must be of 9 digits.\n\n";
     }
 
-    if (!registerEmail.includes("@")) {
+    if (!registerEmail.includes("@") || !registerEmail.includes(".")) {
       errorMessageString += "Invalid Email format entered.\n\n";
     }
     if (registerPassword.length < 8) {
@@ -78,12 +78,12 @@ function Register() {
           if (res.data.message === "success")
             setCurrentSection("registrationrequested");
           else if (res.data.message === "already registered")
-            alert("Account already exists with this email!");
+            setErrorMessage("Account already exists with this email!");
           else if (res.data.message === "already pending approval")
-            alert(
-              "Your account is already pending approval from the admin. Please keep checking your email inbox for further updates."
+            setErrorMessage(
+              "Your account is already pending approval from the admin.\nPlease keep checking your email inbox for further updates."
             );
-          else alert(res.data.message);
+          else setErrorMessage(res.data.message);
         });
     }
   };
@@ -433,7 +433,6 @@ const RegisterSection = styled.div`
     border-radius: 8px;
     width: 100%;
     padding: 10px;
-    /* border-radius: 10px; */
     white-space: pre-line;
   }
 `;

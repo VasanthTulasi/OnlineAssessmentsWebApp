@@ -18,17 +18,22 @@ function ForgotPassword() {
   });
 
   const sendPasswordResetLink = async () => {
-    setMessage("Password reset email is sent to your mail id.");
-    setButtonDisplay({ display: "none" });
-    return;
+    if (forgotPasswordEmail === "") {
+      setMessage("Email field cannot be empty.");
+      return;
+    }
+
     axios
       .post("/forgotPassword", {
         email: forgotPasswordEmail,
       })
       .then((res) => {
-        if (res.data.message === "password reset email sent")
-          setMessage("Password reset email is sent to your mail id.");
-        else if (res.data.message === "user not found")
+        if (res.data.message === "success") {
+          setMessage(
+            "Password reset email is sent to your mail id. Please check your email inbox."
+          );
+          setButtonDisplay({ display: "none" });
+        } else if (res.data.message === "user not found")
           setMessage(
             "User does not exist with this email! Please enter a valid email."
           );

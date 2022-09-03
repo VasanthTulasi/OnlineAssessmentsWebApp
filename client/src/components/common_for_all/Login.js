@@ -31,11 +31,9 @@ function Login() {
   });
 
   const loginButtonClicked = async () => {
-    // setErrorMessage("Invalid User ID or Password");
-    // return;
-
-    if (loginEmail === "") alert("Email field cannot be blank!");
-    else if (loginPassword === "") alert("Password field cannot be blank!");
+    
+    if (loginEmail === "") setErrorMessage("Email field cannot be blank!");
+    else if (loginPassword === "") setErrorMessage("Password field cannot be blank!");
     else {
       axios
         .post("http://localhost:3001/users/login", {
@@ -43,8 +41,8 @@ function Login() {
           password: loginPassword,
         })
         .then((res) => {
-          if (res.data.message !== "Success")
-            alert("Invalid User Name or Password!");
+          if (res.data.message !== "success")
+            setErrorMessage("Invalid User Name or Password!");
           else {
             setIsUserLoggedIn(true);
             setLoggedInUserDetails({

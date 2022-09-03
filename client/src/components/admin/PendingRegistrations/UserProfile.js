@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import ProfileData from "../../common_for_all/MyProfile/ProfileData";
 import BodyImage from "../../../svgs/body_background.svg";
 import styled from "styled-components";
@@ -12,6 +12,9 @@ function UserProfile() {
   const { state } = useLocation();
   const userObj = state;
   const [isModalVisible, setisModalVisible] = useState(false);
+  const [message, setMessage] = useState("");
+  const approveButton = useRef(null);
+  const rejectButton = useRef(null);
 
   const axios = Axios.create({
     withCredentials: true,
@@ -27,11 +30,14 @@ function UserProfile() {
     console.log(userObj);
     axios.post("/approveregistration", userObj).then((res) => {
       if (res.data.message === "success") {
-        alert("User Registration Approved Successfully!");
-        navigate("../userslist");
+        setMessage("User registration approved successfully!");
+        // navigate("../userslist");
+        disableButtons();
       } else {
-        alert("Cannot approve user. Please try again after sometime!");
-        navigate("../userslist");
+        setMessage(
+          "Server Error: Unable to approve user. Please try again later!"
+        );
+        // navigate("../userslist");
       }
     });
   };
@@ -45,38 +51,58 @@ function UserProfile() {
     axios
       .post("/rejectregistration", {
         email: userObj.email,
-        rejectionReason: reason
+        rejectionReason: reason,
       })
       .then((res) => {
         if (res.data.message === "success") {
-          alert("User Registration Rejected Successfully!");
-          navigate("../userslist");
+          setMessage("User registration rejected successfully!");
+          disableButtons();
+          // navigate("../userslist");
         } else {
-          alert("User does not exist or already deleted!");
-          navigate("../userslist");
+          setMessage(
+            "Server Error: Unable to approve user. Please try again later!"
+          );
+          // navigate("../userslist");
         }
       });
+  };
+
+  const disableButtons = () => {
+    approveButton.current.disabled = true;
+    rejectButton.current.disabled = true;
+
+    approveButton.current.style.backgroundColor = "gray";
+    rejectButton.current.style.backgroundColor = "gray";
   };
 
   return (
     <Profile>
       {isModalVisible && (
-        <UserRejectModal setModalVisibility={()=>setisModalVisible(false)} confirmRejection={confirmRejection} />
+        <UserRejectModal
+          setModalVisibility={() => setisModalVisible(false)}
+          confirmRejection={confirmRejection}
+        />
       )}
       <div className="profile-heading">User Profile</div>
       <ProfileData userData={userObj} />
+      {message && <div className="error-message">{message}</div>}
       <div>
-        <button className="change-password-button" onClick={goBack}>
+        <button className="user-profile-buttons" onClick={goBack}>
           Go Back
         </button>
         <button
-          className="change-password-button"
+          ref={approveButton}
+          className="user-profile-buttons"
           onClick={rejectUser}
           style={{ marginLeft: "30px", marginRight: "30px" }}
         >
           Reject
         </button>
-        <button className="change-password-button" onClick={approveUser}>
+        <button
+          ref={rejectButton}
+          className="user-profile-buttons"
+          onClick={approveUser}
+        >
           Approve
         </button>
       </div>
@@ -85,12 +111,13 @@ function UserProfile() {
 }
 
 const Profile = styled.div`
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
-  /* background-color: #282c34; */
-  background-image: url("${BodyImage}");
-  background-repeat: no-repeat;
-  background-size: cover;
+  height: auto;
+  background-color: #282c34;
+  /* background-image: url("${BodyImage}"); */
+  /* background-repeat: no-repeat; */
+  /* background-size: cover; */
   color: #61dafb;
   /* font-size: 50px; */
   padding-top: 72px;
@@ -148,8 +175,9 @@ const Profile = styled.div`
     background-color: #282c34;
   }
 
-  .change-password-button {
+  .user-profile-buttons {
     margin-top: 25px;
+    margin-bottom: 25px;
     border: 1px solid black;
     /* border: 1px solid white; */
     color: #282c34;
@@ -169,8 +197,19 @@ const Profile = styled.div`
     padding: 0 20px 0 20px;
   }
 
-  .change-password-button:hover {
+  .user-profile-buttons:hover {
     cursor: pointer;
+  }
+
+  .error-message {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 10px;
+    border: 1px solid white;
+    padding: 10px;
+    border-radius: 10px;
   }
 `;
 

@@ -1,15 +1,14 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 function UserRejectModal(props) {
-
   const [reason, setReason] = useState("");
+  const [message, setMessage] = useState("");
 
   const reject = () => {
-    if(reason === "")
-        alert("Rejection reason cannot be empty. It is a mandatory field.");
-    else
-        props.confirmRejection(reason);
+    if (reason === "")
+      setMessage("Rejection reason cannot be empty. It is a mandatory field.");
+    else props.confirmRejection(reason);
   };
 
   return (
@@ -23,21 +22,19 @@ function UserRejectModal(props) {
         <input
           className="modal-reason"
           placeholder="Rejection Reason"
-          onChange={(event) => setReason(event.target.value)}
+          onChange={(event) => {
+            setMessage("");
+            setReason(event.target.value);
+          }}
         />
         <br />
+        {message && <div className="error-message-no-border">{message}</div>}
         <br />
         <div className="modal-buttons">
-          <button
-            className="modal-save"
-            onClick={reject}
-          >
+          <button className="modal-save" onClick={reject}>
             SAVE
           </button>
-          <button
-            className="modal-save"
-            onClick={props.setModalVisibility}
-          >
+          <button className="modal-save" onClick={props.setModalVisibility}>
             GO BACK
           </button>
         </div>
@@ -90,7 +87,7 @@ const ModalBox = styled.div`
     padding-left: 10px;
   }
 
-  .modal-buttons{
+  .modal-buttons {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
@@ -113,6 +110,17 @@ const ModalBox = styled.div`
 
   .modal-save:hover {
     cursor: pointer;
+  }
+
+  .error-message-no-border {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 10px;
+    /* border: 1px solid white; */
+    /* padding: 10px; */
+    /* border-radius: 10px; */
   }
 `;
 

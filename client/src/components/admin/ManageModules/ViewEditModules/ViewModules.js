@@ -4,12 +4,12 @@ import styled from "styled-components";
 import Axios from "axios";
 import ConfirmDeleteModal from "../ConfirmDeletionModal";
 
-
 function ViewModules() {
   let [modulesArray, setModulesArray] = useState([]);
   const navigate = useNavigate();
   const [isModalVisible, setisModalVisible] = useState(false);
   const [deletionIndex, setDeletionIndex] = useState();
+  const [message, setMessage] = useState("");
 
   const axios = Axios.create({
     withCredentials: true,
@@ -20,31 +20,36 @@ function ViewModules() {
   const editModule = (event) => {
     const itemIndex = event.currentTarget.id.split("_")[1];
     navigate("../editmodule", {
-      state: modulesArray[itemIndex]
+      state: modulesArray[itemIndex],
     });
   };
 
-
-  const deleteModule = (event) =>{
+  const deleteModule = (event) => {
     setDeletionIndex(event.currentTarget.id.split("_")[1]);
     setisModalVisible(true);
-  }
+  };
 
   const confirmedModuleDeletion = () => {
     setisModalVisible(false);
     const itemIndex = deletionIndex;
-    axios.post("/deleteModule",{module_code: modulesArray[itemIndex].module_code}).then((res) => {
-      if(res.data.message === "success"){
-        alert("Module deleted succesfully!");
-        const modModulesArray = modulesArray;
-        modModulesArray.splice(itemIndex,1);
-        console.log("New Array is "+JSON.stringify(modModulesArray));
-        setModulesArray([...modModulesArray]);
-      }
-      else
-        alert("Error: " + res.data.message);
-    });
-  }
+    axios
+      .post("/deleteModule", {
+        module_code: modulesArray[itemIndex].module_code,
+      })
+      .then((res) => {
+        if (res.data.message === "success") {
+          setMessage(
+            "Module " +
+              modulesArray[itemIndex].module_code +
+              " deleted succesfully!"
+          );
+          const modModulesArray = modulesArray;
+          modModulesArray.splice(itemIndex, 1);
+          // console.log("New Array is " + JSON.stringify(modModulesArray));
+          setModulesArray([...modModulesArray]);
+        } else setMessage("Server Error! Please try again later");
+      });
+  };
 
   useEffect(() => {
     axios.get("/listofmodules").then((res) => {
@@ -54,50 +59,55 @@ function ViewModules() {
 
   return (
     <>
-    {isModalVisible && (
-      <ConfirmDeleteModal setModalVisibility={()=>setisModalVisible(false)} moduleInfo={modulesArray[deletionIndex].module_code} confirmedDeletion={confirmedModuleDeletion}/>
-    )}
-    <ViewEditMod>
-      <div>View / Edit Modules</div>
-      <table className="module-data-content">
-        <tbody>
-          <tr>
-            <td className="module-data start headers-color">S. No</td>
-            <td className="module-data headers-color">Module Code</td>
-            <td className="module-data headers-color">Module Title</td>
-            <td className="module-data headers-color">Year</td>
-            <td className="module-data end headers-color">Sem</td>
-          </tr>
-          {modulesArray.map((ele, index) => {
-            return (
-              <tr>
-                <td className="module-data start">{index+1}</td>
-                <td className="module-data mid">{ele.module_code}</td>
-                <td className="module-data mid">{ele.module_title}</td>
-                <td className="module-data mid">{ele.module_year}</td>
-                <td className="module-data end">{ele.module_semester}</td>
-                <td>
-                  <button
-                    id={"editButton_" + index}
-                    className="module-data-button"
-                    onClick={editModule}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    id={"deleteButton_" + index}
-                    className="module-data-button"
-                    onClick={deleteModule}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </ViewEditMod>
+      {isModalVisible && (
+        <ConfirmDeleteModal
+          setModalVisibility={() => setisModalVisible(false)}
+          moduleInfo={modulesArray[deletionIndex].module_code}
+          confirmedDeletion={confirmedModuleDeletion}
+        />
+      )}
+      <ViewEditMod>
+        <div>View / Edit Modules</div>
+        <table className="module-data-content">
+          <tbody>
+            <tr>
+              <td className="module-data start headers-color">S. No</td>
+              <td className="module-data headers-color">Module Code</td>
+              <td className="module-data headers-color">Module Title</td>
+              <td className="module-data headers-color">Year</td>
+              <td className="module-data end headers-color">Sem</td>
+            </tr>
+            {modulesArray.map((ele, index) => {
+              return (
+                <tr>
+                  <td className="module-data start">{index + 1}</td>
+                  <td className="module-data mid">{ele.module_code}</td>
+                  <td className="module-data mid">{ele.module_title}</td>
+                  <td className="module-data mid">{ele.module_year}</td>
+                  <td className="module-data end">{ele.module_semester}</td>
+                  <td>
+                    <button
+                      id={"editButton_" + index}
+                      className="module-data-button"
+                      onClick={editModule}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      id={"deleteButton_" + index}
+                      className="module-data-button"
+                      onClick={deleteModule}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        {message && <div className="error-message">{message}</div>}
+      </ViewEditMod>
     </>
   );
 }
@@ -173,6 +183,17 @@ const ViewEditMod = styled.div`
 
   .headers-color {
     color: #61dafb;
+  }
+
+  .error-message {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 30px;
+    border: 1px solid white;
+    border-radius: 8px;
+    padding: 10px;
   }
 `;
 

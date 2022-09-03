@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext} from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import styled from "styled-components";
 import FIBTemplate from "../professor/QuestionTemplates/FIBTemplate";
 import MCQTemplate from "../professor/QuestionTemplates/MCQTemplate";
@@ -31,7 +31,6 @@ function ViewDiscussions() {
         question_index: state.questionIndex,
       })
       .then((res) => {
-        console.log("res received");
         setDiscussions(res.data);
         setDiscussionsLoaded(true);
         setResponses(Array(res.data.length).fill(""));
@@ -44,26 +43,37 @@ function ViewDiscussions() {
       alert("New discussion point cannot be empty!");
       return false;
     }
-    // alert(discussionText);
+    console.log("hey");
+    // return;
     axios
       .post("/saveNewDiscussion", {
+        user_name:
+          loggedInUserDetails.first_name + "_" + loggedInUserDetails.last_name,
         discussion_point: discussionText,
         responses: [],
         assessment_id: state.assessmentId,
         question_index: state.questionIndex,
       })
       .then((res) => {
-        // if (res.data.message === "success") {
-        //   setDiscussions((prevState) => [
-        //     ...prevState,
-        //     {
-        //       discussion_point: discussionText,
-        //       responses: [],
-        //     },
-        //   ]);
-        // } else {
-        //   alert("Server Error! Please try again!");
-        // }
+        console.log("Received res");
+        if (res.data.message === "success") {
+          console.log("into successs");
+          setDiscussions((prevState) => [
+            ...prevState,
+            {
+              user_name:
+                loggedInUserDetails.first_name +
+                "_" +
+                loggedInUserDetails.last_name,
+              discussion_point: discussionText,
+              responses: [],
+            },
+          ]);
+
+          newDiscussion.current.value = "";
+        } else {
+          alert("Server Error! Please try again!");
+        }
       });
   };
 
@@ -84,7 +94,22 @@ function ViewDiscussions() {
         discussion_index: ind,
       })
       .then((res) => {
-        console.log("done");
+        if (res.data.message === "success") {
+          const disc = [...discussions];
+          disc[ind].responses.push({
+            user_name:
+              loggedInUserDetails.first_name +
+              "_" +
+              loggedInUserDetails.last_name,
+            user_response: responses[ind],
+          });
+          setDiscussions([...disc]);
+          const resp = [...responses];
+          resp[ind] = "";
+          setResponses([...resp]);
+        } else {
+          alert("Server Error! Please try again!");
+        }
       });
   };
 
@@ -154,7 +179,7 @@ function ViewDiscussions() {
             <div className="discussion">
               <div className="discussion_heading">
                 <div>
-                  <i>Discussion Point</i>
+                  <i>{ele.user_name}</i>
                 </div>
                 <div>{ele.discussion_point}</div>
               </div>
@@ -178,9 +203,10 @@ function ViewDiscussions() {
                   className="text-area-dis"
                   ref={discussionResponse}
                   // id={"disRes" + index}
-                  onBlur={(event) => saveResponse(event, index)}
+                  onChange={(event) => saveResponse(event, index)}
                   rows="3"
                   placeholder="Enter your response here..."
+                  value={responses[index]}
                 />
                 <br />
                 <button
@@ -195,7 +221,7 @@ function ViewDiscussions() {
         })}
       {discussionsLoaded && discussions.length === 0 && (
         <div className="discussions-text">
-          No Discussions for this Questions
+          No discussions found for this question.
         </div>
       )}
       <textarea

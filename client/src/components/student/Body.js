@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import ViewTakeAssessments from "./ViewTakeAssessments/ViewTakeAssessments";
 import ViewCheckResults from "./Results/ViewCheckResults";
+import Discussions from "../common_for_prof_and_stu/Discussions";
 import Profile from "../common_for_all/MyProfile/MyProfile";
 import NavBar from "../common_for_all/Navbar";
 import { AssessmentContext } from "../../contexts/AssessmentContext";
@@ -27,6 +28,7 @@ function Body() {
             path="/viewCheckResults/*"
             element={<ViewCheckResults />}
           />
+          <Route exact path="/discussions/*" element={<Discussions />} />
           <Route exact path="/myprofile/*" element={<Profile />} />
         </Routes>
       </AssessmentContext.Provider>

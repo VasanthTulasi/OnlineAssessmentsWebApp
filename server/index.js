@@ -2,13 +2,14 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
-const cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
 
 const PendingRegistrationsRoute = require("./routes/PendingRegistrationsRoute");
 const UsersRoute = require("./routes/UsersRoute");
 const ModulesRoute = require("./routes/ModulesRoute");
 const AssessmentsRoute = require("./routes/AssessmentsRoute");
 const SubmissionsRoute = require("./routes/SubmissionsRoute");
+const DiscussionsRoute = require("./routes/DiscussionsRoute");
 
 const corsConfig = {
   credentials: true,
@@ -27,6 +28,7 @@ app.use("/users", UsersRoute);
 app.use("/modules", ModulesRoute);
 app.use("/assessments", AssessmentsRoute);
 app.use("/submissions", SubmissionsRoute);
+app.use("/discussions", DiscussionsRoute);
 
 app.listen(3001, () => {
   console.log("Server is good");

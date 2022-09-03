@@ -156,7 +156,7 @@ function ViewAssessments() {
                             : "module-data-button button-disabled"
                         }
                       >
-                        View Discussions
+                        View Questions
                       </button>
                     </td>
                   </tr>

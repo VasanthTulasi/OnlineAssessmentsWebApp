@@ -14,7 +14,9 @@ function ViewQuestions() {
     navigate("../viewDiscussions", {
       state: {
         questionIndex: ind,
+        assessmentId: state.assessment._id,
         question: state.assessment.questions[ind],
+        assessment: state.assessment,
       },
     });
   };

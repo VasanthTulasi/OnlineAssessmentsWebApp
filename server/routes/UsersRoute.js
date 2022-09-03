@@ -204,4 +204,23 @@ router.post("/assignedModuleCodes", async (req, res) => {
   }
 });
 
+router.post("/getUnassignedUsers", async (req, res) => {
+  console.log("Entered");
+  const { moduleCode } = req.body;
+  const users = await UsersModel.find(
+    {
+      assigned_modules: { $nin: moduleCode },
+    },
+    { uni_id: true, _id: false }
+  );
+  if (users) {
+    let moduleUsers = users;
+    moduleUsers = moduleUsers.map((ele) => {
+      return ele.uni_id;
+    });
+    console.log("Users: " + moduleUsers);
+    res.send(moduleUsers);
+  }
+});
+
 module.exports = router;

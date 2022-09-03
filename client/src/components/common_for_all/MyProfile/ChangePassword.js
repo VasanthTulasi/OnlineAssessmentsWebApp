@@ -12,6 +12,7 @@ function ChangePassword() {
   const navigate = useNavigate();
   const { loggedInUserDetails } = useContext(LoginContext);
   const userEmail = loggedInUserDetails.email;
+  const [message, setMessage] = useState("");
 
   const axios = Axios.create({
     withCredentials: true,
@@ -20,33 +21,44 @@ function ChangePassword() {
   });
 
   const saveNewPassword = () => {
+    let errorMessageString = "";
     if (
       currentPassword === "" ||
       newPassword === "" ||
       reenterNewPassword === ""
     ) {
-      alert("Fields cannot be empty. All the fields must be filled.");
-    } else if (newPassword.length < 8) {
-      alert("New Password should contain atleast 8 characters.");
-    } else if (newPassword !== reenterNewPassword) {
-      alert("Password and Re-enter password fields do not match.");
-    } else {
-      axios
-        .post("/changePassword", { userEmail, currentPassword, newPassword })
-        .then((res) => {
-          if (res.data.message === "incorrect password")
-            alert(
-              "Password reset failed! Entered incorrect current password. Please try again!"
-            );
-          else if (res.data.message === "success") {
-            alert("Password changed successfully!");
-            navigate("../profilecontent");
-          } else alert("Error: " + res.data.message+". Please try again.");
-        });
+      errorMessageString +=
+        "Fields cannot be empty. All the fields must be filled.\n\n";
     }
+    if (newPassword.length < 8) {
+      errorMessageString +=
+        "New Password should contain atleast 8 characters.\n\n";
+    }
+    if (newPassword !== reenterNewPassword) {
+      errorMessageString +=
+        "Password and Re-enter password fields do not match.\n\n";
+    }
+    if (errorMessageString !== "") {
+      setMessage("Error(s):\n\n" + errorMessageString);
+      return;
+    } else {
+      setMessage([]);
+    }
+    axios
+      .post("/changePassword", { userEmail, currentPassword, newPassword })
+      .then((res) => {
+        if (res.data.message === "incorrect password")
+          setMessage(
+            "Password reset failed! Entered incorrect current password.\nPlease try again!"
+          );
+        else if (res.data.message === "success") {
+          setMessage("Password changed successfully!");
+          // navigate("../profilecontent");
+        } else setMessage("Server Error. Please try again later.");
+      });
   };
 
-  const cancelOperation = () => {
+  const goBack = () => {
     navigate("../profilecontent");
   };
 
@@ -77,12 +89,13 @@ function ChangePassword() {
           type="password"
           onChange={(event) => setreenterNewPassword(event.target.value)}
         />
+        {message && <div className="error-message">{message}</div>}
         <div className="change-password-buttons">
           <button className="button" onClick={saveNewPassword}>
             SAVE
           </button>
-          <button className="button" onClick={cancelOperation}>
-            CANCEL
+          <button className="button" onClick={goBack}>
+            GO BACK
           </button>
         </div>
       </div>
@@ -183,6 +196,19 @@ const Main = styled.div`
 
   .back-to-login-page:hover {
     cursor: pointer;
+  }
+
+  .error-message {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 20px;
+    border: 1px solid white;
+    border-radius: 8px;
+    width: 100%;
+    padding: 10px;
+    white-space: pre-line;
   }
 `;
 

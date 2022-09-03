@@ -89,23 +89,24 @@ router.post("/getModulesInfo", async (req, res) => {
 
 router.post("/assignUsers", async (req, res) => {
   const { moduleCode, newUsers } = req.body;
-  let validUsers = [],
-    invalidUsers = [];
-  let user = null;
+  // let validUsers = [];
+  // invalidUsers = [];
+  // let user = null;
+
+  // for (let i = 0; i < newUsers.length; i++) {
+  //   user = await UsersModel.findOne({ uni_id: newUsers[i] });
+  //   if (user) validUsers.push(newUsers[i]);
+  //   else invalidUsers.push(newUsers[i]);
+  // }
 
   for (let i = 0; i < newUsers.length; i++) {
-    user = await UsersModel.findOne({ uni_id: newUsers[i] });
-    if (user) validUsers.push(newUsers[i]);
-    else invalidUsers.push(newUsers[i]);
-  }
-
-  for (let i = 0; i < validUsers.length; i++) {
     await UsersModel.updateOne(
-      { uni_id: validUsers[i] },
+      { uni_id: newUsers[i] },
       { $addToSet: { assigned_modules: { $each: [moduleCode] } } }
     );
   }
-  res.json({ message: "success", invalidUsers: invalidUsers });
+
+  res.json({ message: "success" });
 });
 
 router.post("/deleteUserFromModule", async (req, res) => {

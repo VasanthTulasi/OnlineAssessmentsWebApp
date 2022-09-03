@@ -4,13 +4,14 @@ import Axios from "axios";
 import ConfirmDeleteModal from "./ConfirmDeletionModal";
 import { useNavigate } from "react-router-dom";
 import SingleSelect from "react-select";
+import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 
 function ViewUsersForModules() {
   let [moduleCode, setModuleCode] = useState("");
-  let [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
   let [newUsers, setNewUsers] = useState([]);
-  let [invalidUsers, setInvalidUsers] = useState([]);
+  let [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
+  let [usersFromDB, setUsersFromDB] = useState([]);
   let [usersSavedStatus, setUsersSavedStatus] = useState("");
   const [isModalVisible, setisModalVisible] = useState(false);
   const navigate = useNavigate();
@@ -18,6 +19,12 @@ function ViewUsersForModules() {
   const axios = Axios.create({
     withCredentials: true,
     baseURL: "http://localhost:3001/modules",
+    crossDomain: true,
+  });
+
+  const axios2 = Axios.create({
+    withCredentials: true,
+    baseURL: "http://localhost:3001/users",
     crossDomain: true,
   });
 
@@ -31,36 +38,41 @@ function ViewUsersForModules() {
     });
   }, []);
 
+  useEffect(() => {
+    if (moduleCode != "") {
+      getUnassignedUsers(moduleCode);
+    }
+  }, [moduleCode]);
+
+  const getUnassignedUsers = (moduleCode) => {
+    console.log("Triggered");
+    axios2
+      .post("/getUnassignedUsers", { moduleCode: moduleCode })
+      .then((res) => {
+        setUsersFromDB([]);
+        let users = res.data;
+        users = users.map((ele) => {
+          return { label: ele, value: ele };
+        });
+        console.log("unassigned users: " + JSON.stringify(users));
+        setUsersFromDB([...users]);
+      });
+  };
+
   const saveUsers = () => {
     if (moduleCode === "" || newUsers.length === 0) {
-      alert("Fields cannot be empty. All the fields must be filled.");
+      setUsersSavedStatus(
+        "Fields cannot be empty. All the fields must be filled."
+      );
       return;
     }
-    setInvalidUsers([]);
     axios.post("/assignUsers", { moduleCode, newUsers }).then((res) => {
-      // console.log("message is: "+res.data.message);
-      // console.log("length is: "+res.data.invalidUsers.length);
-      if (
-        res.data.message === "success" &&
-        res.data.invalidUsers.length === 0
-      ) {
-        console.log("reached");
+      if (res.data.message === "success") {
         setUsersSavedStatus(
           "All the specified users are assigned to the module successfully."
         );
-      } else if (res.data.invalidUsers.length === newUsers.length) {
-        setUsersSavedStatus(
-          "Error: None of the specified users are added to the module as they are invalid. Please find the invalid user(s) below."
-        );
-        setInvalidUsers(res.data.invalidUsers);
-      } else if (
-        res.data.message === "success" &&
-        res.data.invalidUsers.length !== 0
-      ) {
-        setUsersSavedStatus(
-          "Error: Failed to assign the below users to the module as they are invalid. The remaining users are successfully assigned."
-        );
-        setInvalidUsers(res.data.invalidUsers);
+        getUnassignedUsers(moduleCode);
+        setNewUsers([]);
       } else setUsersSavedStatus("Error: " + res.data.message);
     });
   };
@@ -141,7 +153,7 @@ function ViewUsersForModules() {
           Enter the University ID(s) of the User(s)
         </label>
         <div className="select-module-dropdown">
-          <CreatableSelect
+          {/* <CreatableSelect
             styles={customStyles}
             placeholder="Please type here and add them"
             onChange={selectedUsers}
@@ -152,8 +164,22 @@ function ViewUsersForModules() {
               DropdownIndicator: () => null,
               IndicatorSeparator: () => null,
             }}
+          /> */}
+          <Select
+            styles={customStyles}
+            isMulti
+            options={usersFromDB}
+            placeholder="Select or Enter User ID"
+            noOptionsMessage={() => "No User To Add"}
+            onChange={selectedUsers}
+            value={newUsers.map((ele) => {
+              return { label: ele, value: ele };
+            })}
           />
         </div>
+        {usersSavedStatus && (
+          <div className="error-message">{usersSavedStatus}</div>
+        )}
         <div className="add-new-user-buttons">
           <button className="button" onClick={saveUsers}>
             SAVE
@@ -162,33 +188,6 @@ function ViewUsersForModules() {
             GO BACK
           </button>
         </div>
-      </div>
-      <div className="user-save-status">
-        {usersSavedStatus !== "" && (
-          <div className="heading" style={{ fontSize: "17px" }}>
-            {usersSavedStatus}
-          </div>
-        )}
-        {invalidUsers.length !== 0 && (
-          <table className="module-data-content">
-            <tbody>
-              <tr>
-                <td className="module-data start headers-color">S. No</td>
-                <td className="module-data end headers-color">
-                  Invalid User IDs
-                </td>
-              </tr>
-              {invalidUsers.map((ele, index) => {
-                return (
-                  <tr>
-                    <td className="module-data start">{index + 1}</td>
-                    <td className="module-data end">{ele}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
       </div>
     </Main>
   );
@@ -382,6 +381,14 @@ const Main = styled.div`
 
   .button:hover {
     cursor: pointer;
+  }
+
+  .error-message {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 20px;
   }
 `;
 

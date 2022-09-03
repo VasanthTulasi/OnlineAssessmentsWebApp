@@ -9,6 +9,7 @@ function ResetPassword() {
   const tokenFromURL = useParams().token;
   const [newPassword, setNewPassword] = useState("");
   const [reenterNewPassword, setReenterNewPassword] = useState("");
+  const [message, setMessage] = useState("");
 
   const axios = Axios.create({
     withCredentials: true,
@@ -17,30 +18,42 @@ function ResetPassword() {
   });
 
   const saveNewPassword = () => {
+    let errorMessageString = "";
     if (newPassword === "" || reenterNewPassword === "") {
-      alert("Fields cannot be empty. Both the fields must be filled.");
-    } else if (newPassword.length < 8) {
-      alert("Password should contain atleast 8 characters.");
-    } else if (newPassword !== reenterNewPassword) {
-      alert("Password and Re-enter password fields do not match.");
-    } else {
-      axios
-        .post("/resetPassword", {
-          password: newPassword,
-          resetToken: tokenFromURL,
-        })
-        .then((res) => {
-          if (res.data.message === "password reset successful") {
-            alert(
-              "Your password reset is successful. Please login using your new password."
-            );
-          } else if (res.data.message === "link expired") {
-            alert(
-              "This link is expired. Please request for a new password reset link using 'Forgot Password' operation."
-            );
-          }
-        });
+      errorMessageString +=
+        "Fields cannot be empty. Both the fields must be filled.\n\n";
     }
+    if (newPassword.length < 8) {
+      errorMessageString += "Password should contain atleast 8 characters.\n\n";
+    }
+    if (newPassword !== reenterNewPassword) {
+      errorMessageString +=
+        "Password and Re-enter password fields do not match.\n\n";
+    }
+
+    if (errorMessageString !== "") {
+      setMessage("Error(s):\n\n" + errorMessageString);
+      return;
+    } else {
+      setMessage("");
+    }
+
+    axios
+      .post("/resetPassword", {
+        password: newPassword,
+        resetToken: tokenFromURL,
+      })
+      .then((res) => {
+        if (res.data.message === "password reset successful") {
+          setMessage(
+            "Your password reset is successful. Please login using your new password."
+          );
+        } else if (res.data.message === "link expired") {
+          setMessage(
+            "This link is expired.\nPlease request for a new password reset link using 'Forgot Password' operation."
+          );
+        }
+      });
   };
 
   return (
@@ -53,6 +66,7 @@ function ResetPassword() {
         <div className="reset-password-card">
           <label className="reset-password-label">Enter New Password</label>
           <input
+            type="password"
             className="reset-password-text-field"
             placeholder="New Password"
             id="reset_password"
@@ -62,11 +76,13 @@ function ResetPassword() {
             Re-enter New Password
           </label>
           <input
+            type="password"
             className="reset-confirm-password-text-field"
             placeholder="Re-enter New Password"
             id="reset_confirm_password"
             onChange={(event) => setReenterNewPassword(event.target.value)}
           />
+          {message && <div className="error-message">{message}</div>}
           <button
             className="save-new-password-button"
             onClick={saveNewPassword}
@@ -162,6 +178,7 @@ const ResetPasswordSection = styled.div`
 
   .save-new-password-button {
     margin-top: 30px;
+    margin-bottom: 30px;
     border: 1px solid #282c34;
     /* border: 0px; */
     color: white;
@@ -173,10 +190,24 @@ const ResetPasswordSection = styled.div`
     height: 45px;
     letter-spacing: 3px;
     border-radius: 5px;
+
   }
 
   .save-new-password-button:hover {
     cursor: pointer;
+  }
+
+  .error-message {
+    color: red;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 20px;
+    border: 1px solid red;
+    border-radius: 8px;
+    width: 100%;
+    padding: 10px;
+    white-space: pre-line;
   }
 `;
 

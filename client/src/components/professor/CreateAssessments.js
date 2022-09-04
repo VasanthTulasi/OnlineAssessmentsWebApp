@@ -324,7 +324,7 @@ function CreateAssessments() {
     setQuestions(modQuestionArray);
 
     if (modQuestionArray.length == 0)
-      createAssess.current.style.paddingBottom = "150px";
+      createAssess.current.style.paddingBottom = "50px";
   };
 
   const save = () => {

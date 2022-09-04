@@ -30,6 +30,7 @@ function EditAssessments() {
   const [totalMarks, setTotalMarks] = useState(null);
   const selectedDurationNumberDiv = useRef(null);
   const [changedMeasure, setChangedMeasure] = useState(0);
+  const editAssess = useRef(null);
 
   const axios = Axios.create({
     withCredentials: true,
@@ -321,6 +322,7 @@ function EditAssessments() {
       },
     ]);
     setNextKeyId((currentId) => currentId + 1);
+    editAssess.current.style.paddingBottom = "0px";
   };
 
   const removeQuestion = (event) => {
@@ -328,6 +330,9 @@ function EditAssessments() {
     let modQuestionArray = [...questions];
     modQuestionArray.splice(index, 1);
     setQuestions(modQuestionArray);
+
+    if (modQuestionArray.length == 0)
+      editAssess.current.style.paddingBottom = "50px";
   };
 
   const save = () => {
@@ -607,7 +612,7 @@ function EditAssessments() {
   };
 
   return (
-    <EditAssessment>
+    <EditAssessment ref={editAssess}>
       <div className="pending-registrations-heading">Edit Assessment</div>
       <div className="assessment-info">
         <label className="assessment-info-label">Enter Assessment Title</label>
@@ -677,12 +682,14 @@ function EditAssessments() {
         />
         <label className="assessment-info-label">Enter Total Marks</label>
         <input
+          type="number"
+          min="0"
           className="assessment-text-field"
           placeholder="Total Marks"
-          onBlur={(e) => {
+          onChange={(e) => {
             setTotalMarks(parseInt(e.target.value));
           }}
-          value={totalMarks}
+          defaultValue={totalMarks}
         />
 
         <label className="assessment-info-label">Select Module Code</label>
@@ -701,6 +708,7 @@ function EditAssessments() {
               label: moduleCode,
               value: moduleCode,
             }}
+            maxMenuHeight={160}
           />
           {/* </div> */}
         </div>
@@ -841,6 +849,7 @@ const EditAssessment = styled.div`
   align-items: center;
   flex-direction: column;
   /* background-color: #282c34; */
+  /* padding-bottom: 200px; */
 
   .pending-registrations-heading {
     color: white;

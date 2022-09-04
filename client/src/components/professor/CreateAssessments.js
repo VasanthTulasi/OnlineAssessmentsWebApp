@@ -27,6 +27,7 @@ function CreateAssessments() {
   const [totalMarks, setTotalMarks] = useState(null);
   const [showfirstQuestion, setShowFirstQuestion] = useState(true);
   const selectedDurationNumberDiv = useRef(null);
+  const createAssess = useRef(null);
 
   const axios = Axios.create({
     withCredentials: true,
@@ -240,6 +241,12 @@ function CreateAssessments() {
         moduleCodes = moduleCodes.map((ele) => {
           return { value: ele, label: ele };
         });
+        moduleCodes.push({ value: "hello", label: "hello" });
+        moduleCodes.push({ value: "hello2", label: "hello2" });
+        moduleCodes.push({ value: "hello3", label: "hello3" });
+        moduleCodes.push({ value: "hello4", label: "hello4" });
+        moduleCodes.push({ value: "hello5", label: "hello5" });
+
         setModuleCodesFromDB(moduleCodes);
       });
 
@@ -260,6 +267,7 @@ function CreateAssessments() {
       displayFirstQuestion();
       setShowFirstQuestion(false);
     }
+    createAssess.current.style.paddingBottom = "0px";
   };
 
   const changeDurationMeasure = (event) => {
@@ -314,6 +322,9 @@ function CreateAssessments() {
     let modQuestionArray = [...questions];
     modQuestionArray.splice(index, 1);
     setQuestions(modQuestionArray);
+
+    if (modQuestionArray.length == 0)
+      createAssess.current.style.paddingBottom = "150px";
   };
 
   const save = () => {
@@ -407,8 +418,7 @@ function CreateAssessments() {
     for (let i = 0; i < questions.length; i++) {
       marksSum += questions[i].questionMarks;
     }
-    // console.log(marksSum);
-    // console.log(totalMarks);
+
     if (marksSum != totalMarks) {
       alert(
         "Total marks and the sum of the individual marks do not match. Please make sure they match."
@@ -578,7 +588,7 @@ function CreateAssessments() {
   };
 
   return (
-    <CreateAssessment>
+    <CreateAssessment ref={createAssess}>
       <div className="pending-registrations-heading">Create an Assessment</div>
       <div className="assessment-info">
         <label className="assessment-info-label">Enter Assessment Title</label>
@@ -654,6 +664,9 @@ function CreateAssessments() {
             placeholder="Select or Search Module Code"
             onChange={moduleCodeSelected}
             noOptionsMessage={() => "This module is not assigned to you"}
+            // menuPortalTarget={document.body}
+            // menuPosition={"fixed"}
+            maxMenuHeight={160}
           />
         </div>
       </div>
@@ -762,9 +775,9 @@ function CreateAssessments() {
 }
 
 const CreateAssessment = styled.div`
-  height: 100%;
-  width: 100%;
   min-height: 100vh;
+  width: 100%;
+  height: auto;
   background-color: #282c34;
   /* background-image: url("${BodyImage}");
   background-repeat: repeat;
@@ -777,6 +790,7 @@ const CreateAssessment = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
+  padding-bottom: 150px;
 
   .pending-registrations-heading {
     color: white;

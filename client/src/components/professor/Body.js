@@ -14,9 +14,21 @@ function Body() {
     <>
       <NavBar />
       <Routes>
-        <Route exact path="/createAssessments" element={<CreateAssessments />} />
-        <Route exact path="/viewEditAssessments/*" element={<ViewEditAssessments />} />
-        <Route exact path="/studentSubmissions/*" element={<StudentSubmissions />} />
+        <Route
+          exact
+          path="/createAssessments"
+          element={<CreateAssessments />}
+        />
+        <Route
+          exact
+          path="/viewEditAssessments/*"
+          element={<ViewEditAssessments />}
+        />
+        <Route
+          exact
+          path="/studentSubmissions/*"
+          element={<StudentSubmissions />}
+        />
         <Route exact path="/discussions/*" element={<Discussions />} />
         <Route exact path="/myprofile/*" element={<MyProfile />} />
       </Routes>

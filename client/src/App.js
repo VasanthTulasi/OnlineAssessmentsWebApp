@@ -1,8 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import NavBar from "./components/common_for_all/Navbar";
-import Login from "./components/common_for_all/Login";
 import StudentBody from "./components/student/Body";
 import AdminBody from "./components/admin/Body";
 import ProfessorBody from "./components/professor/Body";
@@ -15,7 +13,11 @@ function App() {
 
   return (
     <LoginContext.Provider
-      value={{ setIsUserLoggedIn, loggedInUserDetails, setLoggedInUserDetails }}
+      value={{
+        setIsUserLoggedIn,
+        loggedInUserDetails,
+        setLoggedInUserDetails,
+      }}
     >
       {!isUserLoggedIn ? (
         <LandingPage />
@@ -24,7 +26,7 @@ function App() {
       ) : loggedInUserDetails.role === "professor" ? (
         <ProfessorBody />
       ) : loggedInUserDetails.role == "admin" ? (
-        <AdminBody/>
+        <AdminBody />
       ) : (
         <div>No Role Exists For User</div>
       )}

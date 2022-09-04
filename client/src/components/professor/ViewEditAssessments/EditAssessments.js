@@ -523,7 +523,9 @@ function EditAssessments() {
                 formulaArray[k] === "-" ||
                 formulaArray[k] === "*" ||
                 formulaArray[k] === "/" ||
-                formulaArray[k] === "%"
+                formulaArray[k] === "%" ||
+                formulaArray[k] === ")" ||
+                formulaArray[k] === "("
               )
                 continue;
 

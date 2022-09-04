@@ -29,7 +29,7 @@ function ViewAssessments() {
 
   const deleteAssessment = (event) => {
     setDeletionIndex(event.currentTarget.id.split("_")[1]);
-    setisModalVisible(true);  
+    setisModalVisible(true);
   };
 
   const editModule = (event) => {
@@ -132,8 +132,7 @@ function ViewAssessments() {
               options={moduleCodesFromDB}
               styles={customStyles}
               placeholder="Select or Enter Module Code"
-              onChange={(selOption)=>setModuleCode(selOption.value)}
-              
+              onChange={(selOption) => setModuleCode(selOption.value)}
             />
           </div>
           <div className="heading" style={{ fontSize: "17px" }}>
@@ -367,8 +366,6 @@ const ViewEditMod = styled.div`
   .headers-color {
     color: #61dafb;
   }
-
-  
 `;
 
 export default ViewAssessments;

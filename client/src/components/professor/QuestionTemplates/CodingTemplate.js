@@ -28,7 +28,7 @@ function CodingTemplate(props) {
   ];
 
   const codeTemplates = [
-    "public class AssessOnline {\n\tpublic static void main(String[] args){\n\t\tanswer();\n\t} \n\tpublic static void answer(){\n\t\t//Your Code Here\n\t}\n}",
+    "import java.util.Scanner;\npublic class AssessOnline {\n\tpublic static void main(String[] args){\n\t\tScanner sc = new Scanner(System.in);\n\t\tsc.close();\n\t\tanswer();\n\t} \n\tpublic static void answer(){\n\t\t//Your Code Here\n\t}\n}",
     "def answer():\n\t#Your Answer Here\n\nanswer();",
     "#include <iostream>\n\nusing namespace std;\n\nvoid answer(){\n\t//Your Answer Here\n}\n\nint main() {\n\tanswer();\n}",
     "#include <stdio.h>\n\nvoid answer(){\n\t//Your Answer Here\n}\n\nint main() {\n\tanswer();\n}",
@@ -185,6 +185,7 @@ function CodingTemplate(props) {
         defaultValue={props.questionText}
         disabled={props.isDisabled}
         placeholder="Coding Question"
+        spellCheck={"false"}
       />
       <label className="label-class">
         {props.isDisabled
@@ -234,6 +235,7 @@ function CodingTemplate(props) {
           onKeyDown={checkTabPressInTemplate}
           placeholder="Code Template for Students"
           defaultValue={props.codingTemplate}
+          spellCheck="false"
         />
       )}
       {!props.isDisabled && <label className="label-class">Test Cases</label>}

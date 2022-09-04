@@ -381,7 +381,7 @@ router.post("/autoEvaluate", async (req, res) => {
         } else if (marks.questions[j].questionType === "coding") {
           const studentCodeOutput = submission.answers[j][2];
           const expectedOutput = [];
-          for (let k = 0; k < correctAnswers.length; k++) {
+          for (let k = 0; k < correctAnswers[j].length; k++) {
             expectedOutput.push(correctAnswers[j][k].expected_output);
           }
           // console.log("Student Code Results: " + studentCodeOutput);
@@ -517,7 +517,7 @@ router.post("/autoEvaluateAll", async (req, res) => {
           } else if (marks.questions[j].questionType === "coding") {
             const studentCodeOutput = submission.answers[j][2];
             const expectedOutput = [];
-            for (let k = 0; k < correctAnswers.length; k++) {
+            for (let k = 0; k < correctAnswers[j].length; k++) {
               expectedOutput.push(correctAnswers[j][k].expected_output);
             }
             // console.log("Student Code Results: " + studentCodeOutput);

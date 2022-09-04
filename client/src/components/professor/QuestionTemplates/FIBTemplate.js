@@ -399,8 +399,8 @@ function FIBTemplate(props) {
       </button>
       {!props.isDisabled && randomNumberReferences && (
         <div className="label-class">
-          Random number reference name(s) to write the mathematical formula:{" "}
-          {randomNumberReferences}
+          Use the following random number reference name(s) to write the
+          mathematical formula: {randomNumberReferences}
         </div>
       )}
       <br />

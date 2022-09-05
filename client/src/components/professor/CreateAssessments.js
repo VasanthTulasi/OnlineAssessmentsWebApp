@@ -24,10 +24,13 @@ function CreateAssessments() {
   const [selectedDurationNumber, setSelectedDurationNumber] = useState(10);
   const [windowStartTime, setWindowStartTime] = useState("");
   const [windowEndTime, setWindowEndTime] = useState("");
-  const [totalMarks, setTotalMarks] = useState(null);
+  const [totalMarks, setTotalMarks] = useState(0);
   const [showfirstQuestion, setShowFirstQuestion] = useState(true);
+  const [message, setMessage] = useState("");
   const selectedDurationNumberDiv = useRef(null);
   const createAssess = useRef(null);
+  const errorMessageRef = useRef(null);
+  const totalMarksRef = useRef(null);
 
   const axios = Axios.create({
     withCredentials: true,
@@ -40,6 +43,10 @@ function CreateAssessments() {
     baseURL: "http://localhost:3001/assessments",
     crossDomain: true,
   });
+
+  const resetComponent = () => {
+    setQuestions([]);
+  };
 
   //Question Type Method
   const changeQuestionType = (index, val) => {
@@ -241,12 +248,6 @@ function CreateAssessments() {
         moduleCodes = moduleCodes.map((ele) => {
           return { value: ele, label: ele };
         });
-        moduleCodes.push({ value: "hello", label: "hello" });
-        moduleCodes.push({ value: "hello2", label: "hello2" });
-        moduleCodes.push({ value: "hello3", label: "hello3" });
-        moduleCodes.push({ value: "hello4", label: "hello4" });
-        moduleCodes.push({ value: "hello5", label: "hello5" });
-
         setModuleCodesFromDB(moduleCodes);
       });
 
@@ -327,6 +328,10 @@ function CreateAssessments() {
       createAssess.current.style.paddingBottom = "50px";
   };
 
+  useEffect(() => {
+    errorMessageRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [message]);
+
   const save = () => {
     // console.log("\n" + JSON.stringify(questions));
     // return;
@@ -335,23 +340,53 @@ function CreateAssessments() {
     // console.log(selectedDurationMeasure);
     // console.log(windowStartTime);
     // console.log(windowEndTime);
-
+    let errMessage = "";
     if (
       assessmentTitle === "" ||
       windowStartTime === "" ||
       windowEndTime === "" ||
       totalMarks === ""
     ) {
-      alert("Fields cannot be empty. All the fields must be filled.");
-    } else if (windowStartTime <= getCurrentTime()) {
-      alert(
-        "Assessment Window Start Time cannot be in the past. Please select a future time."
+      // alert("Fields cannot be empty. All the fields must be filled.");
+      errMessage +=
+        "Fields cannot be empty. All the fields must be filled.\n\n";
+    }
+    if (windowStartTime <= getCurrentTime()) {
+      errMessage +=
+        "Assessment Window Start Time cannot be in the past. Please select a future time.\n\n";
+    }
+    if (windowEndTime <= windowStartTime) {
+      errMessage +=
+        "Assessment Window End Time cannot be same or earlier than the Start Time.\n\n";
+    }
+
+    if (errMessage !== "") {
+      setMessage("Please resolve the following error(s):\n\n" + errMessage);
+      totalMarksRef.current.style.display = "none";
+      return;
+    } else {
+      setMessage("");
+      totalMarksRef.current.style.display = "none";
+    }
+
+    let marksSum = 0;
+    for (let i = 0; i < questions.length; i++) {
+      marksSum += questions[i].questionMarks;
+    }
+
+    if (marksSum != totalMarks) {
+      setMessage(
+        "Total marks and the sum of the individual marks do not match. Do you want the total marks to be updated to match the sum?\n\n"
       );
-    } else if (windowEndTime <= windowStartTime) {
-      alert(
-        "Assessment Window End Time cannot be same or earlier than the Start Time."
-      );
-    } else if (validateQuestions() === true) {
+      totalMarksRef.current.style.display = "block";
+      return;
+    }
+
+    validateAndSave();
+  };
+
+  const validateAndSave = () => {
+    if (validateQuestions() === true) {
       let assessment = {
         module_code: moduleCode,
         title: assessmentTitle,
@@ -398,7 +433,16 @@ function CreateAssessments() {
       assessment.questions = questionsWithoutIDs;
       console.log("final object: " + JSON.stringify(assessment));
       axios2.post("/saveNewAssessment", assessment).then((res) => {
-        alert(JSON.stringify(res.data.message));
+        if (res.data.message == "success") {
+          setMessage("Assessment Saved Successfully!");
+          totalMarksRef.current.style.display = "none";
+          resetComponent();
+        } else {
+          setMessage(
+            "Server Error: Failed to create assessment. Please try again later!"
+          );
+          totalMarksRef.current.style.display = "none";
+        }
       });
     }
   };
@@ -414,62 +458,76 @@ function CreateAssessments() {
   };
 
   const validateQuestions = () => {
-    let marksSum = 0;
-    for (let i = 0; i < questions.length; i++) {
-      marksSum += questions[i].questionMarks;
-    }
-
-    if (marksSum != totalMarks) {
-      alert(
-        "Total marks and the sum of the individual marks do not match. Please make sure they match."
-      );
-      return false;
-    }
+    let errorMessageString = "";
 
     for (let i = 0; i < questions.length; i++) {
       if (questions[i].questionText === "") {
-        alert(
-          "Error in question number " + (i + 1) + ". Question cannot be empty."
-        );
-        return false;
+        // alert(
+        //   "Error in question number " + (i + 1) + ". Question cannot be empty."
+        // );
+        errorMessageString +=
+          "Error in question number " +
+          (i + 1) +
+          ". Question cannot be empty.\n\n";
+        // return false;
       }
 
       if (questions[i].questionType === "mcq") {
         if (questions[i].options.length < 2) {
-          alert(
+          // alert(
+          //   "Error in question number " +
+          //     (i + 1) +
+          //     ". There must atleast be two options for the question."
+          // );
+          errorMessageString +=
             "Error in question number " +
-              (i + 1) +
-              ". There must atleast be two options for the question."
-          );
-          return false;
-        } else if (questions[i].correctAnswer === "") {
-          alert(
-            "Error in question number " +
-              (i + 1) +
-              ". The correct answer selected for the question is invalid."
-          );
-          return false;
+            (i + 1) +
+            ". There must atleast be two options for the question.\n\n";
+          // return false;
         }
-      } else if (questions[i].questionType === "fib") {
-        if (questions[i].correctFIBAnswers.length === 0) {
-          alert(
+        if (questions[i].correctAnswer === "") {
+          // alert(
+          //   "Error in question number " +
+          //     (i + 1) +
+          //     ". The correct answer selected for the question is invalid."
+          // );
+          errorMessageString +=
             "Error in question number " +
-              (i + 1) +
-              ". There must at least be one blank in the question."
-          );
-          return false;
+            (i + 1) +
+            ". The correct answer selected for the question is invalid.\n\n";
+          // return false;
+        }
+      }
+      if (questions[i].questionType === "fib") {
+        if (questions[i].correctFIBAnswers.length === 0) {
+          // alert(
+          //   "Error in question number " +
+          //     (i + 1) +
+          //     ". There must at least be one blank in the question."
+          // );
+          errorMessageString +=
+            "Error in question number " +
+            (i + 1) +
+            ". There must at least be one blank in the question.\n\n";
+          // return false;
         }
 
         for (let j = 0; j < questions[i].correctFIBAnswers.length; j++) {
           if (questions[i].correctFIBAnswers[j] === "") {
-            alert(
+            // alert(
+            //   "Error in question number " +
+            //     (i + 1) +
+            //     ". The correct answer for question " +
+            //     (j + 1) +
+            //     " cannot be empty."
+            // );
+            errorMessageString +=
               "Error in question number " +
-                (i + 1) +
-                ". The correct answer for question " +
-                (j + 1) +
-                " cannot be empty."
-            );
-            return false;
+              (i + 1) +
+              ". The correct answer for question " +
+              (j + 1) +
+              " cannot be empty.\n\n";
+            // return false;
           }
 
           if (questions[i].correctFIBAnswerTypes[j] === "formula") {
@@ -504,14 +562,22 @@ function CreateAssessments() {
                 continue;
 
               if (!randNumReferencesArray.includes(formulaArray[k])) {
-                alert(
+                // alert(
+                //   formulaArray[k] +
+                //     " is an invalid reference in the formula in question number " +
+                //     (i + 1) +
+                //     " - blank " +
+                //     (j + 1)
+                // );
+                errorMessageString +=
+                  "Error in question number " +
+                  (i + 1) +
+                  " - Blank " +
+                  (j + 1) +
+                  ". '" +
                   formulaArray[k] +
-                    " is an invalid reference in the formula in question number " +
-                    (i + 1) +
-                    " - blank " +
-                    (j + 1)
-                );
-                return false;
+                  "' is an invalid reference in the formula. \n\n";
+                // return false;
               }
             }
 
@@ -522,33 +588,73 @@ function CreateAssessments() {
                 !e.message.includes("is not defined") &&
                 !e.message.includes("Invalid reference")
               ) {
-                alert(
+                // alert(
+                //   e.message +
+                //     " in question number " +
+                //     (i + 1) +
+                //     " - blank " +
+                //     (j + 1)
+                // );
+                errorMessageString +=
                   e.message +
-                    " in question number " +
-                    (i + 1) +
-                    " - blank " +
-                    (j + 1)
-                );
-                return false;
+                  " in question number " +
+                  (i + 1) +
+                  " - blank " +
+                  (j + 1) +
+                  "\n\n";
+                // return false;
               }
             }
           }
         }
-      } else if (questions[i].questionType === "essay") {
+      }
+      if (questions[i].questionType === "essay") {
         //Essay question validations here...
-      } else if (questions[i].questionType === "coding") {
+      }
+      if (questions[i].questionType === "coding") {
         if (questions[i].codingLanguage === "") {
-          alert(
+          // alert(
+          //   "Error in question number " +
+          //     (i + 1) +
+          //     ". Atleast one programming language must be selected."
+          // );
+          errorMessageString +=
             "Error in question number " +
-              (i + 1) +
-              ". Atleast one programming language must be selected."
-          );
-          return false;
+            (i + 1) +
+            ". Atleast one programming language must be selected.\n\n";
+          // return false;
         }
       }
     }
 
-    return true;
+    if (errorMessageString !== "") {
+      setMessage(
+        "Please resolve the following error(s):\n\n" + errorMessageString
+      );
+      totalMarksRef.current.style.display = "none";
+      return false;
+    } else {
+      setMessage("");
+      totalMarksRef.current.style.display = "none";
+      return true;
+    }
+  };
+
+  const updateTotalMarks = () => {
+    let marksSum = 0;
+    for (let i = 0; i < questions.length; i++) {
+      marksSum += questions[i].questionMarks;
+    }
+    setTotalMarks(marksSum);
+    setMessage("Updated total marks to match the sum of the individual marks.");
+    totalMarksRef.current.style.display = "none";
+  };
+
+  const dontUpdateTotalMarks = () => {
+    setMessage(
+      "Please update total marks to match the sum of the individual marks."
+    );
+    totalMarksRef.current.style.display = "none";
   };
 
   const customStyles1 = {
@@ -652,9 +758,10 @@ function CreateAssessments() {
         <input
           className="assessment-text-field"
           placeholder="Total Marks Awarded"
-          onBlur={(e) => {
+          onChange={(e) => {
             setTotalMarks(parseInt(e.target.value));
           }}
+          value={parseInt(totalMarks)}
         />
         <label className="assessment-info-label">Select Module Code</label>
         <div className="select-module-dropdown">
@@ -759,6 +866,35 @@ function CreateAssessments() {
               </div>
             );
           })}
+      </div>
+      {message && (
+        <>
+          <div ref={errorMessageRef} className="error-message">
+            {message}
+          </div>
+        </>
+      )}
+      <div
+        style={{
+          width: "100%",
+          textAlign: "center",
+          display: "none",
+        }}
+        ref={totalMarksRef}
+      >
+        <button
+          className="total-marks-button"
+          onClick={() => updateTotalMarks()}
+        >
+          Yes
+        </button>
+        <button
+          className="total-marks-button"
+          style={{ marginLeft: "50px" }}
+          onClick={() => dontUpdateTotalMarks()}
+        >
+          No
+        </button>
       </div>
       {moduleCode !== "" && (
         <div style={{ textAlign: "center" }}>
@@ -952,6 +1088,39 @@ const CreateAssessment = styled.div`
   }
 
   .new-question-button:hover {
+    cursor: pointer;
+  }
+
+  .error-message {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 20px;
+    border: 1px dotted white;
+    border-radius: 8px;
+    width: 80%;
+    padding: 10px;
+    white-space: pre-line;
+    /* margin-left: 10px; */
+    /* margin-right: 10px; */
+  }
+
+  .total-marks-button {
+    margin-top: 5px;
+    border: 1px solid black;
+    color: #282c34;
+    background-color: white;
+    font-family: "Sourse Sans Pro ", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    width: max-content;
+    border-radius: 25px;
+    padding: 6px 10px 6px 10px;
+    text-align: center;
+  }
+
+  .total-marks-button:hover {
     cursor: pointer;
   }
 `;

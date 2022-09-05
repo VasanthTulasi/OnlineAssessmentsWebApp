@@ -9,7 +9,7 @@ router.post("/saveNewAssessment", async (req, res) => {
   assessment
     .save()
     .then(async () => {
-      res.json({ message: "Assessment saved successfully!" });
+      res.json({ message: "success" });
       // let studentEmails = [];
       // const students = await UsersModel.find(
       //   { role: "student" },
@@ -51,7 +51,7 @@ router.post("/updateAssessmentById", async (req, res) => {
     },
     { ...req.body.assessment }
   )
-    .then(() => res.json({ message: "Assessment Edited Successfully!" }))
+    .then(() => res.json({ message: "success" }))
     .catch((err) => res.json({ message: err }));
 });
 

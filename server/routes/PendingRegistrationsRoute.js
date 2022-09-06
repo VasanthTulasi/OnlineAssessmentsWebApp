@@ -13,7 +13,7 @@ router.route("/").post(async (req, res) => {
     res.json({ message: "already registered" });
   } else {
     const alreadyPendingApproval = await PendingRegistrationsModel.findOne({
-      email: user.email
+      email: user.email,
     });
     if (alreadyPendingApproval) {
       res.json({ message: "already pending approval" });
@@ -78,7 +78,7 @@ router.post("/activateaccount", async (req, res) => {
   // });
 
   let user = await PendingRegistrationsModel.findOne({
-    activationToken: token
+    activationToken: token,
   }).clone();
   if (!user) {
     res.json({ message: "user not found" });
@@ -89,7 +89,7 @@ router.post("/activateaccount", async (req, res) => {
       email: user.email,
       password: user.password,
       role: user.role,
-      uni_id: user.uni_id
+      uni_id: user.uni_id,
     };
 
     console.log(finalUser);
@@ -101,7 +101,7 @@ router.post("/activateaccount", async (req, res) => {
         function (err) {
           if (err) throw err;
           sendMail.regApprovalMail(user.email);
-          res.json({message: "success"});
+          res.json({ message: "success" });
         }
       ).clone();
     });
@@ -110,7 +110,7 @@ router.post("/activateaccount", async (req, res) => {
 
 router.post("/rejectregistration", async (req, res) => {
   const rejectUser = await PendingRegistrationsModel.find({
-    email: req.body.email
+    email: req.body.email,
   });
 
   if (rejectUser.length !== 0) {

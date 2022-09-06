@@ -86,7 +86,7 @@ function EditModule() {
 
   return (
     <EditMod>
-      <div className="add-new-module-heading">New Module</div>
+      <div className="add-new-module-heading">Edit Module</div>
       <div className="add-new-module-card">
         <label className="add-new-module-label">Enter Module Code</label>
         <input

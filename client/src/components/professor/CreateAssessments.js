@@ -24,7 +24,7 @@ function CreateAssessments() {
   const [selectedDurationNumber, setSelectedDurationNumber] = useState(10);
   const [windowStartTime, setWindowStartTime] = useState("");
   const [windowEndTime, setWindowEndTime] = useState("");
-  const [totalMarks, setTotalMarks] = useState(0);
+  const [totalMarks, setTotalMarks] = useState("");
   const [showfirstQuestion, setShowFirstQuestion] = useState(true);
   const [message, setMessage] = useState("");
   const selectedDurationNumberDiv = useRef(null);
@@ -92,12 +92,14 @@ function CreateAssessments() {
           "questionType",
           "questionMarks",
           "questionText",
+          "essayWordLimit",
           "correctKeywords",
         ],
         modQuestionArr,
         index
       );
       modQuestionArr[index].correctKeywords = [];
+      modQuestionArr[index].essayWordLimit = "";
     } else {
       deletePropertiesExcept(
         [
@@ -153,6 +155,12 @@ function CreateAssessments() {
   const saveEssayQuestion = (index, question) => {
     let modQuestionArr = [...questions];
     modQuestionArr[index].questionText = question;
+    setQuestions(modQuestionArr);
+  };
+
+  const saveEssayWordLimit = (index, wordLimit) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].essayWordLimit = wordLimit;
     setQuestions(modQuestionArr);
   };
 
@@ -369,6 +377,28 @@ function CreateAssessments() {
       totalMarksRef.current.style.display = "none";
     }
 
+    let marksError = "";
+    if (isNaN(totalMarks))
+      marksError += "Total marks cannot be a non-numeric value.\n\n";
+
+    for (let i = 0; i < questions.length; i++) {
+      if (questions[i].questionMarks == "")
+        marksError +=
+          "Error in question number " +
+          (i + 1) +
+          ". Marks cannot be empty.\n\n";
+      else if (isNaN(questions[i].questionMarks))
+        marksError +=
+          "Error in question number " +
+          (i + 1) +
+          ". Marks cannot be non-numeric value.\n\n";
+    }
+
+    if (marksError != "") {
+      setMessage(marksError);
+      return;
+    }
+
     let marksSum = 0;
     for (let i = 0; i < questions.length; i++) {
       marksSum += questions[i].questionMarks;
@@ -428,10 +458,12 @@ function CreateAssessments() {
             questionText: ele.questionText,
             correctKeywords: ele.correctKeywords,
             questionMarks: ele.questionMarks,
+            essayWordLimit: ele.essayWordLimit,
           };
       });
       assessment.questions = questionsWithoutIDs;
       console.log("final object: " + JSON.stringify(assessment));
+      // return;
       axios2.post("/saveNewAssessment", assessment).then((res) => {
         if (res.data.message == "success") {
           setMessage("Assessment Saved Successfully!");
@@ -609,7 +641,16 @@ function CreateAssessments() {
         }
       }
       if (questions[i].questionType === "essay") {
-        //Essay question validations here...
+        if (questions[i].essayWordLimit == "")
+          errorMessageString +=
+            "Error in question number " +
+            (i + 1) +
+            ". Word limit cannot be empty.\n\n";
+        else if (isNaN(questions[i].essayWordLimit))
+          errorMessageString +=
+            "Error in question number " +
+            (i + 1) +
+            ". Word limit cannot be a non numeric value.\n\n";
       }
       if (questions[i].questionType === "coding") {
         if (questions[i].codingLanguage === "") {
@@ -643,6 +684,7 @@ function CreateAssessments() {
   const updateTotalMarks = () => {
     let marksSum = 0;
     for (let i = 0; i < questions.length; i++) {
+      if (isNaN(questions[i].questionMarks)) continue;
       marksSum += questions[i].questionMarks;
     }
     setTotalMarks(marksSum);
@@ -759,9 +801,9 @@ function CreateAssessments() {
           className="assessment-text-field"
           placeholder="Total Marks Awarded"
           onChange={(e) => {
-            setTotalMarks(parseInt(e.target.value));
+            setTotalMarks(e.target.value);
           }}
-          value={parseInt(totalMarks)}
+          value={totalMarks}
         />
         <label className="assessment-info-label">Select Module Code</label>
         <div className="select-module-dropdown">
@@ -827,8 +869,10 @@ function CreateAssessments() {
                       indexVal={index}
                       saveEssayQuestion={saveEssayQuestion}
                       saveEssayCorrectKeywords={saveEssayCorrectKeywords}
+                      saveEssayWordLimit={saveEssayWordLimit}
                       questionText={ele.questionText}
                       correctKeywords={ele.correctKeywords}
+                      essayWordLimit={ele.essayWordLimit}
                     />
                   )}
                   {ele.questionType === "coding" && (

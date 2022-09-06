@@ -27,7 +27,7 @@ function EditAssessments() {
   const [selectedDurationNumber, setSelectedDurationNumber] = useState(10);
   const [windowStartTime, setWindowStartTime] = useState("");
   const [windowEndTime, setWindowEndTime] = useState("");
-  const [totalMarks, setTotalMarks] = useState(null);
+  const [totalMarks, setTotalMarks] = useState("");
   const [message, setMessage] = useState("");
   const selectedDurationNumberDiv = useRef(null);
   const [changedMeasure, setChangedMeasure] = useState(0);
@@ -94,12 +94,14 @@ function EditAssessments() {
           "questionType",
           "questionMarks",
           "questionText",
+          "essayWordLimit",
           "correctKeywords",
         ],
         modQuestionArr,
         index
       );
       modQuestionArr[index].correctKeywords = [];
+      modQuestionArr[index].essayWordLimit = "";
     } else {
       deletePropertiesExcept(
         [
@@ -155,6 +157,12 @@ function EditAssessments() {
   const saveEssayQuestion = (index, question) => {
     let modQuestionArr = [...questions];
     modQuestionArr[index].questionText = question;
+    setQuestions(modQuestionArr);
+  };
+
+  const saveEssayWordLimit = (index, wordLimit) => {
+    let modQuestionArr = [...questions];
+    modQuestionArr[index].essayWordLimit = wordLimit;
     setQuestions(modQuestionArr);
   };
 
@@ -391,6 +399,28 @@ function EditAssessments() {
       totalMarksRef.current.style.display = "none";
     }
 
+    let marksError = "";
+    if (isNaN(totalMarks))
+      marksError += "Total marks cannot be a non-numeric value.\n\n";
+
+    for (let i = 0; i < questions.length; i++) {
+      if (questions[i].questionMarks == "")
+        marksError +=
+          "Error in question number " +
+          (i + 1) +
+          ". Marks cannot be empty.\n\n";
+      else if (isNaN(questions[i].questionMarks))
+        marksError +=
+          "Error in question number " +
+          (i + 1) +
+          ". Marks cannot be non-numeric value.\n\n";
+    }
+
+    if (marksError != "") {
+      setMessage(marksError);
+      return;
+    }
+
     let marksSum = 0;
     for (let i = 0; i < questions.length; i++) {
       marksSum += questions[i].questionMarks;
@@ -450,6 +480,7 @@ function EditAssessments() {
             questionText: ele.questionText,
             correctKeywords: ele.correctKeywords,
             questionMarks: ele.questionMarks,
+            essayWordLimit: ele.essayWordLimit,
           };
       });
       assessment.questions = questionsWithoutIDs;
@@ -640,7 +671,16 @@ function EditAssessments() {
         }
       }
       if (questions[i].questionType === "essay") {
-        //Essay question validations here...
+        if (questions[i].essayWordLimit == "")
+          errorMessageString +=
+            "Error in question number " +
+            (i + 1) +
+            ". Word limit cannot be empty.\n\n";
+        else if (isNaN(questions[i].essayWordLimit))
+          errorMessageString +=
+            "Error in question number " +
+            (i + 1) +
+            ". Word limit cannot be a non numeric value.\n\n";
       }
       if (questions[i].questionType === "coding") {
         if (questions[i].codingLanguage === "") {
@@ -674,6 +714,7 @@ function EditAssessments() {
   const updateTotalMarks = () => {
     let marksSum = 0;
     for (let i = 0; i < questions.length; i++) {
+      if (isNaN(questions[i].questionMarks)) continue;
       marksSum += questions[i].questionMarks;
     }
     setTotalMarks(marksSum);
@@ -795,14 +836,12 @@ function EditAssessments() {
         />
         <label className="assessment-info-label">Enter Total Marks</label>
         <input
-          type="number"
-          min="0"
           className="assessment-text-field"
           placeholder="Total Marks"
           onChange={(e) => {
-            setTotalMarks(parseInt(e.target.value));
+            setTotalMarks(e.target.value);
           }}
-          value={parseInt(totalMarks)}
+          value={totalMarks}
         />
 
         <label className="assessment-info-label">Select Module Code</label>
@@ -874,8 +913,10 @@ function EditAssessments() {
                     indexVal={index}
                     saveEssayQuestion={saveEssayQuestion}
                     saveEssayCorrectKeywords={saveEssayCorrectKeywords}
+                      saveEssayWordLimit={saveEssayWordLimit}
                     questionText={ele.questionText}
                     correctKeywords={ele.correctKeywords}
+                      essayWordLimit={ele.essayWordLimit}
                   />
                 )}
                 {ele.questionType === "coding" && (

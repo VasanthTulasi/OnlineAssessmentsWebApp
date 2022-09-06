@@ -312,8 +312,10 @@ function EvaluateSubmission() {
                       indexVal={index}
                       saveEssayQuestion={() => {}}
                       saveEssayCorrectKeywords={() => {}}
+                      saveEssayWordLimit={() => {}}
                       questionText={ele.questionText}
                       correctKeywords={ele.correctKeywords}
+                      essayWordLimit={ele.essayWordLimit}
                       isDisabled={true}
                     />
                   )}

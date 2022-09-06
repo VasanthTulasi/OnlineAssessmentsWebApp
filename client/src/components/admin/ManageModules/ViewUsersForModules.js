@@ -161,7 +161,7 @@ function ViewUsersForModules() {
                         className="module-data-button"
                         onClick={deleteUser}
                       >
-                        Delete
+                        Remove
                       </button>
                     </td>
                   </tr>

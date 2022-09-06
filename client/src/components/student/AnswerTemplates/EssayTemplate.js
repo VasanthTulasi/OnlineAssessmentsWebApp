@@ -6,6 +6,32 @@ function EssayTemplate(props) {
   const { question, questionIndex, totalQuestions, assessment_id } = props;
   const { loggedInUserDetails } = useContext(LoginContext);
   const uniId = loggedInUserDetails.uni_id;
+  const [wordsLeft, setWordsLeft] = useState();
+
+  useState(() => {
+    console.log(question.essayWordLimit);
+    setWordsLeft(question.essayWordLimit);
+  }, []);
+
+  const saveAnswer = (event) => {
+    const answerText = event.target.value;
+    const remWords = question.essayWordLimit - answerText.split(" ").length;
+
+    if (
+      event.code === "Backspace" ||
+      event.code === "Delete" ||
+      event.code === "ArrowLeft" ||
+      event.code === "ArrowRight"
+    ) {
+      if (remWords >= 0) setWordsLeft(remWords);
+      return;
+    }
+
+    if (remWords < 0) event.preventDefault();
+    else {
+      if (remWords >= 0) setWordsLeft(remWords);
+    }
+  };
 
   return (
     <EssayAnswer>
@@ -13,11 +39,13 @@ function EssayTemplate(props) {
         Question {questionIndex + 1} / {totalQuestions}
       </div>
       <div className="question-text">{question.questionText}</div>
+      <div className="question-text">Words Left: {wordsLeft} </div>
       <textarea
         className="text-area"
         onBlur={(event) =>
           props.saveEssayAnswer(questionIndex, event.target.value)
         }
+        onKeyDown={(event) => saveAnswer(event)}
         rows="10"
         placeholder="Write your answer here... It will be autosaved as you write."
         onChange={(event) =>

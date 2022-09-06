@@ -60,7 +60,10 @@ function NavBar(props) {
               </Link>
             </li>
             <li>
-              <Link to="/discussions/viewAssessments" className="menu">
+              <Link
+                to="/discussions/viewAssessments"
+                className={props.navLinksAccess}
+              >
                 Discussions
               </Link>
             </li>

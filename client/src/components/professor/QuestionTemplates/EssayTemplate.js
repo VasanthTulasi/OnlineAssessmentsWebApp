@@ -5,10 +5,16 @@ import CreatableSelect from "react-select/creatable";
 function EssayTemplate(props) {
   const textAreaComponent = useRef(null);
   const correctKeywordsComponent = useRef(null);
+  const wordLimitComponent = useRef(null);
 
   const saveEssayQuestion = (event) => {
     const questionId = textAreaComponent.current.id.split("_")[3];
     props.saveEssayQuestion(questionId, event.target.value);
+  };
+
+  const saveWordLimit = (event) => {
+    const questionId = wordLimitComponent.current.id.split("_")[3];
+    props.saveEssayWordLimit(questionId, event.target.value);
   };
 
   const saveEssayCorrectKeywords = (enteredKeywords) => {
@@ -94,7 +100,23 @@ function EssayTemplate(props) {
         disabled={props.isDisabled}
       />
       <label className="label-class">
-        {props.isDisabled ? "Correct Answer Keywords" : "Enter Correct Answer Keywords"}
+        {props.isDisabled ? "Word Limit" : "Enter Word Limit"}
+      </label>
+      <br />
+      <input
+        ref={wordLimitComponent}
+        onChange={saveWordLimit}
+        className="blanks-answer-field"
+        id={"essay_word_limit_" + props.indexVal}
+        placeholder="Word Limit"
+        defaultValue={props.essayWordLimit}
+        disabled={props.isDisabled}
+      />
+      <br />
+      <label className="label-class" style={{ marginTop: "5px" }}>
+        {props.isDisabled
+          ? "Correct Answer Keywords"
+          : "Enter Correct Answer Keywords"}
       </label>
       <div style={{ marginTop: "5px" }}>
         <CreatableSelect
@@ -150,6 +172,19 @@ const Essay = styled.div`
 
   textarea:disabled {
     color: white;
+  }
+
+  .blanks-answer-field {
+    color: #282c34;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    border: 1px solid #282c34;
+    margin-top: 5px;
+    border-radius: 5px;
+    width: 400px;
+    height: 35px;
+    padding-left: 10px;
   }
 `;
 

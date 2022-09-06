@@ -41,36 +41,39 @@ router.post("/login", (req, res) => {
     if (!userInDB) {
       res.json({ message: "Invalid User Name or Password!" });
     } else {
-      bcrypt.compare(user.password, userInDB.password).then((valid) => {
-        if (valid) {
-          const info = {
-            first_name: userInDB.first_name,
-            last_name: userInDB.last_name,
-            email: userInDB.email,
-            role: userInDB.role,
-            uni_id: userInDB.uni_id,
-          };
+      bcrypt
+        .compare(user.password, userInDB.password)
 
-          jwt.sign(
-            info,
-            "thisistheloginsecretcode",
-            { expiresIn: "1h" },
-            (err, token) => {
-              if (err) res.json({ message: err });
-              else {
-                res.cookie("token", token, { httpOnly: true });
-                res.json({
-                  message: "success",
-                  user_data: info,
-                  token: "Bearer " + token,
-                });
+        .then((valid) => {
+          if (valid) {
+            const info = {
+              first_name: userInDB.first_name,
+              last_name: userInDB.last_name,
+              email: userInDB.email,
+              role: userInDB.role,
+              uni_id: userInDB.uni_id,
+            };
+
+            jwt.sign(
+              info,
+              "thisistheloginsecretcode",
+              { expiresIn: "1h" },
+              (err, token) => {
+                if (err) res.json({ message: err });
+                else {
+                  res.cookie("token", token, { httpOnly: true });
+                  res.json({
+                    message: "success",
+                    user_data: info,
+                    token: "Bearer " + token,
+                  });
+                }
               }
-            }
-          );
-        } else {
-          res.json({ message: "Invalid User Name or Password!" });
-        }
-      });
+            );
+          } else {
+            res.json({ message: "Invalid User Name or Password!" });
+          }
+        });
     }
   });
 });
@@ -205,7 +208,6 @@ router.post("/assignedModuleCodes", async (req, res) => {
 });
 
 router.post("/getUnassignedUsers", async (req, res) => {
-  console.log("Entered");
   const { moduleCode } = req.body;
   const users = await UsersModel.find(
     {
@@ -218,7 +220,6 @@ router.post("/getUnassignedUsers", async (req, res) => {
     moduleUsers = moduleUsers.map((ele) => {
       return ele.uni_id;
     });
-    console.log("Users: " + moduleUsers);
     res.send(moduleUsers);
   }
 });

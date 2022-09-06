@@ -3,13 +3,11 @@ const ModulesModel = require("../Models/ModulesModel");
 const UsersModel = require("../Models/UsersModel");
 
 router.get("/listofmodules", async (req, res) => {
-  // console.log("reached");
   const modulesList = await ModulesModel.find();
   if (modulesList) res.send(modulesList);
 });
 
 router.post("/editModule", async (req, res) => {
-  console.log(req.body.moduleCode);
   ModulesModel.updateOne(
     { module_code: req.body.moduleCode },
     {
@@ -28,7 +26,8 @@ router.post("/editModule", async (req, res) => {
 });
 
 router.post("/deleteModule", (req, res) => {
-  ModulesModel.deleteOne({ module_code: req.body.module_code }, function (err) {
+  ModulesModel.deleteOne({ module_code: req.body.module_code },
+    function (err) {
     if (err) res.json({ message: err });
     res.json({ message: "success" });
   });
@@ -46,9 +45,10 @@ router.post("/addNewModule", async (req, res) => {
   });
 
   if (module.length > 0) {
-    console.log(module);
     res.json({ message: "Module already exists! Please add a new module." });
-  } else {
+  } 
+  
+  else {
     const newModule = new ModulesModel(moduleData);
     newModule
       .save()
@@ -89,16 +89,6 @@ router.post("/getModulesInfo", async (req, res) => {
 
 router.post("/assignUsers", async (req, res) => {
   const { moduleCode, newUsers } = req.body;
-  // let validUsers = [];
-  // invalidUsers = [];
-  // let user = null;
-
-  // for (let i = 0; i < newUsers.length; i++) {
-  //   user = await UsersModel.findOne({ uni_id: newUsers[i] });
-  //   if (user) validUsers.push(newUsers[i]);
-  //   else invalidUsers.push(newUsers[i]);
-  // }
-
   for (let i = 0; i < newUsers.length; i++) {
     await UsersModel.updateOne(
       { uni_id: newUsers[i] },

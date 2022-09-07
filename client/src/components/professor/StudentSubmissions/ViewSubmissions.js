@@ -82,7 +82,7 @@ function ViewSubmissions() {
           modSubmissionsArray[index].marks_released = true;
           setSubmissionsArray(modSubmissionsArray);
         } else {
-          alert("Error: " + res.data.message);
+          console.log("Server Error: " + res.data.message);
         }
       });
   };
@@ -99,7 +99,7 @@ function ViewSubmissions() {
           modSubmissionsArray[index].marks_released = true;
           setSubmissionsArray(modSubmissionsArray);
         } else {
-          alert("Error: " + res.data.message);
+          console.log("Error: " + res.data.message);
         }
       });
   };

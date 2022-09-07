@@ -220,7 +220,7 @@ router.post("/getStudentAnswersAndMarks", async (req, res) => {
   }
 });
 
-router.post("/saveMarksAwarded", (req, res) => {
+router.post("/saveMarksAndFeedback", (req, res) => {
   const {
     assessment_id,
     student_uni_id,
@@ -296,6 +296,7 @@ router.post("/autoEvaluate", async (req, res) => {
   );
 
   if (marks) {
+
     for (let i = 0; i < marks.questions.length; i++) {
       if (marks.questions[i].questionType === "mcq") {
         correctAnswers.push(marks.questions[i].correctAnswer);
@@ -348,11 +349,8 @@ router.post("/autoEvaluate", async (req, res) => {
             (correctFIBCount / totalFIBCount) * marksForCorrectAnswers[j];
           marksToBeAwarded.push(String(finalMarks));
         } else if (marks.questions[j].questionType === "essay") {
-          console.log("Triggered essay");
           const studentEssayAnswer = submission.answers[j];
-
-          let totalCorrectKeywordsCount =
-            marks.questions[j].correctKeywords.length;
+          let totalCorrectKeywordsCount = correctAnswers[j].length;
 
           if (totalCorrectKeywordsCount === 0) {
             if (submission.manually_evaluated === true)
@@ -360,15 +358,11 @@ router.post("/autoEvaluate", async (req, res) => {
             else marksToBeAwarded.push("");
           } else {
             let studentCorrectKeywordsCount = 0;
-            for (
-              let k = 0;
-              k < marks.questions[j].correctKeywords.length;
-              k++
-            ) {
+            for (let k = 0;k < correctAnswers[j].length;k++) {
               if (
                 studentEssayAnswer
                   .toLowerCase()
-                  .includes(marks.questions[j].correctKeywords[k].toLowerCase())
+                  .includes(correctAnswers[j][k].toLowerCase())
               ) {
                 studentCorrectKeywordsCount++;
               }
@@ -486,7 +480,7 @@ router.post("/autoEvaluateAll", async (req, res) => {
             const studentEssayAnswer = submission.answers[j];
 
             let totalCorrectKeywordsCount =
-              marks.questions[j].correctKeywords.length;
+              correctAnswers[j].length;
 
             if (totalCorrectKeywordsCount === 0) {
               if (submission.manually_evaluated === true)
@@ -496,14 +490,14 @@ router.post("/autoEvaluateAll", async (req, res) => {
               let studentCorrectKeywordsCount = 0;
               for (
                 let k = 0;
-                k < marks.questions[j].correctKeywords.length;
+                k < correctAnswers[j].length;
                 k++
               ) {
                 if (
                   studentEssayAnswer
                     .toLowerCase()
                     .includes(
-                      marks.questions[j].correctKeywords[k].toLowerCase()
+                      correctAnswers[j][k].toLowerCase()
                     )
                 ) {
                   studentCorrectKeywordsCount++;
@@ -574,7 +568,6 @@ router.post("/getOverallPercentages", async (req, res) => {
           { marks_awarded: true }
         );
         if (marks) {
-          console.log(marks.marks_awarded);
           let marksAssigned = marks.marks_awarded;
           if (marksAssigned.length != 0) {
             let awardedMarks = 0;
@@ -582,12 +575,10 @@ router.post("/getOverallPercentages", async (req, res) => {
               awardedMarks += parseInt(marks.marks_awarded[k]);
             }
             combinedAwardedMarks += awardedMarks;
-            console.log("Com marks" + combinedAwardedMarks);
             combinedTotalMarks += assessments[j].total_marks;
           }
         }
       }
-      // console.log("Tot marks" + combinedTotalMarks);
       const percentage = (combinedAwardedMarks / combinedTotalMarks) * 100;
       finalMarks.push(Math.ceil(percentage));
     }

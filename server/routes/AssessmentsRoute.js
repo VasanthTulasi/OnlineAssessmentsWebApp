@@ -4,40 +4,40 @@ const UsersModel = require("../Models/UsersModel");
 const sendMail = require("../services/EmailService");
 
 router.post("/saveNewAssessment", async (req, res) => {
-  // console.log(JSON.stringify(req.body));
   const assessment = new AssessmentsModel(req.body);
   assessment
     .save()
     .then(async () => {
       res.json({ message: "success" });
-      // let studentEmails = [];
-      // const students = await UsersModel.find(
-      //   { role: "student" },
-      //   { email: true, assigned_modules: true, _id: false }
-      // );
-      // for (let i = 0; i < students.length; i++) {
-      //   if (students[i].assigned_modules.includes(req.body.module_code))
-      //     studentEmails.push(students[i].email);
-      // }
 
-      // const assessmentInfoForEmail = {
-      //   title: req.body.title,
-      //   duration: req.body.duration_number + " " + req.body.duration_measure,
-      //   module_code: req.body.module_code,
-      //   window_start_time: new Date(req.body.window_start_time)
-      //     .toString()
-      //     .slice(0, 21),
-      //   window_end_time: new Date(req.body.window_end_time)
-      //     .toString()
-      //     .slice(0, 21),
-      //   total_marks: req.body.total_marks,
-      // };
-      // for (let i = 0; i < studentEmails.length; i++) {
-      //   sendMail.assessmentScheduledEmail(
-      //     studentEmails[i],
-      //     assessmentInfoForEmail
-      //   );
-      // }
+      let studentEmails = [];
+      const students = await UsersModel.find(
+        { role: "student" },
+        { email: true, assigned_modules: true, _id: false }
+      );
+      for (let i = 0; i < students.length; i++) {
+        if (students[i].assigned_modules.includes(req.body.module_code))
+          studentEmails.push(students[i].email);
+      }
+
+      const assessmentInfoForEmail = {
+        title: req.body.title,
+        duration: req.body.duration_number + " " + req.body.duration_measure,
+        module_code: req.body.module_code,
+        window_start_time: new Date(req.body.window_start_time)
+          .toString()
+          .slice(0, 21),
+        window_end_time: new Date(req.body.window_end_time)
+          .toString()
+          .slice(0, 21),
+        total_marks: req.body.total_marks,
+      };
+      for (let i = 0; i < studentEmails.length; i++) {
+        sendMail.assessmentScheduledEmail(
+          studentEmails[i],
+          assessmentInfoForEmail
+        );
+      }
     })
     .catch((err) => res.json({ message: err }));
 });

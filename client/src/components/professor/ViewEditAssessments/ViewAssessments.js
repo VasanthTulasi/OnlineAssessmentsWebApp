@@ -14,6 +14,7 @@ function ViewAssessments() {
   const [isModalVisible, setisModalVisible] = useState(false);
   const [deletionIndex, setDeletionIndex] = useState();
   let [moduleCodesFromDB, setModuleCodesFromDB] = useState([]);
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const axios = Axios.create({
     withCredentials: true,
@@ -106,11 +107,11 @@ function ViewAssessments() {
       })
       .then((res) => {
         if (res.data.message === "success") {
-          alert("Assessment deleted succesfully!");
+          setMessage("Assessment deleted succesfully!");
           const modAssessmentsArray = assessmentsArray;
           modAssessmentsArray.splice(itemIndex, 1);
           setAssessmentsArray([...modAssessmentsArray]);
-        } else alert("Error: " + res.data.message);
+        } else setMessage("Error: " + res.data.message);
       });
   };
 
@@ -236,6 +237,7 @@ function ViewAssessments() {
               )}
             </tbody>
           </table>
+          {message && <div className="error-message">{message}</div>}
         </div>
       </ViewEditMod>
     </>
@@ -273,7 +275,7 @@ const ViewEditMod = styled.div`
     align-items: flex-start;
     flex-direction: column;
     /* border:1px solid red; */
-    width: 80%;
+    width: 90%;
   }
 
   .select-module-label {
@@ -365,6 +367,16 @@ const ViewEditMod = styled.div`
 
   .headers-color {
     color: #61dafb;
+  }
+  .error-message-no-border {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 30px;
+    border: 1px solid white;
+    border-radius: 8px;
+    padding: 10px;
   }
 `;
 

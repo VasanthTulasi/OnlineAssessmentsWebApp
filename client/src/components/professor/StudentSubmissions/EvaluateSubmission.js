@@ -23,6 +23,8 @@ function EvaluateSubmission() {
   const [isAutoEvaluated, setIsAutoEvaluated] = useState(false);
   const [isManuallyEvaluated, setIsManuallyEvaluated] = useState(false);
   const [plagInfo, setPlagInfo] = useState([]);
+  const [marksMessage, setMarksMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const axios = Axios.create({
     withCredentials: true,
@@ -84,10 +86,10 @@ function EvaluateSubmission() {
 
     for (let i = 0; i < questions.length; i++) {
       if (questions[i].questionType === "essay") {
-        console.log("in essay");
         var formData = new FormData();
         formData.append("key", "b1ca0f2ed1dd83a645b1b3b19ceb755f");
         formData.append("data", String(studentAnswers[i]));
+
         axios3({
           method: "post",
           url: "https://www.check-plagiarism.com/apis/checkPlag",
@@ -113,7 +115,7 @@ function EvaluateSubmission() {
   const save = () => {
     if (validateQuestions()) {
       axios2
-        .post("/saveMarksAwarded", {
+        .post("/saveMarksAndFeedback", {
           assessment_id: state.assessment_id,
           student_uni_id: state.student_uni_id,
           marks_awarded: marksAwarded,
@@ -123,54 +125,31 @@ function EvaluateSubmission() {
         })
         .then((res) => {
           if (res.data.message === "success") {
-            alert("Marks saved successfully!");
-            navigate("../viewSubmissions", {
-              state: {
-                _id: state.assessment_id,
-                total_marks: totalMarks,
-              },
-            });
+            setErrorMessage("Marks and feedback saved successfully!");
           }
         });
     }
   };
 
   const validateQuestions = () => {
-    // for (let i = 0; i < marksAwarded.length; i++) {
-    //   if (marksAwarded[i] == "") {
-    //     console.log(
-    //       "Error in question number " +
-    //         (i + 1) +
-    //         ". Marks awarded cannot be empty."
-    //     );
-    //     return false;
-    //   }
-    // }
+    let errMessage = "";
 
     for (let i = 0; i < marksAwarded.length; i++) {
       if (marksAwarded[i] > questions[i].questionMarks) {
-        console.log(
+        errMessage +=
           "Error in question number " +
-            (i + 1) +
-            ". Marks awarded cannot exceed the maximum marks for this question."
-        );
-        return false;
+          (i + 1) +
+          ". Marks awarded cannot exceed the maximum marks for this question.\n\n";
       }
     }
 
-    // let marksSum = 0;
-    // for (let i = 0; i < marksAwarded.length; i++) {
-    //   marksSum += parseInt(marksAwarded[i]);
-    // }
-
-    // if (totalMarksAwarded > totalMarks) {
-    //   console.log(
-    //     "Sum of the individual marks cannot exceed the maximum marks for this assessment."
-    //   );
-    //   return false;
-    // }
-
-    return true;
+    if (errMessage != "") {
+      setErrorMessage(errMessage);
+      return false;
+    } else {
+      setErrorMessage("");
+      return true;
+    }
   };
 
   const goBack = () => {
@@ -183,6 +162,7 @@ function EvaluateSubmission() {
   };
 
   const validateEntry = (event) => {
+    setMarksMessage("");
     if (
       event.which === 8 ||
       event.which === 13 ||
@@ -194,7 +174,7 @@ function EvaluateSubmission() {
     if (event.which >= 48 && event.which <= 57) return;
     if (event.which >= 96 && event.which <= 105) return;
 
-    alert("Only numeric values are allowed in this field");
+    setMarksMessage("Only numeric values are allowed in this field");
     event.preventDefault();
   };
 
@@ -528,9 +508,14 @@ function EvaluateSubmission() {
                       id={"marks_awarded_" + index}
                       className="submission-text-field"
                       onChange={saveAwardedMarks}
-                      // onKeyDown={validateEntry}
+                      onKeyDown={validateEntry}
                       value={marksAwarded[index]}
                     />
+                    {marksMessage && (
+                      <div className="error-message-no-border">
+                        {marksMessage}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -556,6 +541,7 @@ function EvaluateSubmission() {
           />
         </div>
       </div>
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
       <div
         style={{
           textAlign: "center",
@@ -891,6 +877,27 @@ const EvalSubmission = styled.div`
     margin-bottom: 20px;
     /* border: none; */
     resize: none;
+  }
+
+  .error-message-no-border {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    margin-top: 10px;
+  }
+
+  .error-message {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 20px;
+    border: 1px solid white;
+    border-radius: 8px;
+    /* width: 100%; */
+    padding: 10px;
+    white-space: pre-line;
   }
 `;
 

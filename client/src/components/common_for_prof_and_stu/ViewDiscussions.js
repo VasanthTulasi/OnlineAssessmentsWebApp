@@ -17,6 +17,8 @@ function ViewDiscussions() {
   const [responses, setResponses] = useState([]);
   const newDiscussion = useRef(null);
   const discussionResponse = useRef(null);
+  const [responseMessage, setResponseMessage] = useState("");
+  const [newDiscussionMessage, setNewDiscussionMessage] = useState("");
 
   const axios = Axios.create({
     withCredentials: true,
@@ -40,11 +42,10 @@ function ViewDiscussions() {
   const addNewDiscussion = () => {
     const discussionText = newDiscussion.current.value;
     if (discussionText === "") {
-      alert("New discussion point cannot be empty!");
+      setNewDiscussionMessage("New discussion point cannot be empty!");
       return false;
-    }
-    console.log("hey");
-    // return;
+    } else setNewDiscussionMessage("");
+
     axios
       .post("/saveNewDiscussion", {
         user_name:
@@ -72,7 +73,7 @@ function ViewDiscussions() {
 
           newDiscussion.current.value = "";
         } else {
-          alert("Server Error! Please try again!");
+          setNewDiscussionMessage("Server Error! Please try again!");
         }
       });
   };
@@ -84,6 +85,11 @@ function ViewDiscussions() {
   };
 
   const addResponse = (ind) => {
+    if (responses[ind] === "") {
+      setResponseMessage("Response cannot be empty!");
+      return false;
+    } else setResponseMessage("");
+
     axios
       .post("/saveNewResponse", {
         user_name:
@@ -108,7 +114,7 @@ function ViewDiscussions() {
           resp[ind] = "";
           setResponses([...resp]);
         } else {
-          alert("Server Error! Please try again!");
+          setResponseMessage("Server Error! Please try again!");
         }
       });
   };
@@ -202,13 +208,17 @@ function ViewDiscussions() {
                 <textarea
                   className="text-area-dis"
                   ref={discussionResponse}
-                  // id={"disRes" + index}
                   onChange={(event) => saveResponse(event, index)}
                   rows="3"
                   placeholder="Enter your response here..."
                   value={responses[index]}
                 />
                 <br />
+                {responseMessage && (
+                  <div className="error-message-no-border-response">
+                    {responseMessage}
+                  </div>
+                )}
                 <button
                   className="new-response-button"
                   onClick={() => addResponse(index)}
@@ -231,6 +241,9 @@ function ViewDiscussions() {
         placeholder="Enter a new discussion point here..."
       />
       <br />
+      {newDiscussionMessage && (
+        <div className="error-message-no-border">{newDiscussionMessage}</div>
+      )}
       <button className="new-discussion-button" onClick={addNewDiscussion}>
         Submit
       </button>
@@ -370,6 +383,24 @@ const ViewDis = styled.div`
 
   .new-discussion-button {
     cursor: pointer;
+  }
+
+  .error-message-no-border {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  .error-message-no-border-response {
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 10px;
+    margin-left: 40px;
   }
 `;
 

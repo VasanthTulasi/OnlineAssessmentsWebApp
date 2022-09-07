@@ -66,9 +66,6 @@ function FIBTemplate(props) {
   }, [randomNumsGenerated]);
 
   useEffect(() => {
-    // console.log("correct answers " + question.correctFIBAnswers);
-    // setRandomNumsGenerated([]);
-    console.log("use effect in fib template");
     let quesTextArr = question.questionText.split(" ");
     let randNums = [];
     quesTextArr = quesTextArr.map((ele) => {

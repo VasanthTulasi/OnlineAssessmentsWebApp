@@ -153,7 +153,7 @@ function TakeAssessments() {
             setNavLinksStyle("menu");
           }
         } else {
-          alert("Error: " + JSON.stringify(res.data.message));
+          console.log("Error: " + JSON.stringify(res.data.message));
         }
       });
   };
@@ -339,21 +339,18 @@ function TakeAssessments() {
     let durInMilliSec;
     if (durMeasure == "hours") durInMilliSec = durNumber * 60 * 60 * 1000;
     else durInMilliSec = durNumber * 60 * 1000;
-
     return durInMilliSec;
   };
 
   const startCountDownTimer = (durInMilliSec) => {
     let time = getTimeLeft(durInMilliSec);
     setTimeLeft(time);
-    // remTime.current = time;
     countdownTimer.current = setInterval(() => {
       console.log("running timer");
       durInMilliSec -= 1000;
       time = getTimeLeft(durInMilliSec);
       setTimeLeft(time);
-      // remTime.current = time;
-      // updateTimeLeftInDb(durInMilliSec);
+      updateTimeLeftInDb(durInMilliSec);
       if (durInMilliSec === 0) {
         clearInterval(countdownTimer.current);
         setAssessmentElapsedMessage(
@@ -436,7 +433,7 @@ function TakeAssessments() {
       )}
       {/* {questions[questionIndex].questionText} */}
       <div className="title-timer">
-        <div className="title">Java MCQ Test</div>
+        <div className="title">{state.assessment.title}</div>
         <div className="timer">Time Left: {timeLeft}</div>
       </div>
       {questions[questionIndex].questionType === "mcq" && (

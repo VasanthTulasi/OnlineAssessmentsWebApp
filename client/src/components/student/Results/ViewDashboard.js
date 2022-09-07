@@ -45,6 +45,7 @@ function ViewDashboard() {
       .post("/assignedModuleCodes", { uni_id: loggedInUserDetails.uni_id })
       .then((res) => {
         let moduleCodes = res.data;
+        console.log("Module codes: " + moduleCodes);
         getModuleInfo(moduleCodes);
       });
   }, []);
@@ -84,7 +85,8 @@ function ViewDashboard() {
     barInfo = assignedCoursesInfo.map((val, ind) => {
       return {
         courseId: val.module_code,
-        "Course Progress Percentage": data[ind] === null ? "NA" : parseInt(data[ind]),
+        "Course Progress Percentage":
+          data[ind] === null ? "NA" : parseInt(data[ind]),
       };
     });
     setBarData(barInfo);

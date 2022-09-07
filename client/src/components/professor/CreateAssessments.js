@@ -594,13 +594,6 @@ function CreateAssessments() {
                 continue;
 
               if (!randNumReferencesArray.includes(formulaArray[k])) {
-                // alert(
-                //   formulaArray[k] +
-                //     " is an invalid reference in the formula in question number " +
-                //     (i + 1) +
-                //     " - blank " +
-                //     (j + 1)
-                // );
                 errorMessageString +=
                   "Error in question number " +
                   (i + 1) +
@@ -609,7 +602,6 @@ function CreateAssessments() {
                   ". '" +
                   formulaArray[k] +
                   "' is an invalid reference in the formula. \n\n";
-                // return false;
               }
             }
 
@@ -620,13 +612,6 @@ function CreateAssessments() {
                 !e.message.includes("is not defined") &&
                 !e.message.includes("Invalid reference")
               ) {
-                // alert(
-                //   e.message +
-                //     " in question number " +
-                //     (i + 1) +
-                //     " - blank " +
-                //     (j + 1)
-                // );
                 errorMessageString +=
                   e.message +
                   " in question number " +
@@ -634,7 +619,6 @@ function CreateAssessments() {
                   " - blank " +
                   (j + 1) +
                   "\n\n";
-                // return false;
               }
             }
           }

@@ -74,7 +74,7 @@ function ViewAssessments() {
     });
   }, [moduleCode]);
 
-  const customStyles = {
+  const styleForDropdown = {
     valueContainer: (provided) => ({
       ...provided,
       width: "400px",
@@ -138,7 +138,7 @@ function ViewAssessments() {
           <div className="select-module-dropdown">
             <SingleSelect
               options={moduleCodesFromDB}
-              styles={customStyles}
+              styles={styleForDropdown}
               placeholder="Select or Enter Module Code"
               onChange={(selOption) => setModuleCode(selOption.value)}
             />

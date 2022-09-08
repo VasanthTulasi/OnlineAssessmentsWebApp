@@ -683,7 +683,7 @@ function CreateAssessments() {
     totalMarksRef.current.style.display = "none";
   };
 
-  const customStyles1 = {
+  const styleForDropdown1 = {
     container: (provided) => ({
       ...provided,
       width: "400px",
@@ -793,7 +793,7 @@ function CreateAssessments() {
         <div className="select-module-dropdown">
           <SingleSelect
             options={moduleCodesFromDB}
-            styles={customStyles1}
+            styles={styleForDropdown1}
             placeholder="Select or Search Module Code"
             onChange={moduleCodeSelected}
             noOptionsMessage={() => "This module is not assigned to you"}

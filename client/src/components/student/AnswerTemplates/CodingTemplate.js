@@ -72,42 +72,6 @@ function CodingTemplate(props) {
     codingLanguageComponent.current.value = question.codingLanguage;
   }, [question]);
 
-  const customStyles = {
-    container: (provided) => ({
-      ...provided,
-      width: "400px",
-      height: "35px",
-      marginLeft: "20px",
-      marginTop: "20px",
-    }),
-    valueContainer: (provided) => ({
-      ...provided,
-      paddingLeft: "10px",
-      color: "black",
-      font: "17px",
-      fontFamily: '"Source Sans Pro", sans-serif',
-      fontSize: "17px",
-      fontWeight: 400,
-      color: "#282c34",
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      color: "black",
-      font: "17px",
-      fontFamily: '"Source Sans Pro", sans-serif',
-      fontSize: "17px",
-      fontWeight: 400,
-      color: "#282c34",
-      backgroundColor: state.isSelected ? "#61dafb" : "white",
-      "&:hover": {
-        backgroundColor: "rgba(189,197,209,.3)",
-      },
-    }),
-    placeholder: (provided) => ({
-      ...provided,
-      fontSize: "17px",
-    }),
-  };
 
   const checkTabPressed = (event) => {
     if (event.code === "Tab") {

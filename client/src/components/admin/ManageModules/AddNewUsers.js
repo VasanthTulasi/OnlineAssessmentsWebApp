@@ -92,13 +92,13 @@ function ViewUsersForModules() {
   };
 
   /*
-Title: Create customised styled for the dropdown using a customStyles object
+Title: Create customised styled for the dropdown using react-select properties
 Author: React-select
 Date: NA
 Source: https://react-select.com/styles
 Details: This below piece of code is used in multiple files to customise dropdowns.
 */
-  const customStyles = {
+  const styleForDropdown = {
     container: (provided) => ({
       ...provided,
       width: "400px",
@@ -157,7 +157,7 @@ Details: This below piece of code is used in multiple files to customise dropdow
           */}
           <SingleSelect
             options={moduleCodesFromDB}
-            styles={customStyles}
+            styles={styleForDropdown}
             placeholder="Select or Enter Module Code"
             onChange={selectedModule}
             noOptionsMessage={() => "Module Not Found"}
@@ -168,7 +168,7 @@ Details: This below piece of code is used in multiple files to customise dropdow
         </label>
         <div className="select-module-dropdown">
           {/* <CreatableSelect
-            styles={customStyles}
+            styles={styleForDropdown}
             placeholder="Please type here and add them"
             onChange={selectedUsers}
             isMulti
@@ -180,7 +180,7 @@ Details: This below piece of code is used in multiple files to customise dropdow
             }}
           /> */}
           <Select
-            styles={customStyles}
+            styles={styleForDropdown}
             isMulti
             options={usersFromDB}
             placeholder="Select or Enter User ID"

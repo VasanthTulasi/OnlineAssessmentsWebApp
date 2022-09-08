@@ -22,7 +22,7 @@ function QuestionTypeDropdown(props) {
     props.changeQuestionType(questionId, selOption.value);
   };
 
-  const customStyles = {
+  const styleForDropdown = {
     valueContainer: (provided, { isDisabled }) => ({
       ...provided,
       width: "400px",
@@ -72,7 +72,7 @@ function QuestionTypeDropdown(props) {
       ref={questionTypeComponent}
       id={"question_type_" + props.indexVal}
       options={questionTypesDropdown}
-      styles={customStyles}
+      styles={styleForDropdown}
       onChange={setQuestionType}
       defaultValue={{
         label: questionTypePairs[props.questionType],

@@ -13,7 +13,7 @@ function MCQTemplate(props) {
     return 'Add Option "' + value + '"';
   }
 
-  const customStyles = {
+  const styleForDropdown = {
     container: (provided) => ({
       ...provided,
       width: "400px",
@@ -123,7 +123,7 @@ function MCQTemplate(props) {
         <CreatableSelect
           isDisabled={props.isDisabled}
           ref={optionsComponent}
-          styles={customStyles}
+          styles={styleForDropdown}
           placeholder="Please Type Here And Add Them"
           id={"options_id_" + props.indexVal}
           onChange={saveMCQQuestionOptions}
@@ -153,7 +153,7 @@ function MCQTemplate(props) {
           ref={correctOptionComponent}
           options={availableOptions}
           id={"correct_option_" + props.indexVal}
-          styles={customStyles}
+          styles={styleForDropdown}
           placeholder="Correct Answer"
           onChange={saveMCQCorrectAnswer}
           noOptionsMessage={() => "This is not one of the added options"}

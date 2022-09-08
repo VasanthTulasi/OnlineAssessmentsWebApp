@@ -28,7 +28,7 @@ function EssayTemplate(props) {
     return 'Add Keyword "' + value + '"';
   }
 
-  const customStyles = {
+  const styleForDropdown = {
     container: (provided) => ({
       ...provided,
       width: "400px",
@@ -131,7 +131,7 @@ function EssayTemplate(props) {
         <CreatableSelect
           isDisabled={props.isDisabled}
           ref={correctKeywordsComponent}
-          styles={customStyles}
+          styles={styleForDropdown}
           placeholder="Please Type Here And Add Them"
           id={"keywords_id_" + props.indexVal}
           onChange={saveEssayCorrectKeywords}

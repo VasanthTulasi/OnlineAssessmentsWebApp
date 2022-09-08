@@ -132,7 +132,7 @@ Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/setRan
     props.saveCodingTestCases(questionId, testCasesWithoutKeys);
   }, [testCases]);
 
-  const customStyles = {
+  const styleForDropdown = {
     container: (provided) => ({
       ...provided,
       width: "400px",
@@ -204,7 +204,7 @@ Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/setRan
           ref={codingLanguageComponent}
           id={"coding_language_" + props.indexVal}
           options={programmingLanguages}
-          styles={customStyles}
+          styles={styleForDropdown}
           placeholder="Select or Search the Programming Language"
           onChange={saveCodingLanguage}
           noOptionsMessage={() => "This programming language is not available"}

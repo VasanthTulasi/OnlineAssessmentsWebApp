@@ -18,6 +18,12 @@ router.route("/").post(async (req, res) => {
     if (alreadyPendingApproval) {
       res.json({ message: "already pending approval" });
     } else {
+      /*
+Title: Hash and Verify a Password with bcrypt
+Author: MARY GATHONI
+Date: 16-May-2022
+Source: https://www.makeuseof.com/nodejs-bcrypt-hash-verify-salt-password/
+*/
       bcrypt
         .hash(password, 10)
         .then((hash) => {

@@ -105,6 +105,12 @@ function ViewDashboard() {
     <Dashboard>
       <div className="heading">Performance Dashboard</div>
       <div style={{ width: "50%", height: "400px", marginTop: "50px" }}>
+        { /*
+Title: Generate a chart with recharts library
+Author: Recharts
+Date: NA
+Source: https://recharts.org/en-US/api/ResponsiveContainer
+*/}
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={barData}>
             <XAxis

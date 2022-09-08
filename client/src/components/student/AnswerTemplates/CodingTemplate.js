@@ -21,11 +21,6 @@ function CodingTemplate(props) {
         ]
       : [{ label: question.codingLanguage, value: question.codingLanguage }];
 
-  // const programmingLanguages = {
-  //   label: question.codingLanguage,
-  //   value: question.codingLanguage,
-  // };
-
   const saveCodingAnswer = (event) => {
     props.saveCodingAnswer(questionIndex, event.target.value);
   };
@@ -74,10 +69,6 @@ function CodingTemplate(props) {
     console.log("init arry" + initialArray);
     props.saveInitialCodingArray(questionIndex, initialArray);
     codeArea.current.value = question.codingTemplate;
-    // codingLanguageComponent.current.value = {
-    //   label: question.codingLanguage,
-    //   value: question.codingLanguage,
-    // };
     codingLanguageComponent.current.value = question.codingLanguage;
   }, [question]);
 
@@ -142,48 +133,9 @@ function CodingTemplate(props) {
         <input
           ref={codingLanguageComponent}
           id={"coding_language_" + props.indexVal}
-          // options={programmingLanguages}
-          // styles={customStyles}
-          // placeholder="Select or Search the Programming Language"
-          // onChange={saveCodingLanguage}
-          // noOptionsMessage={() => "This programming language is not available"}
-          // isDisabled={question.codingLanguage !== "Any" ? true : false}
           className="coding-language"
           disabled={true}
         />
-        {/* <SingleSelect
-          ref={codingLanguageComponent}
-          id={"coding_language_" + props.indexVal}
-          options={programmingLanguages}
-          styles={customStyles}
-          placeholder="Select or Search the Programming Language"
-          onChange={saveCodingLanguage}
-          noOptionsMessage={() => "This programming language is not available"}
-          isDisabled={question.codingLanguage !== "Any" ? true : false}
-          defaultValue={() => {
-            return question.codingLanguage === "Any"
-              ? {
-                  label: localStorage.getItem(
-                    assessment_id +
-                      "_" +
-                      uniId +
-                      "_coding_language_" +
-                      String(questionIndex)
-                  ),
-                  value: localStorage.getItem(
-                    assessment_id +
-                      "_" +
-                      uniId +
-                      "_coding_language_" +
-                      String(questionIndex)
-                  ),
-                }
-              : {
-                  label: question.codingLanguage,
-                  value: question.codingLanguage,
-                };
-          }}
-        /> */}
       </div>
       <textarea
         ref={codeArea}
@@ -198,15 +150,6 @@ function CodingTemplate(props) {
             event.target.value
           )
         }
-        // defaultValue={
-        //   localStorage.getItem(
-        //     assessment_id + "_" + uniId + "_answer_" + String(questionIndex)
-        //   ) != undefined
-        //     ? localStorage.getItem(
-        //         assessment_id + "_" + uniId + "_answer_" + String(questionIndex)
-        //       )
-        //     : question.codingTemplate
-        // }
       />
     </CodingAnswer>
   );

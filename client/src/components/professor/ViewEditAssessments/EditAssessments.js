@@ -506,6 +506,13 @@ function EditAssessments() {
 
   const getCurrentTime = () => {
     let date = new Date();
+    /*
+Title: Convert date into ISO string by considering time zone.
+Author: Dustin Silk
+Date: 06-Jun-2016
+Source: https://stackoverflow.com/questions/10830357/javascript-toisostring-ignores-timezone-offset
+Details: This piece of code is used in multiple files.
+*/
     let finalDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
       .toISOString()
       .slice(0, 16);
@@ -913,10 +920,10 @@ function EditAssessments() {
                     indexVal={index}
                     saveEssayQuestion={saveEssayQuestion}
                     saveEssayCorrectKeywords={saveEssayCorrectKeywords}
-                      saveEssayWordLimit={saveEssayWordLimit}
+                    saveEssayWordLimit={saveEssayWordLimit}
                     questionText={ele.questionText}
                     correctKeywords={ele.correctKeywords}
-                      essayWordLimit={ele.essayWordLimit}
+                    essayWordLimit={ele.essayWordLimit}
                   />
                 )}
                 {ele.questionType === "coding" && (

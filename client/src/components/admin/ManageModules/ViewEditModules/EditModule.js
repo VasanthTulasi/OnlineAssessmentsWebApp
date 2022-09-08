@@ -17,10 +17,15 @@ function EditModule() {
     state.module_semester.substring(4, 5)
   );
   const [message, setMessage] = useState("");
-  // const saveButton = useRef(null);
-
   const navigate = useNavigate();
 
+  /*
+Title: Create axios instance with 'withCredentials' value as "true"
+Author: Saurav Gami
+Date: 16-Aug-2022
+Source: https://stackoverflow.com/questions/43002444/make-axios-send-cookies-in-its-requests-automatically
+Details: This piece of code is used in multiple files.
+*/
   const axios = Axios.create({
     withCredentials: true,
     baseURL: "http://localhost:3001/modules",

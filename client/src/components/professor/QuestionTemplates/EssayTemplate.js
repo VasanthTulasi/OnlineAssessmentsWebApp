@@ -119,6 +119,13 @@ function EssayTemplate(props) {
           : "Enter Correct Answer Keywords"}
       </label>
       <div style={{ marginTop: "5px" }}>
+        {
+          // Title: Add multiple items in dropdown using React-select creatable dropdown
+          // Author: React-select
+          // Date: NA
+          // Source: https://react-select.com/home
+          // Details: This piece of code is used in multiple files.
+        }
         <CreatableSelect
           isDisabled={props.isDisabled}
           ref={correctKeywordsComponent}
@@ -130,6 +137,11 @@ function EssayTemplate(props) {
           formatCreateLabel={formatCreateLabel}
           noOptionsMessage={() => null}
           components={{
+            // Title: Remove dropdown indicator and the indicator separator from the dropdown
+            // Author: Rajesh Kumar
+            // Date: 07-Aug-2019
+            // Source: https://stackoverflow.com/questions/54961077/react-select-is-there-a-way-to-remove-the-button-on-the-right-that-expand-the-l
+            // Details: This piece of code is used in multiple files.
             DropdownIndicator: () => null,
             IndicatorSeparator: () => null,
           }}

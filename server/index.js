@@ -19,6 +19,7 @@ const corsConfig = {
 app.use(cookieParser());
 app.use(cors(corsConfig));
 app.use(express.json());
+
 mongoose.connect(
   "mongodb+srv://lalithavasanth10:Pmbcem08@onlineexamcluster.x1ohh.mongodb.net/OnlineExamWebAppDB?retryWrites=true&w=majority"
 );
@@ -31,5 +32,5 @@ app.use("/submissions", SubmissionsRoute);
 app.use("/discussions", DiscussionsRoute);
 
 app.listen(3001, () => {
-  console.log("Server is good");
+  console.log("Server is running...");
 });

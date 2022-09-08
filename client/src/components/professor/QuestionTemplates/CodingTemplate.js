@@ -68,6 +68,12 @@ function CodingTemplate(props) {
     props.saveCodingTemplate(questionId, codingTemplateComponent.current.value);
   };
 
+  /*
+Title: Usage of setRangeText() function in HTML
+Author: MDN Web Docs
+Date: 01-Jun-2022
+Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/setRangeText
+*/
   const checkTabPressInTemplate = (event) => {
     if (event.code === "Tab") {
       event.preventDefault();
@@ -86,8 +92,8 @@ function CodingTemplate(props) {
       ...prevState,
       {
         key_id: nextKey,
-        sample_input: "another input",
-        expected_output: "another output",
+        sample_input: "",
+        expected_output: "",
       },
     ]);
     setNextKey((curVal) => curVal + 1);

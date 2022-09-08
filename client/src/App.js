@@ -11,6 +11,13 @@ function App() {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const [loggedInUserDetails, setLoggedInUserDetails] = useState({});
 
+  { /*
+  Title: React Context Api Usage
+  Author: Savannah TechStack
+  Date: 29-Jun-2022
+  Source: https://blog.devgenius.io/react-context-api-using-typescript-9d54e1c921dd
+  Details: Although the above blog implements the functionality in typescript, implementation below is done in JavaScript.
+  */}
   return (
     <LoginContext.Provider
       value={{

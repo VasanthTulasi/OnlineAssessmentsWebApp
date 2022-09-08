@@ -479,11 +479,11 @@ function CreateAssessments() {
     }
   };
 
-  //Convert Time zone
-  //https://stackoverflow.com/questions/49330139/date-toisostring-but-local-time-instead-of-utc
   const getCurrentTime = () => {
-    let date = new Date();
-    let finalDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    let latestDate = new Date();
+    let finalDate = new Date(
+      latestDate.getTime() - latestDate.getTimezoneOffset() * 60000
+    )
       .toISOString()
       .slice(0, 16);
     return finalDate;
@@ -797,8 +797,6 @@ function CreateAssessments() {
             placeholder="Select or Search Module Code"
             onChange={moduleCodeSelected}
             noOptionsMessage={() => "This module is not assigned to you"}
-            // menuPortalTarget={document.body}
-            // menuPosition={"fixed"}
             maxMenuHeight={160}
           />
         </div>

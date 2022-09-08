@@ -1,6 +1,13 @@
 "use strict";
 const nodemailer = require("nodemailer");
 
+ /*
+Title: SMTP Transport
+Author: Node Mailer
+Date: NA
+Source: http://nodemailer.com/smtp/
+Details: This piece of code is used for multiple methods.
+*/
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,

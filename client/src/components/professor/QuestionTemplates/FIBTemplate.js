@@ -80,7 +80,6 @@ function FIBTemplate(props) {
   };
 
   const checkIfEditingInsideRandNum = (event) => {
-    // console.log("trigggered");
     if (
       event.code === "Backspace" ||
       event.code === "Delete" ||
@@ -111,6 +110,13 @@ function FIBTemplate(props) {
     }
   };
 
+  /*
+Title: Get current caret position in text area
+Author: Vivek Kumar
+Date: 01-Nov-2019
+Source: https://stackoverflow.com/questions/38385936/change-the-cursor-position-in-a-textarea-with-react
+Details: This piece of code is used in multiple files.
+*/
   const checkIfAddingInBlank = () => {
     const currentPos = textAreaComponent.current.selectionStart;
     const prevChar = textAreaComponent.current.value[currentPos - 1];

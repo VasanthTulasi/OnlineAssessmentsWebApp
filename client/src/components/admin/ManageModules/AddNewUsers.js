@@ -91,6 +91,13 @@ function ViewUsersForModules() {
     setNewUsers(newUserIds);
   };
 
+  /*
+Title: Create customised styled for the dropdown using a customStyles object
+Author: React-select
+Date: NA
+Source: https://react-select.com/styles
+Details: This below piece of code is used in multiple files to customise dropdowns.
+*/
   const customStyles = {
     container: (provided) => ({
       ...provided,
@@ -141,6 +148,13 @@ function ViewUsersForModules() {
       <div className="add-new-user-card">
         <label className="add-new-user-label">Select Module</label>
         <div className="select-module-dropdown">
+          {/*
+          Title: Customised dropdown using React-select
+          Author: React-select
+          Date: NA
+          Source: https://react-select.com/
+          Details: This below piece of code is used in multiple files to customise dropdowns.
+          */}
           <SingleSelect
             options={moduleCodesFromDB}
             styles={customStyles}

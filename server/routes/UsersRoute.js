@@ -5,12 +5,13 @@ const Users = require("../Models/UsersModel");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../services/EmailService");
 
-// const cookieParser = require('cookie-parser');
-// router.use(cookieParser());
-
+/*
+Title: Create and Verify JWTs with Node.js
+Author: Geeks For Geeks
+Date: 16-Feb-2022
+Source: https://www.geeksforgeeks.org/how-to-create-and-verify-jwts-with-node-js/
+*/
 const checkToken = (req, res, next) => {
-  // const token = req.headers["authorization"]?.split(" ")[1];
-  // console.log("checkToken called");
   const token = req.cookies.token;
   console.log("Token is " + JSON.stringify(token));
   if (token) {
@@ -41,39 +42,49 @@ router.post("/login", (req, res) => {
     if (!userInDB) {
       res.json({ message: "Invalid User Name or Password!" });
     } else {
-      bcrypt
-        .compare(user.password, userInDB.password)
+       /*
+Title: Hash and Verify a Password with bcrypt
+Author: MARY GATHONI
+Date: 16-May-2022
+Source: https://www.makeuseof.com/nodejs-bcrypt-hash-verify-salt-password/
+*/
+      bcrypt.compare(user.password, userInDB.password).then((valid) => {
+        if (valid) {
+          const info = {
+            first_name: userInDB.first_name,
+            last_name: userInDB.last_name,
+            email: userInDB.email,
+            role: userInDB.role,
+            uni_id: userInDB.uni_id,
+          };
 
-        .then((valid) => {
-          if (valid) {
-            const info = {
-              first_name: userInDB.first_name,
-              last_name: userInDB.last_name,
-              email: userInDB.email,
-              role: userInDB.role,
-              uni_id: userInDB.uni_id,
-            };
-
-            jwt.sign(
-              info,
-              "thisistheloginsecretcode",
-              { expiresIn: "1h" },
-              (err, token) => {
-                if (err) res.json({ message: err });
-                else {
-                  res.cookie("token", token, { httpOnly: true });
-                  res.json({
-                    message: "success",
-                    user_data: info,
-                    token: "Bearer " + token,
-                  });
-                }
+          /*
+Title: Create and Verify JWTs with Node.js
+Author: Geeks For Geeks
+Date: 16-Feb-2022
+Source: https://www.geeksforgeeks.org/how-to-create-and-verify-jwts-with-node-js/
+Details: This piece of code is used in multiple areas.
+*/
+          jwt.sign(
+            info,
+            "thisistheloginsecretcode",
+            { expiresIn: "1h" },
+            (err, token) => {
+              if (err) res.json({ message: err });
+              else {
+                res.cookie("token", token, { httpOnly: true });
+                res.json({
+                  message: "success",
+                  user_data: info,
+                  token: "Bearer " + token,
+                });
               }
-            );
-          } else {
-            res.json({ message: "Invalid User Name or Password!" });
-          }
-        });
+            }
+          );
+        } else {
+          res.json({ message: "Invalid User Name or Password!" });
+        }
+      });
     }
   });
 });
@@ -124,6 +135,14 @@ router.post("/resetPassword", (req, res) => {
       newPassword = hash;
     })
     .then(() => {
+      
+          /*
+Title: Create and Verify JWTs with Node.js
+Author: Geeks For Geeks
+Date: 16-Feb-2022
+Source: https://www.geeksforgeeks.org/how-to-create-and-verify-jwts-with-node-js/
+Details: This piece of code is used in multiple areas.
+*/
       jwt.verify(resetToken, "thisisthepasswordresetsecretcode", (err) => {
         if (err) {
           res.json({ message: "link expired" });

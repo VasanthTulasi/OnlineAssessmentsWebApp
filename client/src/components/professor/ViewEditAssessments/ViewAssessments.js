@@ -33,10 +33,17 @@ function ViewAssessments() {
     setisModalVisible(true);
   };
 
-  const editModule = (event) => {
+  const editAssessment = (event) => {
     const itemIndex = event.currentTarget.id.split("_")[1];
     // console.log(assessmentsArray[itemIndex]);
     navigate("../editAssessments", {
+      state: { _id: assessmentsArray[itemIndex]._id },
+    });
+  };
+
+  const reviewAssessment = (event) => {
+    const itemIndex = event.currentTarget.id.split("_")[1];
+    navigate("../reviewAssessment", {
       state: { _id: assessmentsArray[itemIndex]._id },
     });
   };
@@ -174,8 +181,15 @@ function ViewAssessments() {
                     </td>
                     <td>
                       <button
+                        id={"reviewAssessmentButton_" + index}
+                        onClick={reviewAssessment}
+                        className="module-data-button"
+                      >
+                        View
+                      </button>
+                      <button
                         id={"editButton_" + index}
-                        onClick={editModule}
+                        onClick={editAssessment}
                         disabled={
                           new Date() > new Date(ele.window_start_time)
                             ? true

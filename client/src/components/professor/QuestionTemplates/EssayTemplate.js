@@ -109,7 +109,9 @@ function EssayTemplate(props) {
         className="blanks-answer-field"
         id={"essay_word_limit_" + props.indexVal}
         placeholder="Word Limit"
-        defaultValue={props.essayWordLimit}
+        defaultValue={
+          props.essayWordLimit == undefined ? "NA" : props.essayWordLimit
+        }
         disabled={props.isDisabled}
       />
       <br />

@@ -247,10 +247,10 @@ Details: This piece of code is used in multiple files.
     textAreaComponent.current.value = finalText;
     textAreaComponent.current.focus();
     updateRandomNumberReferences();
-  };
 
     const questionId = textAreaComponent.current.id.split("_")[3];
     props.saveFIBQuestion(questionId, textAreaComponent.current.value);
+  };
 
   const updateRandomNumberReferences = () => {
     const curText = textAreaComponent.current.value;

@@ -43,12 +43,9 @@ router.post("/addNewModule", async (req, res) => {
   const module = await ModulesModel.find({
     module_code: moduleData.module_code,
   });
-
   if (module.length > 0) {
     res.json({ message: "Module already exists! Please add a new module." });
-  } 
-  
-  else {
+  } else {
     const newModule = new ModulesModel(moduleData);
     newModule
       .save()

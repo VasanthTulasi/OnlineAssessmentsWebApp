@@ -18,8 +18,7 @@ router.post("/saveAnswers", async (req, res) => {
   );
 
   if (question_type === "coding") {
-    const finalAnswer = await executeCode(answer, index, req.body.test_cases);
-    // console.log("Fin answer reached: " + JSON.stringify(finalAnswer));
+    const finalAnswer = await executeCode(answer, req.body.test_cases);
     SubmissionsModel.findOneAndUpdate(
       { assessment_id: assessment_id, student_uni_id: student_uni_id },
       { $set: { [`answers.${index}`]: finalAnswer } },
@@ -31,23 +30,14 @@ router.post("/saveAnswers", async (req, res) => {
   }
 });
 
-const executeCode = async (answer, index, testCases) => {
+const executeCode = async (answer, testCases) => {
   const languages = {
     Java: "java",
     Python: "python3",
     "C++": "cpp",
     "C Language": "c",
   };
-
   let executionResults = [];
-
-  // console.log(
-  //   "test cases " +
-  //     testCases[0].sample_input +
-  //     " and " +
-  //     testCases[1].sample_input
-  // );
-  // return;
   for (let i = 0; i < testCases.length; i++) {
     const codeData = {
       script: answer[1],
@@ -69,10 +59,9 @@ const executeCode = async (answer, index, testCases) => {
     executionResults.push(res.data.output);
   }
 
-  let finalAnswer = answer;
-  finalAnswer.push(executionResults);
-  // console.log("Final answer inside method: " + JSON.stringify(finalAnswer));
-  return finalAnswer;
+  let codeOutput = answer;
+  codeOutput.push(executionResults);
+  return codeOutput;
 };
 
 router.post("/createNewSubmission", async (req, res) => {
@@ -296,7 +285,6 @@ router.post("/autoEvaluate", async (req, res) => {
   );
 
   if (marks) {
-
     for (let i = 0; i < marks.questions.length; i++) {
       if (marks.questions[i].questionType === "mcq") {
         correctAnswers.push(marks.questions[i].correctAnswer);
@@ -358,7 +346,7 @@ router.post("/autoEvaluate", async (req, res) => {
             else marksToBeAwarded.push("");
           } else {
             let studentCorrectKeywordsCount = 0;
-            for (let k = 0;k < correctAnswers[j].length;k++) {
+            for (let k = 0; k < correctAnswers[j].length; k++) {
               if (
                 studentEssayAnswer
                   .toLowerCase()
@@ -479,8 +467,7 @@ router.post("/autoEvaluateAll", async (req, res) => {
           } else if (marks.questions[j].questionType === "essay") {
             const studentEssayAnswer = submission.answers[j];
 
-            let totalCorrectKeywordsCount =
-              correctAnswers[j].length;
+            let totalCorrectKeywordsCount = correctAnswers[j].length;
 
             if (totalCorrectKeywordsCount === 0) {
               if (submission.manually_evaluated === true)
@@ -488,17 +475,11 @@ router.post("/autoEvaluateAll", async (req, res) => {
               else marksToBeAwarded.push("");
             } else {
               let studentCorrectKeywordsCount = 0;
-              for (
-                let k = 0;
-                k < correctAnswers[j].length;
-                k++
-              ) {
+              for (let k = 0; k < correctAnswers[j].length; k++) {
                 if (
                   studentEssayAnswer
                     .toLowerCase()
-                    .includes(
-                      correctAnswers[j][k].toLowerCase()
-                    )
+                    .includes(correctAnswers[j][k].toLowerCase())
                 ) {
                   studentCorrectKeywordsCount++;
                 }

@@ -31,6 +31,13 @@ function Register() {
   //Registration Methods
   const registerClicked = () => {
     let errorMessageString = "";
+    /*
+    Title: Password validatio with regex,
+    Author: Rasaf Ibrahim
+    Source: https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
+    Details: This piece of code is used in multiple lines
+    */
+    let validPwd = /^(?=.*\W)(?=.*[a-z])(?=.*[0-9])(?=.*[A-Z])(?!.* ).{8,16}$/;
     if (
       registerFirstName === "" ||
       registerLastName === "" ||
@@ -60,6 +67,9 @@ function Register() {
       errorMessageString +=
         "Password and Re-enter password fields must match.\n\n";
     }
+    if (!registerPassword.match(validPwd))
+      errorMessageString +=
+        "Password should contain at least 8 digits, one lower case letter,\n one upper case letter and one special character.\n\n";
 
     if (errorMessageString !== "") {
       setErrorMessage("Error(s):\n\n" + errorMessageString);

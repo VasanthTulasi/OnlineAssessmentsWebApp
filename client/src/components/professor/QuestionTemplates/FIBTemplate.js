@@ -240,17 +240,17 @@ Details: This piece of code is used in multiple files.
     if (checkIfAddingInRandomNumber()) return;
     let curText = textAreaComponent.current.value;
     let curPosition = textAreaComponent.current.selectionStart;
-    // addNewRandomNumberInArray(curPosition);
     let finalText =
       curText.substring(0, curPosition) +
       " *RandNum* " +
       curText.substring(curPosition);
     textAreaComponent.current.value = finalText;
     textAreaComponent.current.focus();
-    const questionId = textAreaComponent.current.id.split("_")[3];
-    props.saveFIBQuestion(questionId, textAreaComponent.current.value);
     updateRandomNumberReferences();
   };
+
+    const questionId = textAreaComponent.current.id.split("_")[3];
+    props.saveFIBQuestion(questionId, textAreaComponent.current.value);
 
   const updateRandomNumberReferences = () => {
     const curText = textAreaComponent.current.value;

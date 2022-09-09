@@ -215,7 +215,7 @@ function TakeAssessments() {
       })
       .then((res) => {
         // console.log("Reached here");
-        startCountDownTimer(res.data.time_left);
+        startCountdownTimer(res.data.time_left);
         setIsInternetLost(false);
       });
   };
@@ -308,7 +308,7 @@ function TakeAssessments() {
           if (res.data.message === "success") {
             setIsInstuctionsModalVisible(false);
             setNavLinksStyle("menu disabled-menu");
-            startCountDownTimer(durationInMilliSec);
+            startCountdownTimer(durationInMilliSec);
           } else alert("Error! Please try again later.");
         });
     } else {
@@ -329,7 +329,7 @@ function TakeAssessments() {
               submitButton.current.textContent = "Submit & Finish";
             setNavLinksStyle("menu disabled-menu");
             setIsInstuctionsModalVisible(false);
-            startCountDownTimer(state.submissionData.session_details.time_left);
+            startCountdownTimer(state.submissionData.session_details.time_left);
           } else alert("Error! Please try again later.");
         });
     }
@@ -342,7 +342,7 @@ function TakeAssessments() {
     return durInMilliSec;
   };
 
-  const startCountDownTimer = (durInMilliSec) => {
+  const startCountdownTimer = (durInMilliSec) => {
     let time = getTimeLeft(durInMilliSec);
     setTimeLeft(time);
     countdownTimer.current = setInterval(() => {

@@ -19,6 +19,7 @@ function ResetPassword() {
 
   const saveNewPassword = () => {
     let errorMessageString = "";
+    let validPwd = /^(?=.*\W)(?=.*[a-z])(?=.*[0-9])(?=.*[A-Z])(?!.* ).{8,16}$/;
     if (newPassword === "" || reenterNewPassword === "") {
       errorMessageString +=
         "Fields cannot be empty. Both the fields must be filled.\n\n";
@@ -30,6 +31,9 @@ function ResetPassword() {
       errorMessageString +=
         "Password and Re-enter password fields do not match.\n\n";
     }
+    if (!newPassword.match(validPwd))
+      errorMessageString +=
+        "Password should contain at least 8 digits, one lower case letter,\n one upper case letter and one special character.\n\n";
 
     if (errorMessageString !== "") {
       setMessage("Error(s):\n\n" + errorMessageString);
@@ -190,7 +194,6 @@ const ResetPasswordSection = styled.div`
     height: 45px;
     letter-spacing: 3px;
     border-radius: 5px;
-
   }
 
   .save-new-password-button:hover {

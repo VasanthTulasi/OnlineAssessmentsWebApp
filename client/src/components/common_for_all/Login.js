@@ -31,12 +31,12 @@ function Login() {
   });
 
   const loginButtonClicked = async () => {
-    
     if (loginEmail === "") setErrorMessage("Email field cannot be blank!");
-    else if (loginPassword === "") setErrorMessage("Password field cannot be blank!");
+    else if (loginPassword === "")
+      setErrorMessage("Password field cannot be blank!");
     else {
       axios
-        .post("http://localhost:3001/users/login", {
+        .post("/login", {
           email: loginEmail,
           password: loginPassword,
         })

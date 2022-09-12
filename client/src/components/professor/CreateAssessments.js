@@ -368,6 +368,10 @@ function CreateAssessments() {
         "Assessment Window End Time cannot be same or earlier than the Start Time.\n\n";
     }
 
+    if (questions.length <= 0)
+      errMessage +=
+        "There must be at least one question in the assessment.\n\n";
+
     if (errMessage !== "") {
       setMessage("Please resolve the following error(s):\n\n" + errMessage);
       totalMarksRef.current.style.display = "none";

@@ -25,13 +25,32 @@ router.post("/editModule", async (req, res) => {
   );
 });
 
-router.post("/deleteModule", (req, res) => {
-  ModulesModel.deleteOne({ module_code: req.body.module_code },
-    function (err) {
-    if (err) res.json({ message: err });
-    res.json({ message: "success" });
-  });
+router.post("/deleteModule", async (req, res) => {
+  ModulesModel.deleteOne(
+    { module_code: req.body.module_code },
+    async function (err) {
+      if (err) res.json({ message: err });
+      const users = await UsersModel.find({
+        assigned_modules: { $in: req.body.module_code },
+      });
+      if (users) {
+        let moduleUsers = [];
+        moduleUsers = users.map((ele) => {
+          return ele.uni_id;
+        });
+        for (let i = 0; i < moduleUsers.length; i++) {
+          await UsersModel.updateOne(
+            { uni_id: moduleUsers[i] },
+            { $pull: { assigned_modules: req.body.module_code } }
+          ).clone();
+        }
+        res.json({ message: "success" });
+      }
+    }
+  );
 });
+
+router.post("/deleteModule", (req, res) => {});
 
 router.post("/addNewModule", async (req, res) => {
   const moduleData = {

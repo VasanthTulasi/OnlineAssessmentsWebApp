@@ -8,9 +8,16 @@ const jwt = require("jsonwebtoken");
 router.route("/").post(async (req, res) => {
   const user = req.body;
   const password = user.password;
-  const alreadyRegistered = await UsersModel.findOne({ email: user.email });
-  if (alreadyRegistered) {
-    res.json({ message: "already registered" });
+  const alreadyRegisteredEmail = await UsersModel.findOne({
+    email: user.email,
+  });
+  const alreadyRegisteredUniId = await UsersModel.findOne({
+    uni_id: user.uni_id,
+  });
+  if (alreadyRegisteredEmail) {
+    res.json({ message: "already registered email" });
+  } else if (alreadyRegisteredUniId) {
+    res.json({ message: "already registered uni id" });
   } else {
     const alreadyPendingApproval = await PendingRegistrationsModel.findOne({
       email: user.email,

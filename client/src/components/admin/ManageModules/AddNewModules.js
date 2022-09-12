@@ -36,19 +36,29 @@ function AddModules() {
       (moduleCode.length !== 6 || moduleCode.substring(0, 2) !== "CO")
     ) {
       // alert("Invalid Module Code Entered.");
-      errorMessageString += "Invalid Module Code Entered.\n\n";
+      errorMessageString +=
+        "Invalid Module Code Entered. Module code should start with 'CO', followed by 4 digits. \n\n";
     }
     // console.log(isNaN(moduleStartYear));
     if (isNaN(moduleStartYear) || isNaN(moduleEndYear)) {
       // alert("Module Year must be a numeric value.");
       errorMessageString += "Module Year must be a numeric value.\n\n";
     }
+
+    if (moduleSemesterNumber > 2022) {
+      // alert("Semester Number must be a numeric value.");
+      errorMessageString += "Module Start must be less than 2023.\n\n";
+    }
+
     if (isNaN(moduleSemesterNumber)) {
       // alert("Semester Number must be a numeric value.");
       errorMessageString += "Semester Number must be a numeric value.\n\n";
     }
 
-    if (moduleSemesterNumber < 1 || moduleSemesterNumber > 8) {
+    if (
+      moduleSemesterNumber !== "" &&
+      (moduleSemesterNumber < 1 || moduleSemesterNumber > 8)
+    ) {
       // alert("Semester Number must be a numeric value.");
       errorMessageString += "Semester Number must be between 1 and 8.\n\n";
     }

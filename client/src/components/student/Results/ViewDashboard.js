@@ -105,7 +105,7 @@ function ViewDashboard() {
     <Dashboard>
       <div className="heading">Performance Dashboard</div>
       <div style={{ width: "50%", height: "400px", marginTop: "50px" }}>
-        { /*
+        {/*
 Title: Generate a chart with recharts library
 Author: Recharts
 Date: NA
@@ -249,8 +249,6 @@ const Dashboard = styled.div`
   background-color: #282c34;
   color: white;
   display: flex;
-  /* align-items: flex-start; */
-  /* justify-content: flex-start; */
   align-items: center;
   justify-content: center;
   font-size: 20px;

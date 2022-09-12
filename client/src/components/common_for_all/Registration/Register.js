@@ -87,8 +87,10 @@ function Register() {
         .then((res) => {
           if (res.data.message === "success")
             setCurrentSection("registrationrequested");
-          else if (res.data.message === "already registered")
+          else if (res.data.message === "already registered email")
             setErrorMessage("Account already exists with this email!");
+          else if (res.data.message === "already registered uni id")
+            setErrorMessage("Account already exists with this university id!");
           else if (res.data.message === "already pending approval")
             setErrorMessage(
               "Your account is already pending approval from the admin.\nPlease keep checking your email inbox for further updates."

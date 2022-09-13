@@ -37,6 +37,13 @@ function ViewAssessments() {
 
   const beginAssessment = (event) => {
     const itemIndex = event.currentTarget.id.split("_")[1];
+    const assessmentEndTime = assessmentsArray[itemIndex].window_end_time;
+    if (new Date() > new Date(assessmentEndTime)) {
+      event.target.disabled = true;
+      event.target.style.backgroundColor = "gray";
+      return;
+    }
+
     navigate("../takeAssessments", {
       state: {
         assessment: assessmentsArray[itemIndex],

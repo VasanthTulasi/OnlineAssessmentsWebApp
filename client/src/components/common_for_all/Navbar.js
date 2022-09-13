@@ -18,7 +18,7 @@ function NavBar(props) {
   });
 
   const signOutClicked = async () => {
-    axios.get("/signOut").then((res) => {
+    axios.post("/signOut", { email: loggedInUserDetails.email }).then((res) => {
       if (res.data.message !== "success")
         console.log("Sign out failed. Try again");
       else {

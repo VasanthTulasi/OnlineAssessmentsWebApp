@@ -292,6 +292,7 @@ function TakeAssessments() {
     );
 
     if (state.submissionData == "") {
+      console.log("Student uni id " + loggedInUserDetails.uni_id);
       attemptsLeft.current = 2;
       axios
         .post("/createNewSubmission", {
@@ -309,7 +310,10 @@ function TakeAssessments() {
             setIsInstuctionsModalVisible(false);
             setNavLinksStyle("menu disabled-menu");
             startCountdownTimer(durationInMilliSec);
-          } else alert("Error! Please try again later.");
+          } else {
+            alert("Error! Please try again later.");
+            console.log(res.data.message);
+          }
         });
     } else {
       attemptsLeft.current =
@@ -559,19 +563,19 @@ const TakeAssess = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border: 1px solid red;
+    border: 1px solid white;
     border-radius: 10px;
     padding: 15px;
     margin: 40px;
   }
 
   .error-message {
-    color: red;
+    color: white;
     font-family: "Source Sans Pro", sans-serif;
     font-weight: 400;
     font-size: 19px;
     text-align: center;
-    border: 1px solid red;
+    border: 1px solid white;
     border-radius: 10px;
     padding: 15px;
     margin-top: 40px;
@@ -580,7 +584,7 @@ const TakeAssess = styled.div`
   }
 
   .error-message-text {
-    color: red;
+    color: white;
     font-family: "Source Sans Pro", sans-serif;
     font-weight: 400;
     font-size: 19px;
@@ -590,8 +594,8 @@ const TakeAssess = styled.div`
   .error-option-button {
     margin-top: 20px;
     margin-left: 50px;
-    border: 1px solid red;
-    color: red;
+    border: 1px solid white;
+    color: white;
     background-color: #282c34;
     font-family: "Sourse Sans Pro ", sans-serif;
     font-size: 15px;

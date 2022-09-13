@@ -154,6 +154,8 @@ router.post("/getSubmissionsForAssessment", async (req, res) => {
       _id: false,
     }
   );
+
+  console.log("Submission data is" + JSON.stringify(submissions));
   if (submissions.length !== 0) {
     for (let i = 0; i < submissions.length; i++) {
       let user = await UsersModel.findOne(
@@ -164,7 +166,6 @@ router.post("/getSubmissionsForAssessment", async (req, res) => {
       //   console.log("entered");
       //   user.marks_awarded = "hello";
       // }
-      console.log();
       const finalUser = {
         first_name: user.first_name,
         last_name: user.last_name,
@@ -476,7 +477,9 @@ router.post("/autoEvaluateAll", async (req, res) => {
             } else {
               let studentCorrectKeywordsCount = 0;
               for (let k = 0; k < correctAnswers[j].length; k++) {
+                console.log("student essay answer: " + studentEssayAnswer);
                 if (
+                  studentEssayAnswer != null &&
                   studentEssayAnswer
                     .toLowerCase()
                     .includes(correctAnswers[j][k].toLowerCase())

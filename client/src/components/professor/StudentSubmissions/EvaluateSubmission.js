@@ -362,7 +362,7 @@ function EvaluateSubmission() {
                               id={"student_answer_" + ind}
                               className="mcq-student-answer"
                               disabled="true"
-                              value={val}
+                              value={val == "" ? "No answer by student" : val}
                             />
                             <br />
                           </>
@@ -379,7 +379,9 @@ function EvaluateSubmission() {
                           className="essay-student-answer"
                           disabled="true"
                         >
-                          {studentAnswers[index]}
+                          {studentAnswers[index] == null
+                            ? "No answer by student"
+                            : studentAnswers[index]}
                         </div>
                       </>
                     )}
@@ -458,7 +460,11 @@ function EvaluateSubmission() {
                                       <textarea
                                         className="text-area"
                                         id={"student_code_output_" + ind}
-                                        value={studentAnswers[index][2][ind]}
+                                        value={
+                                          studentAnswers[index][2][ind] == ""
+                                            ? "No output"
+                                            : studentAnswers[index][2][ind]
+                                        }
                                         disabled="true"
                                         rows="2"
                                         style={{ marginLeft: "20px" }}

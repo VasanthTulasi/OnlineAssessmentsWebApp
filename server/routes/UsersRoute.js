@@ -41,8 +41,8 @@ router.post("/login", (req, res) => {
   Users.findOne({ email: user.email }).then((userInDB) => {
     if (!userInDB) {
       res.json({ message: "Invalid User Name or Password!" });
-    } else {
-       /*
+    } else if (!userInDB.user_logged_in) {
+      /*
 Title: Hash and Verify a Password with bcrypt
 Author: MARY GATHONI
 Date: 16-May-2022
@@ -57,6 +57,14 @@ Source: https://www.makeuseof.com/nodejs-bcrypt-hash-verify-salt-password/
             role: userInDB.role,
             uni_id: userInDB.uni_id,
           };
+
+          UsersModel.updateOne(
+            { email: user.email },
+            { $set: { user_logged_in: true } },
+            function (err, res) {
+              if (err) throw res.json({ message: err });
+            }
+          );
 
           /*
 Title: Create and Verify JWTs with Node.js
@@ -84,6 +92,11 @@ Details: This piece of code is used in multiple areas.
         } else {
           res.json({ message: "Invalid User Name or Password!" });
         }
+      });
+    } else {
+      res.json({
+        message:
+          "Your session is already active in other browser tabs.\n Please logout from existing sessions to login here.",
       });
     }
   });
@@ -135,8 +148,7 @@ router.post("/resetPassword", (req, res) => {
       newPassword = hash;
     })
     .then(() => {
-      
-          /*
+      /*
 Title: Create and Verify JWTs with Node.js
 Author: Geeks For Geeks
 Date: 16-Feb-2022
@@ -193,10 +205,17 @@ router.post("/changePassword", async (req, res) => {
   }
 });
 
-router.get("/signOut", (req, res) => {
+router.post("/signOut", (req, res) => {
+  // console.log("email is: " + req.body.email);
   res.cookie("token", "");
-  res.json({ message: "success" });
-  // console.log("no error");
+  UsersModel.updateOne(
+    { email: req.body.email },
+    { $set: { user_logged_in: false } },
+    function (err, result) {
+      if (err) throw res.json({ message: err });
+      res.json({ message: "success" });
+    }
+  );
 });
 
 router.post("/usersForModule", async (req, res) => {

@@ -103,6 +103,7 @@ router.post("/activateaccount", async (req, res) => {
       password: user.password,
       role: user.role,
       uni_id: user.uni_id,
+      user_logged_in: false,
     };
 
     console.log(finalUser);

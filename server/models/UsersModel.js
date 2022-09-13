@@ -33,6 +33,10 @@ const schema = new mongoose.Schema(
     assigned_modules:{
       type:Array,
       required: false
+    },
+    user_logged_in: {
+      type: Boolean,
+      required: false
     }
   },
   { collection: "Users", versionKey: false }

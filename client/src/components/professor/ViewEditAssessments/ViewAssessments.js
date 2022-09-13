@@ -29,12 +29,27 @@ function ViewAssessments() {
   });
 
   const deleteAssessment = (event) => {
-    setDeletionIndex(event.currentTarget.id.split("_")[1]);
+    const itemIndex = event.currentTarget.id.split("_")[1];
+    setDeletionIndex(itemIndex);
+    const assessmentStartTime = assessmentsArray[itemIndex].window_start_time;
+    if (new Date() >= new Date(assessmentStartTime)) {
+      event.target.disabled = true;
+      event.target.style.backgroundColor = "gray";
+      return;
+    }
+
     setisModalVisible(true);
   };
 
   const editAssessment = (event) => {
     const itemIndex = event.currentTarget.id.split("_")[1];
+    const assessmentStartTime = assessmentsArray[itemIndex].window_start_time;
+    if (new Date() >= new Date(assessmentStartTime)) {
+      event.target.disabled = true;
+      event.target.style.backgroundColor = "gray";
+      return;
+    }
+
     // console.log(assessmentsArray[itemIndex]);
     navigate("../editAssessments", {
       state: { _id: assessmentsArray[itemIndex]._id },
@@ -382,7 +397,7 @@ const ViewEditMod = styled.div`
   .headers-color {
     color: #61dafb;
   }
-  .error-message-no-border {
+  .error-message {
     color: white;
     font-family: "Source Sans Pro", sans-serif;
     font-size: 17px;
@@ -391,6 +406,7 @@ const ViewEditMod = styled.div`
     border: 1px solid white;
     border-radius: 8px;
     padding: 10px;
+    margin-bottom: 30px;
   }
 `;
 

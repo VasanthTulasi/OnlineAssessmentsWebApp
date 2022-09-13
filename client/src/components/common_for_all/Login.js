@@ -41,8 +41,7 @@ function Login() {
           password: loginPassword,
         })
         .then((res) => {
-          if (res.data.message !== "success")
-            setErrorMessage("Invalid User Name or Password!");
+          if (res.data.message !== "success") setErrorMessage(res.data.message);
           else {
             setIsUserLoggedIn(true);
             setLoggedInUserDetails({

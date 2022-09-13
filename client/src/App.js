@@ -1,6 +1,5 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import styled from "styled-components";
 import StudentBody from "./components/student/Body";
 import AdminBody from "./components/admin/Body";
 import ProfessorBody from "./components/professor/Body";

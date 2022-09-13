@@ -41,7 +41,9 @@ router.post("/login", (req, res) => {
   Users.findOne({ email: user.email }).then((userInDB) => {
     if (!userInDB) {
       res.json({ message: "Invalid User Name or Password!" });
-    } else if (!userInDB.user_logged_in) {
+    }
+    // else if (!userInDB.user_logged_in) {
+    else {
       /*
 Title: Hash and Verify a Password with bcrypt
 Author: MARY GATHONI
@@ -58,13 +60,13 @@ Source: https://www.makeuseof.com/nodejs-bcrypt-hash-verify-salt-password/
             uni_id: userInDB.uni_id,
           };
 
-          UsersModel.updateOne(
-            { email: user.email },
-            { $set: { user_logged_in: true } },
-            function (err, res) {
-              if (err) throw res.json({ message: err });
-            }
-          );
+          // UsersModel.updateOne(
+          //   { email: user.email },
+          //   { $set: { user_logged_in: true } },
+          //   function (err, res) {
+          //     if (err) throw res.json({ message: err });
+          //   }
+          // );
 
           /*
 Title: Create and Verify JWTs with Node.js
@@ -92,11 +94,6 @@ Details: This piece of code is used in multiple areas.
         } else {
           res.json({ message: "Invalid User Name or Password!" });
         }
-      });
-    } else {
-      res.json({
-        message:
-          "Your session is already active in other browser tabs.\n Please logout from existing sessions to login here.",
       });
     }
   });
@@ -208,14 +205,14 @@ router.post("/changePassword", async (req, res) => {
 router.post("/signOut", (req, res) => {
   // console.log("email is: " + req.body.email);
   res.cookie("token", "");
-  UsersModel.updateOne(
-    { email: req.body.email },
-    { $set: { user_logged_in: false } },
-    function (err, result) {
-      if (err) throw res.json({ message: err });
-      res.json({ message: "success" });
-    }
-  );
+  res.json({ message: "success" });
+  // UsersModel.updateOne(
+  //   { email: req.body.email },
+  //   { $set: { user_logged_in: false } },
+  //   function (err, result) {
+  //     if (err) throw res.json({ message: err });
+  //   }
+  // );
 });
 
 router.post("/usersForModule", async (req, res) => {

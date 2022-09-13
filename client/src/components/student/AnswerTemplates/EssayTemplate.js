@@ -9,13 +9,15 @@ function EssayTemplate(props) {
   const [wordsLeft, setWordsLeft] = useState();
 
   useState(() => {
-    console.log(question.essayWordLimit);
     setWordsLeft(question.essayWordLimit);
   }, []);
 
   const saveAnswer = (event) => {
     const answerText = event.target.value;
-    const remWords = question.essayWordLimit - answerText.split(" ").length;
+    let remWords;
+    if (answerText != "")
+      remWords = question.essayWordLimit - answerText.split(" ").length;
+    else remWords = question.essayWordLimit;
 
     if (
       event.code === "Backspace" ||
@@ -23,14 +25,18 @@ function EssayTemplate(props) {
       event.code === "ArrowLeft" ||
       event.code === "ArrowRight"
     ) {
-      if (remWords >= 0) setWordsLeft(remWords);
       return;
     }
 
-    if (remWords < 0) event.preventDefault();
-    else {
-      if (remWords >= 0) setWordsLeft(remWords);
-    }
+    if (remWords <= 0) event.preventDefault();
+  };
+
+  const setWords = (event) => {
+    if (event.target.value !== "")
+      setWordsLeft(
+        question.essayWordLimit - event.target.value.split(" ").length
+      );
+    else setWordsLeft(question.essayWordLimit);
   };
 
   return (
@@ -48,12 +54,13 @@ function EssayTemplate(props) {
         onKeyDown={(event) => saveAnswer(event)}
         rows="10"
         placeholder="Write your answer here... It will be autosaved as you write."
-        onChange={(event) =>
+        onChange={(event) => {
+          setWords(event);
           localStorage.setItem(
             assessment_id + "_" + uniId + "_answer_" + String(questionIndex),
             event.target.value
-          )
-        }
+          );
+        }}
         defaultValue={localStorage.getItem(
           assessment_id + "_" + uniId + "_answer_" + String(questionIndex)
         )}

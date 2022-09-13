@@ -18,9 +18,9 @@ function Instructions(props) {
         <p className="instructions">
           Feel free to contact us in case of any queries using the link below.
         </p>
-        <a className="contact-us-link" href="https://www.google.com">
+        {/* <a className="contact-us-link" href="https://www.google.com">
           Contact Us
-        </a>
+        </a> */}
       </div>
     </InstructionsSection>
   );

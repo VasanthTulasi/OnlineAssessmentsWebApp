@@ -99,9 +99,12 @@ function EvaluateSubmission() {
           const plagPercent = res.data.plagPercent;
           const source =
             res.data.sources.length !== 0 ? res.data.sources[0].link : null;
-          modPlagInfo[i] = "Plagiarism Percentage: " + plagPercent + "%.";
-          if (source !== null)
+          if (source !== null) {
+            modPlagInfo[i] = "Plagiarism Percentage: " + plagPercent + "%.";
             modPlagInfo[i] += "\n\n Plagiarised from:\n" + source;
+          } else {
+            modPlagInfo[i] = "Plagiarism Percentage: 0%";
+          }
           setPlagInfo([...modPlagInfo]);
         });
       }

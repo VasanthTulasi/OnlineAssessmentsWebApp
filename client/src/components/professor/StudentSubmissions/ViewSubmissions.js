@@ -288,19 +288,23 @@ function ViewSubmissions() {
             <button className="new-question-button" onClick={goBack}>
               Go Back
             </button>
-            <button
-              ref={autoEvaluateButton}
-              className="new-question-button"
-              onClick={autoEvaluteAll}
-            >
-              Auto-evalute All
-            </button>
-            <button
-              className="new-question-button"
-              onClick={releaseMarksForAll}
-            >
-              Release Result for All
-            </button>
+            {submissionsLoaded && submissionsArray.length !== 0 && (
+              <>
+                <button
+                  ref={autoEvaluateButton}
+                  className="new-question-button"
+                  onClick={autoEvaluteAll}
+                >
+                  Auto-evalute All
+                </button>
+                <button
+                  className="new-question-button"
+                  onClick={releaseMarksForAll}
+                >
+                  Release Result for All
+                </button>
+              </>
+            )}
           </div>
         </div>
       </ViewSubs>

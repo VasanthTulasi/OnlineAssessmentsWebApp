@@ -336,7 +336,7 @@ router.post("/autoEvaluate", async (req, res) => {
           }
           const finalMarks =
             (correctFIBCount / totalFIBCount) * marksForCorrectAnswers[j];
-          marksToBeAwarded.push(String(finalMarks));
+          marksToBeAwarded.push(String(Math.floor(finalMarks)));
         } else if (marks.questions[j].questionType === "essay") {
           const studentEssayAnswer = submission.answers[j];
           let totalCorrectKeywordsCount = correctAnswers[j].length;
@@ -359,7 +359,7 @@ router.post("/autoEvaluate", async (req, res) => {
             const finalMarks =
               (studentCorrectKeywordsCount / totalCorrectKeywordsCount) *
               marksForCorrectAnswers[j];
-            marksToBeAwarded.push(String(finalMarks));
+            marksToBeAwarded.push(String(Math.floor(finalMarks)));
           }
         } else if (marks.questions[j].questionType === "coding") {
           const studentCodeOutput = submission.answers[j][2];
@@ -380,7 +380,7 @@ router.post("/autoEvaluate", async (req, res) => {
           const finalMarks =
             (correctOutputCount / expectedOutput.length) *
             marksForCorrectAnswers[j];
-          marksToBeAwarded.push(String(finalMarks));
+          marksToBeAwarded.push(String(Math.floor(finalMarks)));
 
           console.log("Final Marks: " + finalMarks);
         }
@@ -464,7 +464,7 @@ router.post("/autoEvaluateAll", async (req, res) => {
             }
             const finalMarks =
               (correctFIBCount / totalFIBCount) * marksForCorrectAnswers[j];
-            marksToBeAwarded.push(String(finalMarks));
+            marksToBeAwarded.push(String(Math.floor(finalMarks)));
           } else if (marks.questions[j].questionType === "essay") {
             const studentEssayAnswer = submission.answers[j];
 
@@ -490,7 +490,7 @@ router.post("/autoEvaluateAll", async (req, res) => {
               const finalMarks =
                 (studentCorrectKeywordsCount / totalCorrectKeywordsCount) *
                 marksForCorrectAnswers[j];
-              marksToBeAwarded.push(String(finalMarks));
+              marksToBeAwarded.push(String(Math.floor(finalMarks)));
             }
           } else if (marks.questions[j].questionType === "coding") {
             const studentCodeOutput = submission.answers[j][2];
@@ -511,7 +511,7 @@ router.post("/autoEvaluateAll", async (req, res) => {
             const finalMarks =
               (correctOutputCount / expectedOutput.length) *
               marksForCorrectAnswers[j];
-            marksToBeAwarded.push(String(finalMarks));
+            marksToBeAwarded.push(String(Math.floor(finalMarks)));
 
             console.log("Final Marks: " + finalMarks);
           }

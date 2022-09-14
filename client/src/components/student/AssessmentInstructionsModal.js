@@ -13,14 +13,14 @@ function AssessmentInstructionsModal(props) {
         <br/>
         <label className="modal-heading">
            (1) The questions will be shown one at a time.<br/>
-           (2) Only after the answer for a question is submitted, the next question will be displayed.<br/>
-           (3) Once the answer for a question is submitted, it is not possible to go back and change it.<br/>
-           (4) Please click on 'Save and Next' button once you have written or chosen your answer for the question.<br/>
-           (5) Please do not refresh the browser window or close it during the assessment.<br/>
-           (6) Close all the other tabs in the browser and do not open any new tags during the assessment.<br/>
-           (7) You can see the timer to keep track of the remaining time during the assessment. <br/>
-           (8) The timer runs on the server and you can login again to continue the assessment even you lose your internet connection.<br/>
-           (9) Click on 'Proceed' button below to being the assessment.<br/>
+           {/* (2) Only after the answer for a question is submitted, the next question will be displayed.<br/> */}
+           (2) Once the answer for a question is submitted, it is not possible to go back and change it.<br/>
+           {/* (4) Please click on 'Save and Next' button once you have written or chosen your answer for the question.<br/> */}
+           (3) Please do not refresh the browser window or close it during the assessment.<br/>
+           (4) Close all the other tabs in the browser and do not open any new tabs during the assessment.<br/>
+           (5) You can see the timer to keep track of the remaining time during the assessment. <br/>
+           (6) The timer runs on the server and you can login again to continue the assessment even you lose your internet connection.<br/>
+           {/* (9) Click on 'Proceed' button below to being the assessment.<br/> */}
         </label>
         <br />
         <br />

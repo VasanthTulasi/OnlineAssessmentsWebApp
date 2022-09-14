@@ -45,9 +45,9 @@ function AddModules() {
       errorMessageString += "Module Year must be a numeric value.\n\n";
     }
 
-    if (moduleSemesterNumber > 2022) {
+    if (moduleStartYear > 2023) {
       // alert("Semester Number must be a numeric value.");
-      errorMessageString += "Module Start must be less than 2023.\n\n";
+      errorMessageString += "Module start year must be less than 2024.\n\n";
     }
 
     if (isNaN(moduleSemesterNumber)) {

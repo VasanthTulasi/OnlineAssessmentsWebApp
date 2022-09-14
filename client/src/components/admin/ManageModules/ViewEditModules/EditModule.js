@@ -57,9 +57,9 @@ Details: This piece of code is used in multiple files.
       errorMessageString += "Module Year must be a numeric value.\n\n";
     }
 
-    if (moduleStartYear > 2022) {
+    if (moduleStartYear > 2023) {
       // alert("Semester Number must be a numeric value.");
-      errorMessageString += "Module start year must be less than 2023.\n\n";
+      errorMessageString += "Module start year must be less than 2024.\n\n";
     }
 
     if (moduleEndYear < moduleStartYear) {

@@ -80,12 +80,19 @@ function EvaluateSubmission() {
   const checkPlagiarism = () => {
     let modPlagInfo = [...plagInfo];
     for (let i = 0; i < questions.length; i++) {
-      modPlagInfo.push("Plagiarism Check In-progress...");
+      if (
+        questions[i].questionType === "essay" &&
+        (studentAnswers[i] == "" || studentAnswers[i] == null)
+      ) {
+        modPlagInfo.push("No Plagiarism Check Performed");
+      } else modPlagInfo.push("Plagiarism Check In-progress...");
     }
     setPlagInfo(modPlagInfo);
 
     for (let i = 0; i < questions.length; i++) {
       if (questions[i].questionType === "essay") {
+        if (studentAnswers[i] == "" || studentAnswers[i] == null) continue;
+
         var formData = new FormData();
         formData.append("key", "b1ca0f2ed1dd83a645b1b3b19ceb755f");
         formData.append("data", String(studentAnswers[i]));
@@ -382,7 +389,8 @@ function EvaluateSubmission() {
                           className="essay-student-answer"
                           disabled="true"
                         >
-                          {studentAnswers[index] == null
+                          {studentAnswers[index] == "" ||
+                          studentAnswers[index] == null
                             ? "No answer by student"
                             : studentAnswers[index]}
                         </div>

@@ -369,20 +369,25 @@ router.post("/autoEvaluate", async (req, res) => {
           }
           // console.log("Student Code Results: " + studentCodeOutput);
           // console.log("Expected Results: " + expectedOutput);
-          let correctOutputCount = 0;
 
-          for (let k = 0; k < studentCodeOutput.length; k++) {
-            studentCodeOutput[k].replace("\n", "");
-            if (studentCodeOutput[k].trim() == expectedOutput[k].trim())
-              correctOutputCount++;
+          if (expectedOutput.length == 0) {
+            if (submission.manually_evaluated === true)
+              marksToBeAwarded.push(submission.marks_awarded[j]);
+            else marksToBeAwarded.push("");
+          } else {
+            let correctOutputCount = 0;
+
+            for (let k = 0; k < studentCodeOutput.length; k++) {
+              studentCodeOutput[k].replace("\n", "");
+              if (studentCodeOutput[k].trim() == expectedOutput[k].trim())
+                correctOutputCount++;
+            }
+
+            const finalMarks =
+              (correctOutputCount / expectedOutput.length) *
+              marksForCorrectAnswers[j];
+            marksToBeAwarded.push(String(Math.floor(finalMarks)));
           }
-
-          const finalMarks =
-            (correctOutputCount / expectedOutput.length) *
-            marksForCorrectAnswers[j];
-          marksToBeAwarded.push(String(Math.floor(finalMarks)));
-
-          console.log("Final Marks: " + finalMarks);
         }
       }
 
@@ -500,20 +505,24 @@ router.post("/autoEvaluateAll", async (req, res) => {
             }
             // console.log("Student Code Results: " + studentCodeOutput);
             // console.log("Expected Results: " + expectedOutput);
-            let correctOutputCount = 0;
+            if (expectedOutput.length == 0) {
+              if (submission.manually_evaluated === true)
+                marksToBeAwarded.push(submission.marks_awarded[j]);
+              else marksToBeAwarded.push("");
+            } else {
+              let correctOutputCount = 0;
 
-            for (let k = 0; k < studentCodeOutput.length; k++) {
-              studentCodeOutput[k].replace("\n", "");
-              if (studentCodeOutput[k].trim() == expectedOutput[k].trim())
-                correctOutputCount++;
+              for (let k = 0; k < studentCodeOutput.length; k++) {
+                studentCodeOutput[k].replace("\n", "");
+                if (studentCodeOutput[k].trim() == expectedOutput[k].trim())
+                  correctOutputCount++;
+              }
+
+              const finalMarks =
+                (correctOutputCount / expectedOutput.length) *
+                marksForCorrectAnswers[j];
+              marksToBeAwarded.push(String(Math.floor(finalMarks)));
             }
-
-            const finalMarks =
-              (correctOutputCount / expectedOutput.length) *
-              marksForCorrectAnswers[j];
-            marksToBeAwarded.push(String(Math.floor(finalMarks)));
-
-            console.log("Final Marks: " + finalMarks);
           }
         }
 

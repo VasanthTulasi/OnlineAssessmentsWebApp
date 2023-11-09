@@ -1,7 +1,7 @@
 "use strict";
 const nodemailer = require("nodemailer");
 
- /*
+/*
 Title: SMTP Transport
 Author: Node Mailer
 Date: NA
@@ -29,7 +29,10 @@ const sendPasswordResetMail = async (recipientID, token) =>
     },
     function (err, inf) {
       if (err) console.log("Error is " + err.message);
-      else console.log("Success " + inf.response);
+      else {
+        console.log("link: http://localhost:3000/resetPassword/" + token);
+        console.log("Success " + inf.response);
+      }
     }
   );
 

@@ -70,6 +70,7 @@ A full-stack web application enabling professors to create, schedule, and manage
 | jsonwebtoken | 8.5.1 | JWT authentication |
 | bcrypt | 5.0.1 | Password hashing |
 | nodemailer | 6.7.7 | Email notifications (Gmail SMTP) |
+| dotenv | 16.0.0 | Load environment variables from .env |
 | nodemon | 2.0.16 | Dev auto-restart |
 
 **External Services**
@@ -142,26 +143,25 @@ npm run build    # Outputs to client/build/
 
 ## Environment Setup
 
-The following values are currently hardcoded and should be moved to environment variables before deploying:
+All secrets are loaded from `server/.env` via `dotenv`. The file is git-ignored and must be created locally before running the server.
 
-| Value | Location |
-|---|---|
-| MongoDB connection string | `server/index.js` |
-| JWT secrets | `server/routes/UsersRoute.js` |
-| Gmail credentials | `server/services/EmailService.js` |
-| JDoodle API credentials | `server/routes/SubmissionsRoute.js` |
+Copy `server/.env.example` and fill in your values:
 
-Create a `server/.env` file and load it with `dotenv`:
-
-```env
-MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/<dbname>
-JWT_LOGIN_SECRET=<your-secret>
-JWT_RESET_SECRET=<your-secret>
-GMAIL_USER=<your-gmail>
-GMAIL_APP_PASSWORD=<your-app-password>
-JDOODLE_CLIENT_ID=<your-id>
-JDOODLE_CLIENT_SECRET=<your-secret>
+```bash
+cp server/.env.example server/.env
 ```
+
+| Variable | Description |
+|---|---|
+| `MONGODB_URI` | MongoDB Atlas connection string |
+| `JWT_LOGIN_SECRET` | Secret used to sign login JWTs |
+| `JWT_RESET_SECRET` | Secret used to sign password-reset JWTs |
+| `GMAIL_USER` | Gmail address used to send emails |
+| `GMAIL_APP_PASSWORD` | Gmail App Password (not your account password) |
+| `JDOODLE_CLIENT_ID` | JDoodle API client ID for code execution |
+| `JDOODLE_CLIENT_SECRET` | JDoodle API client secret |
+
+> If you have previously committed credentials to git history, rotate them (MongoDB password, Gmail App Password, JDoodle secret) even after moving them to `.env`.
 
 ---
 

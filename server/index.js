@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -20,9 +21,7 @@ app.use(cookieParser());
 app.use(cors(corsConfig));
 app.use(express.json());
 
-mongoose.connect(
-  "mongodb+srv://lalithavasanth10:Pmbcem08@onlineexamcluster.x1ohh.mongodb.net/OnlineExamWebAppDB?retryWrites=true&w=majority"
-);
+mongoose.connect(process.env.MONGODB_URI);
 
 app.use("/pendingregistrations", PendingRegistrationsRoute);
 app.use("/users", UsersRoute);

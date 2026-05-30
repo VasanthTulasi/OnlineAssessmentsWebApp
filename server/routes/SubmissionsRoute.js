@@ -44,9 +44,8 @@ const executeCode = async (answer, testCases) => {
       stdin: testCases[i].sample_input,
       language: languages[answer[0]],
       versionIndex: "0",
-      clientId: "f5f596e9d23c787b9310a2b7ca2b3c16",
-      clientSecret:
-        "fa13f1033f262922f661ed2427911926ce21d69cf0b410002bba08b747564ce5",
+      clientId: process.env.JDOODLE_CLIENT_ID,
+      clientSecret: process.env.JDOODLE_CLIENT_SECRET,
     };
 
     let res = await axios.post(

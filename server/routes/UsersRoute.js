@@ -15,7 +15,7 @@ const checkToken = (req, res, next) => {
   const token = req.cookies.token;
   console.log("Token is " + JSON.stringify(token));
   if (token) {
-    jwt.verify(token, "thisistheloginsecretcode", (err, currentUser) => {
+    jwt.verify(token, process.env.JWT_LOGIN_SECRET, (err, currentUser) => {
       if (err) res.json({ message: err });
       else {
         // console.log("Current user is: " + JSON.stringify(currentUser));
@@ -77,7 +77,7 @@ Details: This piece of code is used in multiple areas.
 */
           jwt.sign(
             info,
-            "thisistheloginsecretcode",
+            process.env.JWT_LOGIN_SECRET,
             { expiresIn: "1h" },
             (err, token) => {
               if (err) res.json({ message: err });
@@ -114,7 +114,7 @@ router.post("/forgotPassword", async (req, res) => {
     // const resetToken = await jwt.sign(
     jwt.sign(
       info,
-      "thisisthepasswordresetsecretcode",
+      process.env.JWT_RESET_SECRET,
       { expiresIn: "10m" },
       (err, token) => {
         sendMail
@@ -152,7 +152,7 @@ Date: 16-Feb-2022
 Source: https://www.geeksforgeeks.org/how-to-create-and-verify-jwts-with-node-js/
 Details: This piece of code is used in multiple areas.
 */
-      jwt.verify(resetToken, "thisisthepasswordresetsecretcode", (err) => {
+      jwt.verify(resetToken, process.env.JWT_RESET_SECRET, (err) => {
         if (err) {
           res.json({ message: "link expired" });
           throw err;
